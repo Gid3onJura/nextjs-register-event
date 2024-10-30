@@ -3,12 +3,13 @@
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import * as zod from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { formSchema, TFormSchema } from "./util/types"
+import { error } from "console"
 
 interface Event {
   description: string
@@ -32,33 +33,10 @@ const dojos = [
   },
 ]
 
-const formSchema = zod.object({
-  name: zod.string().min(1, { message: "Bitte gib deinen Namen ein" }),
-  event: zod.string().refine(
-    (value) => {
-      if (value === "") {
-        return false
-      }
-      return true
-    },
-    { message: "Bitte wähle ein Event aus" }
-  ),
-  email: zod.string().email({ message: "Bitte gib eine gültige E-Mail Adresse ein" }).optional().or(zod.literal("")),
-  dojo: zod.string().refine(
-    (value) => {
-      if (value === "") {
-        return false
-      }
-      return true
-    },
-    { message: "Bitte wähle ein Dojo aus" }
-  ),
-  comments: zod.string().optional(),
-})
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null)
-  const form = useForm<zod.infer<typeof formSchema>>({
+  const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -83,8 +61,53 @@ export default function Home() {
     fetchEvents()
   }, [])
 
-  const handleSubmit = (values: zod.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: TFormSchema) => {
     console.log({ values })
+    // await new Promise((resolve) => setTimeout(resolve, 2000))
+    const response = await fetch("/api/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: values.name,
+        event: values.event,
+        email: values.email,
+        dojo: values.dojo,
+        comments: values.comments,
+      }),
+      headers: { "Content-Type": "application/json" },
+    })
+    const responseData = await response.json()
+
+    if (!response.ok) {
+      alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")
+      return
+    }
+
+    if (responseData.errors) {
+      const errors = responseData.errors
+      if (errors.email) {
+        form.setError("email", {
+          type: "server",
+          message: "Bitte gib eine gültige E-Mail Adresse ein",
+        })
+      } else if (errors.name) {
+        form.setError("name", {
+          type: "server",
+          message: "Bitte gib deinen Namen ein",
+        })
+      } else if (errors.event) {
+        form.setError("event", {
+          type: "server",
+          message: "Bitte wähle ein Event aus",
+        })
+      } else if (errors.dojo) {
+        form.setError("dojo", {
+          type: "server",
+          message: "Bitte wähle ein Dojo aus",
+        })
+      } else {
+        alert("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.")
+      }
+    }
   }
 
   return (
@@ -146,7 +169,6 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Event *</FormLabel>
                     <FormControl>
-                      {/* <Select onValueChange={(value) => setSelectedEvent(value)}> */}
                       <Select onValueChange={field.onChange}>
                         <SelectTrigger>
                           <SelectValue placeholder="An welchem Event möchtest du teilnehmen?" />
@@ -213,7 +235,7 @@ export default function Home() {
                 )
               }}
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
               Absenden
             </Button>
           </form>

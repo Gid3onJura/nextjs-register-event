@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { formSchema, TFormSchema } from "./util/types"
 import { error } from "console"
+import { Textarea } from "@/components/ui/textarea"
 
 interface Event {
   description: string
@@ -77,6 +78,8 @@ export default function Home() {
     })
     const responseData = await response.json()
 
+    console.log(responseData)
+
     if (!response.ok) {
       alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")
       return
@@ -106,12 +109,23 @@ export default function Home() {
         })
       } else {
         alert("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.")
+        return
       }
     }
+
+    if (responseData.message) {
+      alert(responseData.message)
+    }
+
+    if (responseData.error) {
+      console.log("error", responseData.error)
+    }
+
+    return
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-16 p-24">
       <h1 className="text-3xl font-bold">Anmeldung zu einem Shorai-Do-Kempo Merseburg Event</h1>
 
       {!Array.isArray(events) && <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>}
@@ -223,8 +237,8 @@ export default function Home() {
                   <FormItem>
                     <FormLabel>Bemerkungen</FormLabel>
                     <FormControl>
-                      <Input
-                        type="text"
+                      <Textarea
+                        rows={5}
                         placeholder="Bemerkungen (optional)"
                         className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
                         {...field}
@@ -241,9 +255,6 @@ export default function Home() {
           </form>
         )}
       </Form>
-      <div className="w-full">
-        {selectedEvent && <p className="mt-2 text-gray-600">Selected Event ID: {selectedEvent}</p>}
-      </div>
     </main>
   )
 }

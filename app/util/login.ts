@@ -1,4 +1,4 @@
-const login = async () => {
+export const login = async () => {
   const API_BASE_URL = process.env.API_BASE_URL || null
   const API_KEY = process.env.API_KEY || null
   const API_USER_NICKNAME = process.env.API_USER_NICKNAME || null
@@ -31,5 +31,3 @@ const login = async () => {
     return Response.json(JSON.stringify(error), { status: 500 })
   }
 }
-
-export { login }

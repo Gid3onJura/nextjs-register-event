@@ -1,4 +1,4 @@
-import { login } from "@/app/util/util"
+import { login } from "@/app/util/login"
 
 export async function GET(request: Request) {
   const API_BASE_URL = process.env.API_BASE_URL || null

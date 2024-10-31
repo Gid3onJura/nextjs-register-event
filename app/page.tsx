@@ -74,8 +74,6 @@ export default function Home() {
 
         const eventsData = await eventsResponse.json()
 
-        console.log(eventsData)
-
         setEvents(eventsData)
       } catch (error) {
         console.log(error)
@@ -86,8 +84,7 @@ export default function Home() {
   }, [])
 
   const handleSubmit = async (values: TFormSchema) => {
-    console.log({ values })
-    // await new Promise((resolve) => setTimeout(resolve, 2000))
+    const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
     const response = await fetch("/api/register", {
       method: "POST",
       body: JSON.stringify({
@@ -97,11 +94,10 @@ export default function Home() {
         dojo: values.dojo,
         comments: values.comments,
       }),
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + accessToken },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + accessToken, "api-key": API_KEY ?? "" },
     })
-    const responseData = await response.json()
 
-    console.log(responseData)
+    const responseData = await response.json()
 
     if (!response.ok) {
       alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")

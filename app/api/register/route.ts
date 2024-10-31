@@ -3,22 +3,51 @@ import { formSchema } from "@/util/types"
 import { NextResponse } from "next/server"
 
 import jwt from "jsonwebtoken"
+import { isTimestampExpired } from "@/util/util"
+
+type TUser = {
+  exp: number
+  iat: number
+  id: number
+  nickname: string
+}
 
 export async function POST(request: Request) {
   const body: unknown = await request.json()
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
   const accessTokenSecret = process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET ?? ""
+  const apiUserNickname = process.env.NEXT_PUBLIC_API_USER_NICKNAME ?? ""
 
   if (!request.headers.get("Authorization")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
   const accessToken = request.headers.get("Authorization")?.split(" ")[1] ?? ""
-  jwt.verify(accessToken, accessTokenSecret, (error, user) => {
-    if (error) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-  })
+
+  if (!accessToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const verification = (await Promise.all([
+    jwt.verify(accessToken, accessTokenSecret, (error, user) => {
+      if (error) {
+        return { error: error }
+      }
+      return { user: user }
+    }),
+  ])) as unknown[]
+
+  const verifiedUser = verification.find((item: any): item is { user: TUser } => "user" in item)
+
+  if (verifiedUser && verifiedUser.user.nickname !== apiUserNickname && isTimestampExpired(verifiedUser.user.exp)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const apiKey = request.headers.get("api-key")
+
+  if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  }
 
   // validate body
   const result = formSchema.safeParse(body)

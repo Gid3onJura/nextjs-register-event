@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
   const verifiedUser = verification.find((item: any): item is { user: TUser } => "user" in item)
 
-  if (verifiedUser && verifiedUser.user.nickname !== apiUserNickname && isTimestampExpired(verifiedUser.user.exp)) {
+  if (!verifiedUser || verifiedUser.user.nickname !== apiUserNickname || isTimestampExpired(verifiedUser.user.exp)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

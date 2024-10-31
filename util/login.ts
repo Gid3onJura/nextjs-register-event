@@ -7,7 +7,7 @@ export const login = async () => {
   const headers = {
     Accept: "application/json",
     "Content-Type": "application/json",
-    "api-key": API_KEY ?? "",
+    "api-key": API_KEY,
   }
 
   const url = "login"

@@ -1,6 +1,6 @@
 export const getEvents = async (accessToken: string | null) => {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || null
-  const API_KEY = process.env.NEXT_PUBLIC_API_KEY || null
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
 
   if (!accessToken) {
     return Response.json({ error: "No access token" }, { status: 500 })
@@ -10,7 +10,7 @@ export const getEvents = async (accessToken: string | null) => {
   const headers = {
     Accept: "application/json",
     "Content-Type": "application/json",
-    "api-key": API_KEY ?? "",
+    "api-key": API_KEY,
     Authorization: "Bearer " + accessToken,
   }
 

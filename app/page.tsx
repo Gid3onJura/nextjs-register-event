@@ -94,10 +94,12 @@ export default function Home() {
         dojo: values.dojo,
         comments: values.comments,
       }),
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + accessToken, "api-key": API_KEY ?? "" },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + accessToken, "api-key": API_KEY },
     })
 
     const responseData = await response.json()
+
+    console.log(responseData)
 
     if (!response.ok) {
       alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")

@@ -37,6 +37,7 @@ const dojos = [
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([])
   const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +51,7 @@ export default function Home() {
 
   // get events from api
   useEffect(() => {
+    setIsLoading(true)
     const fetchEvents = async () => {
       let userDataJson = null
 
@@ -59,13 +61,16 @@ export default function Home() {
 
         userDataJson = await userData.json()
 
-        if (!userDataJson) {
+        if (!userDataJson || !userDataJson.accessToken) {
+          console.log("No access token")
+          setIsLoading(false)
           return
         }
 
         setAccessToken(userDataJson.accessToken)
       } catch (error) {
         console.log(error)
+        setIsLoading(false)
         return
       }
 
@@ -75,8 +80,10 @@ export default function Home() {
         const eventsData = await eventsResponse.json()
 
         setEvents(eventsData)
+        setIsLoading(false)
       } catch (error) {
         console.log(error)
+        setIsLoading(false)
         setEvents([])
       }
     }
@@ -98,8 +105,6 @@ export default function Home() {
     })
 
     const responseData = await response.json()
-
-    console.log(responseData)
 
     if (!response.ok) {
       alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")
@@ -149,134 +154,142 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-16 p-24">
       <h1 className="text-3xl font-bold">Anmeldung zu einem Shorai-Do-Kempo Merseburg Event</h1>
-
-      {!Array.isArray(events) && <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>}
-      <Form {...form}>
-        {Array.isArray(events) && events.length > 0 && (
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-md w-full flex flex-col gap-4">
-            {/* Name */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>Name *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Name"
-                        className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )
-              }}
-            />
-            {/* Email */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>Bestätigungs E-Mail</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="E-Mail"
-                        className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )
-              }}
-            />
-            {/* Event */}
-            <FormField
-              control={form.control}
-              name="event"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>Event *</FormLabel>
-                    <FormControl>
-                      <Select onValueChange={field.onChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="An welchem Event möchtest du teilnehmen?" />
-                        </SelectTrigger>
-                        <SelectContent className="">
-                          {events.map((event) => (
-                            <SelectItem key={event.id} value={event.description}>
-                              {event.description}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )
-              }}
-            />
-            {/* Dojo */}
-            <FormField
-              control={form.control}
-              name="dojo"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>Dojo *</FormLabel>
-                    <FormControl>
-                      <Select onValueChange={field.onChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="In welchem Dojo trainierst du?" />
-                        </SelectTrigger>
-                        <SelectContent className="">
-                          {dojos.map((dojo) => (
-                            <SelectItem key={dojo.id} value={dojo.name}>
-                              {dojo.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )
-              }}
-            />
-            {/* Comments */}
-            <FormField
-              control={form.control}
-              name="comments"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>Bemerkungen</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={5}
-                        placeholder="Bemerkungen (optional)"
-                        className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )
-              }}
-            />
-            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-              Absenden
-            </Button>
-          </form>
-        )}
-      </Form>
+      {isLoading ? (
+        <p className="text-black text-xl">Seite wird geladen...</p>
+      ) : (
+        <>
+          {!Array.isArray(events) ? (
+            <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>
+          ) : (
+            <Form {...form}>
+              {Array.isArray(events) && events.length > 0 && (
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-md w-full flex flex-col gap-4">
+                  {/* Name */}
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Name *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Name"
+                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  {/* Email */}
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Bestätigungs E-Mail</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="E-Mail"
+                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  {/* Event */}
+                  <FormField
+                    control={form.control}
+                    name="event"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Event *</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="An welchem Event möchtest du teilnehmen?" />
+                              </SelectTrigger>
+                              <SelectContent className="">
+                                {events.map((event) => (
+                                  <SelectItem key={event.id} value={event.description}>
+                                    {event.description}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  {/* Dojo */}
+                  <FormField
+                    control={form.control}
+                    name="dojo"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Dojo *</FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="In welchem Dojo trainierst du?" />
+                              </SelectTrigger>
+                              <SelectContent className="">
+                                {dojos.map((dojo) => (
+                                  <SelectItem key={dojo.id} value={dojo.name}>
+                                    {dojo.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  {/* Comments */}
+                  <FormField
+                    control={form.control}
+                    name="comments"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Bemerkungen</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              rows={5}
+                              placeholder="Bemerkungen (optional)"
+                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                    Absenden
+                  </Button>
+                </form>
+              )}
+            </Form>
+          )}
+        </>
+      )}
     </main>
   )
 }

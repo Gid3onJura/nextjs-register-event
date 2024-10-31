@@ -7,10 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { formSchema, TFormSchema } from "./util/types"
+import { formSchema, TFormSchema } from "../util/types"
 import { Textarea } from "@/components/ui/textarea"
-import { login } from "./util/login"
-import { getEvents } from "./util/getEvents"
+import { login } from "@/util/login"
+import { getEvents } from "@/util/getEvents"
 
 interface Event {
   description: string
@@ -70,9 +70,11 @@ export default function Home() {
       }
 
       try {
-        const eventsResponse = await getEvents(accessToken)
+        const eventsResponse = await getEvents(userDataJson.accessToken)
 
         const eventsData = await eventsResponse.json()
+
+        console.log(eventsData)
 
         setEvents(eventsData)
       } catch (error) {
@@ -140,6 +142,7 @@ export default function Home() {
 
     if (responseData.error) {
       console.log("error", responseData.error)
+      alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")
     }
 
     return

@@ -1,6 +1,6 @@
 export const getEvents = async (accessToken: string | null) => {
-  const API_BASE_URL = process.env.API_BASE_URL || null
-  const API_KEY = process.env.API_KEY || null
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || null
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY || null
 
   if (!accessToken) {
     return Response.json({ error: "No access token" }, { status: 500 })

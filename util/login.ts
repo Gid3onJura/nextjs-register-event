@@ -1,8 +1,8 @@
 export const login = async () => {
-  const API_BASE_URL = process.env.API_BASE_URL ?? null
-  const API_KEY = process.env.API_KEY ?? null
-  const API_USER_NICKNAME = process.env.API_USER_NICKNAME ?? null
-  const API_USER_PASSWORD = process.env.API_USER_PASSWORD ?? null
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
+  const API_USER_NICKNAME = process.env.NEXT_PUBLIC_API_USER_NICKNAME ?? ""
+  const API_USER_PASSWORD = process.env.NEXT_PUBLIC_API_USER_PASSWORD ?? ""
   // get events from api
   const headers = {
     Accept: "application/json",

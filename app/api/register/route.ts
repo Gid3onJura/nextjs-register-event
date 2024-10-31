@@ -1,13 +1,13 @@
-import { sendEmail } from "@/app/util/email"
-import { formSchema } from "@/app/util/types"
+import { sendEmail } from "@/util/email"
+import { formSchema } from "@/util/types"
 import { NextResponse } from "next/server"
 
 import jwt from "jsonwebtoken"
 
 export async function POST(request: Request) {
   const body: unknown = await request.json()
-  const emailTo = process.env.REGISTER_EMAIL_TO ?? ""
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET ?? ""
+  const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
+  const accessTokenSecret = process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET ?? ""
 
   if (!request.headers.get("Authorization")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })

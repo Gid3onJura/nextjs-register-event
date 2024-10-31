@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { useForm } from "react-hook-form"
@@ -9,8 +8,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { formSchema, TFormSchema } from "./util/types"
-import { error } from "console"
 import { Textarea } from "@/components/ui/textarea"
+import { login } from "./util/login"
+import { getEvents } from "./util/getEvents"
 
 interface Event {
   description: string
@@ -36,7 +36,7 @@ const dojos = [
 
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([])
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
   const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,12 +51,33 @@ export default function Home() {
   // get events from api
   useEffect(() => {
     const fetchEvents = async () => {
-      const response = await fetch("/api/event", {
-        method: "GET",
-      })
-      const data = await response.json()
-      if (data) {
-        setEvents(data)
+      let userDataJson = null
+
+      try {
+        // login into api
+        const userData = await login()
+
+        userDataJson = await userData.json()
+
+        if (!userDataJson) {
+          return
+        }
+
+        setAccessToken(userDataJson.accessToken)
+      } catch (error) {
+        console.log(error)
+        return
+      }
+
+      try {
+        const eventsResponse = await getEvents(accessToken)
+
+        const eventsData = await eventsResponse.json()
+
+        setEvents(eventsData)
+      } catch (error) {
+        console.log(error)
+        setEvents([])
       }
     }
     fetchEvents()
@@ -74,7 +95,7 @@ export default function Home() {
         dojo: values.dojo,
         comments: values.comments,
       }),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + accessToken },
     })
     const responseData = await response.json()
 

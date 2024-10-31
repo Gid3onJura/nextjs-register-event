@@ -1,21 +1,9 @@
-import { login } from "@/app/util/login"
-
-export async function GET(request: Request) {
+export const getEvents = async (accessToken: string | null) => {
   const API_BASE_URL = process.env.API_BASE_URL || null
   const API_KEY = process.env.API_KEY || null
-  let userDataJson = null
 
-  try {
-    // login into api
-    const userData = await login()
-
-    userDataJson = await userData.json()
-
-    if (!userDataJson) {
-      return Response.json({ message: "Login failed! User data not exists", status: 500 }, { status: 500 })
-    }
-  } catch (error) {
-    return Response.json({ error: JSON.stringify(error), message: "[POST login]: Login failed!" }, { status: 500 })
+  if (!accessToken) {
+    return Response.json({ error: "No access token" }, { status: 500 })
   }
 
   // get events from api
@@ -23,7 +11,7 @@ export async function GET(request: Request) {
     Accept: "application/json",
     "Content-Type": "application/json",
     "api-key": API_KEY ?? "",
-    Authorization: "Bearer " + userDataJson.accessToken,
+    Authorization: "Bearer " + accessToken,
   }
 
   const url = "event"

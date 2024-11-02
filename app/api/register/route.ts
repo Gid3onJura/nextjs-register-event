@@ -2,20 +2,13 @@ import { sendEmail } from "@/util/email"
 import { formSchema } from "@/util/types"
 import { NextResponse } from "next/server"
 
-type TUser = {
-  exp: number
-  iat: number
-  id: number
-  nickname: string
-}
-
 export async function POST(request: Request) {
   const body: unknown = await request.json()
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
 
-  if (!request.headers.get("Authorization")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-  }
+  // if (!request.headers.get("Authorization")) {
+  //   return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  // }
 
   // const accessToken = request.headers.get("Authorization")?.split(" ")[1] ?? ""
 

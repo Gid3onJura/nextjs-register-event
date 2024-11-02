@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { formSchema, TFormSchema } from "../util/types"
 import { Textarea } from "@/components/ui/textarea"
-import { login } from "@/util/login"
 import { getEvents } from "@/util/getEvents"
 
 interface Event {
@@ -30,7 +29,7 @@ const dojos = [
 
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([])
-  const [accessToken, setAccessToken] = useState<string | null>(null)
+  // const [accessToken, setAccessToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
@@ -47,7 +46,7 @@ export default function Home() {
   useEffect(() => {
     setIsLoading(true)
     const fetchEvents = async () => {
-      let userDataJson = null
+      // let userDataJson = null
 
       // try {
       //   // login into api
@@ -95,7 +94,7 @@ export default function Home() {
         dojo: values.dojo,
         comments: values.comments,
       }),
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + accessToken, "api-key": API_KEY },
+      headers: { "Content-Type": "application/json", "api-key": API_KEY },
     })
 
     const responseData = await response.json()

@@ -2,9 +2,6 @@ import { sendEmail } from "@/util/email"
 import { formSchema } from "@/util/types"
 import { NextResponse } from "next/server"
 
-import jwt from "jsonwebtoken"
-import { isTimestampExpired } from "@/util/util"
-
 type TUser = {
   exp: number
   iat: number
@@ -15,33 +12,16 @@ type TUser = {
 export async function POST(request: Request) {
   const body: unknown = await request.json()
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
-  const accessTokenSecret = process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET ?? ""
-  const apiUserNickname = process.env.NEXT_PUBLIC_API_USER_NICKNAME ?? ""
 
   if (!request.headers.get("Authorization")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  const accessToken = request.headers.get("Authorization")?.split(" ")[1] ?? ""
+  // const accessToken = request.headers.get("Authorization")?.split(" ")[1] ?? ""
 
-  if (!accessToken) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  const verification = (await Promise.all([
-    jwt.verify(accessToken, accessTokenSecret, (error, user) => {
-      if (error) {
-        return { error: error }
-      }
-      return { user: user }
-    }),
-  ])) as unknown[]
-
-  const verifiedUser = verification.find((item: any): item is { user: TUser } => "user" in item)
-
-  if (!verifiedUser || verifiedUser.user.nickname !== apiUserNickname || isTimestampExpired(verifiedUser.user.exp)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+  // if (!accessToken) {
+  //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  // }
 
   const apiKey = request.headers.get("api-key")
 
@@ -81,7 +61,7 @@ export async function POST(request: Request) {
   <p>Name: ${name}</p>
   <p>Event: ${event}</p>
   <p>Dojo: ${dojo}</p>
-  <p>Comments: <br>${comments?.replace(/\n/g, "<br>")}</p>`
+  <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
 
   // send email to trainer
   try {
@@ -89,7 +69,7 @@ export async function POST(request: Request) {
       emailTo,
       email || "",
       `Anmeldung ${event}: ${name}`,
-      `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nComments: ${comments}`,
+      `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nKommentare: ${comments}`,
       htmlMail
     )
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })

@@ -14,13 +14,7 @@ import { getEvents } from "@/util/getEvents"
 
 interface Event {
   description: string
-  eventcolor: string
-  eventdate: string
-  eventtype: string
-  id: number
-  override: boolean
-  repeating: boolean
-  repetitiontype: string
+  eventyear: string
 }
 
 const dojos = [
@@ -55,27 +49,27 @@ export default function Home() {
     const fetchEvents = async () => {
       let userDataJson = null
 
+      // try {
+      //   // login into api
+      //   const userData = await login()
+
+      //   userDataJson = await userData.json()
+
+      //   if (!userDataJson || !userDataJson.accessToken) {
+      //     console.log("No access token")
+      //     setIsLoading(false)
+      //     return
+      //   }
+
+      //   setAccessToken(userDataJson.accessToken)
+      // } catch (error) {
+      //   console.log(error)
+      //   setIsLoading(false)
+      //   return
+      // }
+
       try {
-        // login into api
-        const userData = await login()
-
-        userDataJson = await userData.json()
-
-        if (!userDataJson || !userDataJson.accessToken) {
-          console.log("No access token")
-          setIsLoading(false)
-          return
-        }
-
-        setAccessToken(userDataJson.accessToken)
-      } catch (error) {
-        console.log(error)
-        setIsLoading(false)
-        return
-      }
-
-      try {
-        const eventsResponse = await getEvents(userDataJson.accessToken)
+        const eventsResponse = await getEvents()
 
         const eventsData = await eventsResponse.json()
 
@@ -220,9 +214,9 @@ export default function Home() {
                                 <SelectValue placeholder="An welchem Event möchtest du teilnehmen?" />
                               </SelectTrigger>
                               <SelectContent className="">
-                                {events.map((event) => (
-                                  <SelectItem key={event.id} value={event.description}>
-                                    {event.description}
+                                {events.map((event, index) => (
+                                  <SelectItem key={index} value={event.description + " " + event.eventyear}>
+                                    {event.description + " " + event.eventyear}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

@@ -1,20 +1,19 @@
-export const getEvents = async (accessToken: string | null) => {
+export const getEvents = async () => {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
 
-  if (!accessToken) {
-    return Response.json({ error: "No access token" }, { status: 500 })
-  }
+  // if (!accessToken) {
+  //   return Response.json({ error: "No access token" }, { status: 500 })
+  // }
 
   // get events from api
   const headers = {
     Accept: "application/json",
     "Content-Type": "application/json",
     "api-key": API_KEY,
-    Authorization: "Bearer " + accessToken,
   }
 
-  const url = "event"
+  const url = "event/reduced"
 
   try {
     const response = await fetch(API_BASE_URL + "/" + url, {

@@ -94,6 +94,6 @@ export async function POST(request: Request) {
     )
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: "Anmeldung fehlgeschlagen" }, { status: 500 })
+    return NextResponse.json({ error: "Anmeldung fehlgeschlagen:" + JSON.stringify(error) }, { status: 500 })
   }
 }

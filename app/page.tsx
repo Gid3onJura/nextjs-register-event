@@ -265,9 +265,13 @@ export default function Home() {
                         <FormItem>
                           <FormLabel>Event *</FormLabel>
                           <FormControl>
-                            <Select onValueChange={field.onChange}>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                               <SelectTrigger>
-                                <SelectValue placeholder="An welchem Event möchtest du teilnehmen?" />
+                                {field.value ? (
+                                  <SelectValue placeholder="An welchem Event möchtest du teilnehmen?" />
+                                ) : (
+                                  "An welchem Event möchtest du teilnehmen?"
+                                )}
                               </SelectTrigger>
                               <SelectContent className="">
                                 {events.map((event, index) => (
@@ -292,9 +296,13 @@ export default function Home() {
                         <FormItem>
                           <FormLabel>Dojo *</FormLabel>
                           <FormControl>
-                            <Select onValueChange={field.onChange}>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                               <SelectTrigger>
-                                <SelectValue placeholder="In welchem Dojo trainierst du?" />
+                                {field.value ? (
+                                  <SelectValue placeholder="In welchem Dojo trainierst du?" />
+                                ) : (
+                                  "In welchem Dojo trainierst du?"
+                                )}
                               </SelectTrigger>
                               <SelectContent className="">
                                 {dojos.map((dojo) => (

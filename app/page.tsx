@@ -188,6 +188,7 @@ export default function Home() {
         setIsVerified(false)
       }
     } catch (error) {
+      console.log(error)
       setIsVerified(false)
     }
   }

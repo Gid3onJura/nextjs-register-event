@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken"
+import { toast } from "react-toastify"
 
 export const isTimestampExpired = (timestamp: number) => {
   const now = Date.now() / 1000
@@ -28,5 +29,33 @@ export const verifyAccessToken = async (accessToken: string) => {
 
   if (!verifiedUser || verifiedUser.user.nickname !== apiUserNickname || isTimestampExpired(verifiedUser.user.exp)) {
     return [{ error: "Unauthorized" }, { status: 401 }]
+  }
+}
+
+export const notify = (message: string, variant: "success" | "error" | "warn" | "info") => {
+  const options = {
+    autoClose: 5000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+  }
+
+  if (variant === "success") {
+    toast.success(message, options)
+  }
+
+  if (variant === "error") {
+    toast.error(message, options)
+  }
+
+  if (variant === "warn") {
+    toast.warn(message, options)
+  }
+
+  if (variant === "info") {
+    toast.info(message, options)
   }
 }

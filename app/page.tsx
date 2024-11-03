@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { getEvents } from "@/util/getEvents"
 
 import ReCAPTCHA from "react-google-recaptcha"
+import { notify } from "@/util/util"
 
 interface Event {
   description: string
@@ -107,7 +108,7 @@ export default function Home() {
     const responseData = await response.json()
 
     if (!response.ok) {
-      alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")
+      notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "warn")
       return
     }
 
@@ -140,18 +141,18 @@ export default function Home() {
           message: "Bitte gib das Captcha ein",
         })
       } else {
-        alert("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.")
+        notify("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.", "error")
         return
       }
     }
 
     if (responseData.message) {
-      alert(responseData.message)
+      notify(responseData.message, "success")
     }
 
     if (responseData.error) {
       console.log("error", responseData.error)
-      alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")
+      notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }
 
     form.reset({

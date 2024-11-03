@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const apiKey = request.headers.get("api-key")
 
   if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+    return NextResponse.json({ error: "Forbidden" }, { status: 404 })
   }
 
   // validate body

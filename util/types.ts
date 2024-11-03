@@ -22,6 +22,7 @@ export const formSchema = zod.object({
     { message: "Bitte wähle ein Dojo aus" }
   ),
   comments: zod.string().optional(),
+  captchatoken: zod.string({ message: "Bitte gib das Captcha ein" }),
 })
 
 export type TFormSchema = zod.infer<typeof formSchema>

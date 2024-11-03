@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { formSchema, TFormSchema } from "../util/types"
 import { Textarea } from "@/components/ui/textarea"
 import { getEvents } from "@/util/getEvents"
+
+import ReCAPTCHA from "react-google-recaptcha"
 
 interface Event {
   description: string
@@ -41,6 +43,10 @@ export default function Home() {
       comments: "",
     },
   })
+
+  // captcha
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const [isVerified, setIsVerified] = useState(false)
 
   // get events from api
   useEffect(() => {
@@ -93,6 +99,7 @@ export default function Home() {
         email: values.email,
         dojo: values.dojo,
         comments: values.comments,
+        captchatoken: values.captchatoken,
       }),
       headers: { "Content-Type": "application/json", "api-key": API_KEY },
     })
@@ -106,6 +113,7 @@ export default function Home() {
 
     if (responseData.errors) {
       const errors = responseData.errors
+      console.log(errors)
       if (errors.email) {
         form.setError("email", {
           type: "server",
@@ -126,6 +134,11 @@ export default function Home() {
           type: "server",
           message: "Bitte wähle ein Dojo aus",
         })
+      } else if (errors.captchatoken) {
+        form.setError("captchatoken", {
+          type: "server",
+          message: "Bitte gib das Captcha ein",
+        })
       } else {
         alert("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.")
         return
@@ -141,7 +154,50 @@ export default function Home() {
       alert("Anmeldung fehlgeschlagen! Bitte versuche es erneut.")
     }
 
+    form.reset({
+      name: "",
+      event: "",
+      email: "",
+      dojo: "",
+      comments: "",
+    })
+    recaptchaRef.current?.reset()
+    setIsVerified(false)
     return
+  }
+
+  const handleCaptchaSubmission = async (captchatoken: string | null) => {
+    try {
+      if (captchatoken) {
+        const response = await fetch("/api/captcha", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ captchatoken }),
+        })
+
+        const data = await response.json()
+
+        if (data && data.message === "Success") {
+          setIsVerified(true)
+          return
+        }
+
+        setIsVerified(false)
+      }
+    } catch (error) {
+      setIsVerified(false)
+    }
+  }
+
+  const handleChange = (token: string | null) => {
+    handleCaptchaSubmission(token)
+  }
+
+  const handleExpired = () => {
+    setIsVerified(false)
   }
 
   return (
@@ -274,7 +330,32 @@ export default function Home() {
                       )
                     }}
                   />
-                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {/* Captcha */}
+                  <FormField
+                    control={form.control}
+                    name="captchatoken"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Abfrage *</FormLabel>
+                          <FormControl>
+                            <ReCAPTCHA
+                              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                              ref={recaptchaRef}
+                              onChange={(token) => {
+                                handleChange(token)
+                                field.onChange(token)
+                              }}
+                              onExpired={handleExpired}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+
+                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || !isVerified}>
                     Absenden
                   </Button>
                 </form>

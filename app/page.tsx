@@ -49,6 +49,10 @@ export default function Home() {
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const [isVerified, setIsVerified] = useState(false)
 
+  // placeholder text
+  const placeholderEvent = "Wähle ein Event"
+  const placeholderDojo = "Wähle ein Dojo"
+
   // get events from api
   useEffect(() => {
     setIsLoading(true)
@@ -214,7 +218,10 @@ export default function Home() {
           ) : (
             <Form {...form}>
               {Array.isArray(events) && events.length > 0 && (
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-md w-full flex flex-col gap-4">
+                <form
+                  onSubmit={form.handleSubmit(handleSubmit)}
+                  className="max-w-md w-full flex flex-col gap-4 justify-center"
+                >
                   {/* Name */}
                   <FormField
                     control={form.control}
@@ -268,13 +275,9 @@ export default function Home() {
                           <FormControl>
                             <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                               <SelectTrigger>
-                                {field.value ? (
-                                  <SelectValue placeholder="An welchem Event möchtest du teilnehmen?" />
-                                ) : (
-                                  "An welchem Event möchtest du teilnehmen?"
-                                )}
+                                {field.value ? <SelectValue placeholder={placeholderEvent} /> : placeholderEvent}
                               </SelectTrigger>
-                              <SelectContent className="">
+                              <SelectContent>
                                 {events.map((event, index) => (
                                   <SelectItem key={index} value={event.description + " " + event.eventyear}>
                                     {event.description + " " + event.eventyear}
@@ -299,11 +302,7 @@ export default function Home() {
                           <FormControl>
                             <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                               <SelectTrigger>
-                                {field.value ? (
-                                  <SelectValue placeholder="In welchem Dojo trainierst du?" />
-                                ) : (
-                                  "In welchem Dojo trainierst du?"
-                                )}
+                                {field.value ? <SelectValue placeholder={placeholderDojo} /> : placeholderDojo}
                               </SelectTrigger>
                               <SelectContent className="">
                                 {dojos.map((dojo) => (
@@ -347,19 +346,21 @@ export default function Home() {
                     render={({ field }) => {
                       return (
                         <FormItem>
-                          <FormLabel>Abfrage *</FormLabel>
-                          <FormControl>
-                            <ReCAPTCHA
-                              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
-                              ref={recaptchaRef}
-                              onChange={(token) => {
-                                handleChange(token)
-                                field.onChange(token)
-                              }}
-                              onExpired={handleExpired}
-                            />
-                          </FormControl>
-                          <FormMessage />
+                          <div className="flex flex-col gap-4 items-center justify-center">
+                            <FormLabel>Abfrage *</FormLabel>
+                            <FormControl>
+                              <ReCAPTCHA
+                                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                                ref={recaptchaRef}
+                                onChange={(token) => {
+                                  handleChange(token)
+                                  field.onChange(token)
+                                }}
+                                onExpired={handleExpired}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )
                     }}

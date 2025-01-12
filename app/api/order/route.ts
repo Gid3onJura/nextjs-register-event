@@ -1,5 +1,5 @@
 import { sendEmail } from "@/util/email"
-import { formSchema } from "@/util/types"
+import { formSchemaOrders } from "@/util/types"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   }
 
   // validate body
-  const result = formSchema.safeParse(body)
+  const result = formSchemaOrders.safeParse(body)
   let zodErrors = {}
   if (!result.success) {
     result.error.issues.forEach((issue) => {
@@ -33,17 +33,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
 
+  return NextResponse.json({ result }, { status: 200 })
+
   const name = result.data?.name
-  const event = result.data?.event
+  const products = result.data?.products
   const email = result.data?.email
-  const dojo = result.data?.dojo
   const comments = result.data?.comments
 
   const htmlMail = `
-  <h1>Anmeldung zum Event: ${event}</h1>\n
-  <p>Name: ${name}</p>
-  <p>Event: ${event}</p>
-  <p>Dojo: ${dojo}</p>
+  <h1>Hi ${name}</h1>
+  <p>Folgende Artikel wurden bestellt: </p>\n
+  ${products?.map((product: any) => {
+    return `<p>${product.name}</p>`
+  })}
   <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
 
   // send email to trainer
@@ -51,8 +53,10 @@ export async function POST(request: Request) {
     await sendEmail(
       emailTo,
       email || "",
-      `Anmeldung ${event}: ${name}`,
-      `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nKommentare: ${comments}`,
+      `Bestellung von ${name}`,
+      `Name: ${name}\nArtikel: ${products?.map((product: any) => {
+        return `${product.name}\n`
+      })}\nKommentare: ${comments}`,
       htmlMail
     )
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -9,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { formSchemaOrders, TFormSchemaOrders } from "@/util/types"
 import { Textarea } from "@/components/ui/textarea"
-import { getEvents } from "@/util/getEvents"
 
 import ReCAPTCHA from "react-google-recaptcha"
 import { notify } from "@/util/util"
@@ -19,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 interface Products {
   name: string
   description: string
+  cost: number
 }
 
 export default function Order() {
@@ -70,6 +69,9 @@ export default function Order() {
   }, [])
 
   const handleSubmit = async (values: TFormSchemaOrders) => {
+    console.log("====================================")
+    console.log(values)
+    console.log("====================================")
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
     const response = await fetch("/api/order", {
       method: "POST",
@@ -269,8 +271,19 @@ export default function Order() {
                                       }}
                                     />
                                   </FormControl>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      placeholder="Anzahl"
+                                      className="w-16 rounded-md border border-input
+                                      bg-transparent px-3 py-2 text-sm"
+                                      {...field}
+                                    />
+                                  </FormControl>
                                   <div className="flex flex-col justify-start">
-                                    <FormLabel className="text-sm font-normal">{product.name}</FormLabel>
+                                    <FormLabel className="text-sm font-normal">
+                                      {product.name} je {product.cost} €/Stk.
+                                    </FormLabel>
                                     <FormDescription>{product.description}</FormDescription>
                                   </div>
                                 </FormItem>

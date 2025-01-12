@@ -1,12 +1,52 @@
 [
   {
-    "name": "T-Shirt (Baumwolle)",
-    "description": "Verfügbar in den Größen S, M, L, XL, XXL",
+    "name": "T-Shirt Größe S (Baumwolle)",
+    "description": "Größe S",
     "cost": 20
   },
   {
-    "name": "T-Shirt (Funktionsmaterial)",
-    "description": "Verfügbar in den Größen S, M, L, XL, XXL. Aus Polen",
+    "name": "T-Shirt Größe M (Baumwolle)",
+    "description": "Größe M",
+    "cost": 20
+  },
+  {
+    "name": "T-Shirt Größe L (Baumwolle)",
+    "description": "Größe L",
+    "cost": 20
+  },
+  {
+    "name": "T-Shirt Größe XL (Baumwolle)",
+    "description": "Größe XL",
+    "cost": 20
+  },
+  {
+    "name": "T-Shirt Größe XXL (Baumwolle)",
+    "description": "",
+    "cost": 20
+  },
+  {
+    "name": "T-Shirt Größe S (Funktionsmaterial)",
+    "description": "aus Polen",
+    "cost": 25
+  },
+  {
+    "name": "T-Shirt Größe M (Funktionsmaterial)",
+    "description": "aus Polen",
+    "cost": 25
+  },
+  {
+    "name": "T-Shirt Größe L (Funktionsmaterial)",
+    "description": "aus Polen",
+    "cost": 25
+  },
+  {
+    "name": "T-Shirt Größe XL (Funktionsmaterial)",
+    "description": "aus Polen",
+    "cost": 25
+  },
+  {
+    "name": "T-Shirt Größe XXL (Funktionsmaterial)",
+    "description": "aus Polen",
     "cost": 25
   },
   {

@@ -1,0 +1,17 @@
+[
+  {
+    "name": "T-Shirt (Baumwolle)",
+    "description": "Verfügbar in den Größen S, M, L, XL, XXL",
+    "cost": 20
+  },
+  {
+    "name": "T-Shirt (Funktionsmaterial)",
+    "description": "Verfügbar in den Größen S, M, L, XL, XXL. Aus Polen",
+    "cost": 25
+  },
+  {
+    "name": "Aufnäher",
+    "description": "Aufnäher mit Kamiza, Aufnäher mit Ying-Yang-Zeichen",
+    "cost": 5
+  }
+]

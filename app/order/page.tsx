@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -29,7 +29,12 @@ export default function Order() {
     resolver: zodResolver(formSchemaOrders),
     defaultValues: {
       name: "",
-      products: [],
+      products: products.map((product) => ({
+        name: product.name,
+        description: product.description,
+        cost: product.cost,
+        quantity: 0, // Important: Initialize quantity
+      })),
       email: "",
       comments: "",
     },
@@ -245,53 +250,52 @@ export default function Order() {
                   />
                   {/* Products */}
                   <FormField
-                    control={form.control}
+                    // control={form.control}
                     name="products"
                     render={() => (
                       <FormItem>
                         <div className="mb-4">
                           <FormLabel>Artikel</FormLabel>
-                          {/* <FormDescription>Welche(n) Artikel willst du bestellen?</FormDescription> */}
                         </div>
-                        {products.map((product, index) => (
-                          <FormField
-                            key={index}
-                            control={form.control}
-                            name="products"
-                            render={({ field }) => {
-                              return (
-                                <FormItem key={index} className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(product.name)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, product.name])
-                                          : field.onChange(field.value?.filter((value) => value !== product.name))
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormControl>
-                                    <Input
-                                      type="number"
-                                      placeholder="Anzahl"
-                                      className="w-16 rounded-md border border-input
-                                      bg-transparent px-3 py-2 text-sm"
-                                      {...field}
-                                    />
-                                  </FormControl>
-                                  <div className="flex flex-col justify-start">
-                                    <FormLabel className="text-sm font-normal">
-                                      {product.name} je {product.cost} €/Stk.
-                                    </FormLabel>
-                                    <FormDescription>{product.description}</FormDescription>
-                                  </div>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
-                        <FormMessage />
+                        <div className="flex flex-col gap-4 w-full">
+                          {products.map((product, index) => {
+                            return (
+                              <div key={product.name} className="flex flex-col gap-2">
+                                <Controller
+                                  control={form.control}
+                                  name={`products.${index}.quantity`}
+                                  render={({ field }) => (
+                                    <div className="flex flex-row items-center justify-between gap-4">
+                                      <FormControl>
+                                        <Input
+                                          type="number"
+                                          min={0}
+                                          placeholder="Anzahl"
+                                          className="w-[6em] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                          {...field}
+                                          onChange={(e) => {
+                                            const value = parseInt(e.target.value, 10) || 0
+                                            field.onChange(value) // Use field.onChange to update form state
+                                          }}
+                                          value={field.value ?? ""} // Ensure a defined value to avoid uncontrolled behavior
+                                        />
+                                      </FormControl>
+                                      <div className="flex flex-col gap-2 w-full">
+                                        <FormLabel>{products[index].name}</FormLabel>
+                                        <div className="flex flex-wrap text-sm text-gray-600]">
+                                          {product.description}
+                                        </div>
+                                      </div>
+                                      <div>{product.cost} €/Stk.</div>
+                                    </div>
+                                  )}
+                                />
+                                <FormMessage />
+                                <hr className="w-full border-t border-gray-300" />
+                              </div>
+                            )
+                          })}
+                        </div>
                       </FormItem>
                     )}
                   />

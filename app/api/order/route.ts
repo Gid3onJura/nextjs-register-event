@@ -21,6 +21,8 @@ export async function POST(request: Request) {
     })
   }
 
+  return NextResponse.json({ result }, { status: 200 })
+
   if (Object.keys(zodErrors).length > 0) {
     return NextResponse.json({ errors: zodErrors })
   }
@@ -32,8 +34,6 @@ export async function POST(request: Request) {
   if (!emailTo) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
-
-  return NextResponse.json({ result }, { status: 200 })
 
   const name = result.data?.name
   const products = result.data?.products

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { useForm, useFieldArray, Controller } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -10,9 +10,8 @@ import { formSchemaOrders, TFormSchemaOrders } from "@/util/types"
 import { Textarea } from "@/components/ui/textarea"
 
 import ReCAPTCHA from "react-google-recaptcha"
-import { notify } from "@/util/util"
+import { getProducts, notify, setOrder } from "@/util/util"
 import Link from "next/link"
-import { Checkbox } from "@/components/ui/checkbox"
 
 interface Products {
   name: string
@@ -52,15 +51,7 @@ export default function Order() {
     setIsLoading(true)
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/products", {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        })
-
-        const data = await response.json()
+        const data = await getProducts()
 
         setProducts(data)
         setIsLoading(false)
@@ -77,62 +68,56 @@ export default function Order() {
     console.log("====================================")
     console.log(values)
     console.log("====================================")
-    const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
-    const response = await fetch("/api/order", {
-      method: "POST",
-      body: JSON.stringify({
-        name: values.name,
-        products: values.products,
-        email: values.email,
-        comments: values.comments,
-        captchatoken: values.captchatoken,
-      }),
-      headers: { "Content-Type": "application/json", "api-key": API_KEY },
-    })
 
-    const responseData = await response.json()
+    const response = await setOrder(values)
 
     if (!response.ok) {
       notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "warn")
       return
     }
 
-    if (responseData.errors) {
-      const errors = responseData.errors
-      console.log(errors)
-      if (errors.email) {
-        form.setError("email", {
-          type: "server",
-          message: "Bitte gib eine gültige E-Mail Adresse ein",
-        })
-      } else if (errors.name) {
-        form.setError("name", {
-          type: "server",
-          message: "Bitte gib deinen Namen ein",
-        })
-      } else if (errors.products) {
-        form.setError("products", {
-          type: "server",
-          message: "Bitte wähle einen Artikel aus",
-        })
-      } else if (errors.captchatoken) {
-        form.setError("captchatoken", {
-          type: "server",
-          message: "Bitte gib das Captcha ein",
-        })
-      } else {
-        notify("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.", "error")
-        return
+    if (response.headers.get("Content-Type")?.includes("application/json")) {
+      const responseData = await response.json()
+      if (responseData.errors) {
+        const errors = responseData.errors
+        console.log(errors)
+        if (errors.email) {
+          form.setError("email", {
+            type: "server",
+            message: "Bitte gib eine gültige E-Mail Adresse ein",
+          })
+        } else if (errors.name) {
+          form.setError("name", {
+            type: "server",
+            message: "Bitte gib deinen Namen ein",
+          })
+        } else if (errors.products) {
+          form.setError("products", {
+            type: "server",
+            message: "Bitte wähle einen Artikel aus",
+          })
+        } else if (errors.captchatoken) {
+          form.setError("captchatoken", {
+            type: "server",
+            message: "Bitte gib das Captcha ein",
+          })
+        } else {
+          notify("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.", "error")
+          return
+        }
       }
-    }
 
-    if (responseData.message) {
-      notify(responseData.message, "success")
-    }
+      if (responseData.message) {
+        notify(responseData.message, "success")
+      }
 
-    if (responseData.error) {
-      console.log("error", responseData.error)
-      notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
+      if (responseData.error) {
+        console.log("error", responseData.error)
+        notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "error")
+      }
+    } else {
+      console.log("Received non-JSON response")
+      notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }
 
     form.reset({

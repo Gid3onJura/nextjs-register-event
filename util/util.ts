@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
 import { toast } from "react-toastify"
+import { TFormSchemaOrders } from "./types"
 
 export const isTimestampExpired = (timestamp: number) => {
   const now = Date.now() / 1000
@@ -11,6 +12,39 @@ type TUser = {
   iat: number
   id: number
   nickname: string
+}
+
+export const getProducts = async () => {
+  const response = await fetch("/api/products", {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+
+  const data = await response.json()
+
+  return data
+}
+
+export const setOrder = async (values: TFormSchemaOrders) => {
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
+  const response = await fetch("/api/order", {
+    method: "POST",
+    body: JSON.stringify({
+      name: values.name,
+      products: values.products,
+      email: values.email,
+      comments: values.comments,
+      captchatoken: values.captchatoken,
+    }),
+    headers: { "Content-Type": "application/json", "api-key": API_KEY },
+  })
+
+  // const responseData = await response.json()
+
+  return response
 }
 
 export const verifyAccessToken = async (accessToken: string) => {

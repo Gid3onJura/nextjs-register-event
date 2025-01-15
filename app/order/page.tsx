@@ -260,7 +260,7 @@ export default function Order() {
                         <div className="flex flex-col gap-4 w-full">
                           {products.map((product, index) => {
                             return (
-                              <div key={product.name} className="flex flex-col gap-2">
+                              <div key={index} className="flex flex-col gap-2">
                                 <Controller
                                   control={form.control}
                                   name={`products.${index}.quantity`}

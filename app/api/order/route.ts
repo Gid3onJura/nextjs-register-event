@@ -69,15 +69,19 @@ export async function POST(request: Request) {
   const name = result.data?.name
   const orderedProducts = result.data?.products
   const email = result.data?.email
-  const comments = result.data?.comments
+  const comments = result.data?.comments ?? ""
   let orderBill: any[] = []
-  let productList: any[] = []
+  let productList = null
+  let sum = 0
 
   // get products from database
   try {
     productList = await getProducts()
   } catch (error) {
-    return NextResponse.json({ error: "Produktliste konnte nicht geladen werden" }, { status: 500 })
+    return NextResponse.json(
+      { error: JSON.stringify(error), message: "Produktliste konnte nicht geladen werden" },
+      { status: 500 }
+    )
   }
 
   // compare ordered products with products from database
@@ -85,17 +89,48 @@ export async function POST(request: Request) {
     productList.forEach((item: any, listIndex: number) => {
       if (orderIndex === listIndex && product.quantity) {
         orderBill.push({ ...item, quantity: product.quantity })
+        console.log(item.price, product.quantity)
+        sum += item.cost * product.quantity
       }
     })
   })
 
+  const orderList = orderBill.map((product: any) => {
+    return (
+      "<tr>" +
+      "<td>" +
+      product.name +
+      "</td>" +
+      "<td>" +
+      product.cost +
+      " €</td>" +
+      "<td>" +
+      product.quantity +
+      "</td>" +
+      "<td>" +
+      product.cost * product.quantity +
+      "€</td>" +
+      "</tr>"
+    )
+  })
+
   const htmlMail = `
-  <h1>Hi ${name}</h1>
+  <h1>Bestellung von ${name}</h1>
   <p>Folgende Artikel wurden bestellt: </p>\n
-  ${orderBill?.map((product: any) => {
-    return `<p>${product.name}</p>`
-  })}
+  <table>
+    <tr>
+      <th style='margin-right: 10px;'>Artikel</th>
+      <th style='margin-right: 10px;'>Preis/Stk.</th>
+      <th style='margin-right: 10px;'>Anzahl</th>
+      <th style='margin-right: 10px;'>Summe</th>
+    </tr>
+  ${orderList.join("")} 
+  </table>
+  <hr/>
+  <p>Endsumme: ${sum} €</p>
   <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
+
+  console.log(htmlMail)
 
   // send email to trainer
   try {

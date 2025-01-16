@@ -53,5 +53,15 @@
     "name": "Aufnäher",
     "description": "Aufnäher mit Kamiza, Aufnäher mit Ying-Yang-Zeichen",
     "cost": 5
+  },
+  {
+    "name": "Rucksack 20l",
+    "description": "Rucksack mit Kamiza-Logo",
+    "cost": 30
+  },
+  {
+    "name": "Rucksack 30l",
+    "description": "Rucksack mit Kamiza-Logo",
+    "cost": 35
   }
 ]

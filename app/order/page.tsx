@@ -65,10 +65,6 @@ export default function Order() {
   }, [])
 
   const handleSubmit = async (values: TFormSchemaOrders) => {
-    console.log("====================================")
-    console.log(values)
-    console.log("====================================")
-
     const response = await setOrder(values)
 
     if (!response.ok) {
@@ -271,7 +267,7 @@ export default function Order() {
                                           {product.description}
                                         </div>
                                       </div>
-                                      <div>{product.cost} €/Stk.</div>
+                                      <div className="flex flex-row w-28">{product.cost} €/Stk.</div>
                                     </div>
                                   )}
                                 />

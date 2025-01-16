@@ -15,10 +15,9 @@ type TUser = {
 }
 
 export const getProducts = async () => {
-  const response = await fetch("/api/products", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`, {
     method: "GET",
     headers: {
-      Accept: "application/json",
       "Content-Type": "application/json",
     },
   })
@@ -30,7 +29,7 @@ export const getProducts = async () => {
 
 export const setOrder = async (values: TFormSchemaOrders) => {
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
-  const response = await fetch("/api/order", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/order`, {
     method: "POST",
     body: JSON.stringify({
       name: values.name,

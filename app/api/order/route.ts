@@ -70,7 +70,7 @@ export async function POST(request: Request) {
   const orderedProducts = result.data?.products
   const email = result.data?.email
   const comments = result.data?.comments ?? ""
-  let orderBill: any[] = []
+  const orderBill: any[] = []
   let productList = null
   let sum = 0
 

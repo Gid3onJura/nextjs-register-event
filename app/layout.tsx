@@ -16,8 +16,8 @@ const geistMono = localFont({
 })
 
 export const metadata: Metadata = {
-  title: "Anmeldung zum Event",
-  description: "Anmeldung zu einem Shorai-Do-Kempo Merseburg Event",
+  title: "SDKM - Bestellen oder Anmelden",
+  description: "Anmeldung zu einem Shorai-Do-Kempo Merseburg Event oder Trainings-Equipment bestellen",
 }
 
 export default function RootLayout({

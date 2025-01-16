@@ -14,6 +14,7 @@ import { getEvents } from "@/util/getEvents"
 import ReCAPTCHA from "react-google-recaptcha"
 import { notify } from "@/util/util"
 import Link from "next/link"
+import CookieBanner from "@/components/CookieBanner"
 
 interface Event {
   description: string
@@ -58,27 +59,6 @@ export default function Home() {
   useEffect(() => {
     setIsLoading(true)
     const fetchEvents = async () => {
-      // let userDataJson = null
-
-      // try {
-      //   // login into api
-      //   const userData = await login()
-
-      //   userDataJson = await userData.json()
-
-      //   if (!userDataJson || !userDataJson.accessToken) {
-      //     console.log("No access token")
-      //     setIsLoading(false)
-      //     return
-      //   }
-
-      //   setAccessToken(userDataJson.accessToken)
-      // } catch (error) {
-      //   console.log(error)
-      //   setIsLoading(false)
-      //   return
-      // }
-
       try {
         const eventsResponse = await getEvents()
 
@@ -110,6 +90,7 @@ export default function Home() {
           </Link>
         </Button>
       </div>
+      <CookieBanner />
     </main>
   )
 }

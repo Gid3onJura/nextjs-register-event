@@ -18,10 +18,20 @@ const CookieBanner = () => {
   return showBanner ? (
     <div className="fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 shadow-md">
       <div className="flex items-center justify-between">
-        <p className="text-sm">
-          Diese Website verwendet Cookies, um die Benutzererfahrung zu verbessern. Durch die weitere Nutzung der Website
-          stimmen Sie der Verwendung von Cookies zu.
-        </p>
+        <div className="text-sm">
+          <div>
+            Im Sinne des Datenschutzes verweisen wir Sie auf unsere Website:{" "}
+            <a
+              className="text-blue-400 hover:text-blue-600"
+              target="_blank"
+              href="https://shorai-do-kempo.org/meta/datenschutz.html"
+            >
+              Datenschutz
+            </a>
+          </div>
+          Diese Website verwendet Cookies, um die Benutzererfahrung zu verbessern. Indem Sie die Website weiterhin
+          nutzen, stimmen Sie der Verwendung von Cookies und unseren Datenschutzbestimmungen zu.
+        </div>
         <button
           onClick={handleAccept}
           className="ml-4 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded"

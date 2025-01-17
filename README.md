@@ -20,17 +20,23 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Deploy on Plesk Server
 
-To learn more about Next.js, take a look at the following resources:
+- [complete Guide](https://stackoverflow.com/questions/78704668/deploy-next-js-14-on-plesk-server)
+- Open and Edit the File in `/node_modules/.bin/next` via the File Manager
+- edit line: `program.command("dev", {
+    isDefault: true
+}).description("Starts Next.js in development mode with hot-code reloading, error reporting, and more.").argument("[directory]",`
+- to: Set `isDefault` to `false`
+- there should be the following code in this file: `` program.command("start").description("Starts Next.js in production mode. The application should be compiled with `next build` first.").argument("[directory]", `A directory on which to start the application. ${(0, _picocolors.italic)("If no directory is provided, the current directory will be used.")}`).addOption(new _commander.Option("-p, --port <port>", "Specify a port number on which to start the application.").argParser(_utils.myParseInt).default(3000).env("PORT")).option("-H, --hostname <hostname>", "Specify a hostname on which to start the application (default: 0.0.0.0).").addOption(new _commander.Option("--keepAliveTimeout <keepAliveTimeout>", "Specify the maximum amount of milliseconds to wait before closing inactive connections.").argParser(_utils.myParseInt)).action((directory, options)=>import("../cli/next-start.js").then((mod)=>mod.nextStart(options, directory))).usage("[directory] [options]"); ``
+- edit line: `` program.command("start", {
+    isDefault: true
+}).description("Starts Next.js in production mode. The application should be compiled with `next build`  `` to `isDefault: false`
+- run `npm install` and `npm build`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Important - Update Project
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- first pull your project from your repo
+- restart Node.js
+- run `npm install`
+- run `npm build`

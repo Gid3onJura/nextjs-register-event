@@ -38,7 +38,7 @@ export const formSchemaOrders = zod.object({
         .number()
         .optional()
         .refine((value) => value === undefined || value > 0, {
-          message: "Bitte gib Zahl größer 0 ein",
+          message: "Bitte gib eine Menge größer 0 ein",
         }),
     })
   ),

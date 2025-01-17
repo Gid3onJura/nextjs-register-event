@@ -98,7 +98,7 @@ export default function Order() {
             message: "Bitte gib das Captcha ein",
           })
         } else {
-          notify("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.", "error")
+          notify("Bestellung fehlgeschlagen! Bitte prüfe deine Eingaben.", "error")
           return
         }
       }
@@ -181,7 +181,7 @@ export default function Order() {
       ) : (
         <>
           {!Array.isArray(products) ? (
-            <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>
+            <p className="text-red-500 text-xl">Das Bestellen ist zur Zeit nicht möglich!</p>
           ) : (
             <Form {...form}>
               {Array.isArray(products) && products.length > 0 && (

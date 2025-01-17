@@ -135,8 +135,8 @@ export async function POST(request: Request) {
   // send email to trainer
   try {
     await sendEmail(emailTo, email || "", `Bestellung von ${name}`, "", htmlMail)
-    return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })
+    return NextResponse.json({ message: "Bestellung gesendet" }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: "Anmeldung fehlgeschlagen:" + JSON.stringify(error) }, { status: 500 })
+    return NextResponse.json({ error: "Bestellung fehlgeschlagen:" + JSON.stringify(error) }, { status: 500 })
   }
 }

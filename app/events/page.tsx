@@ -197,7 +197,9 @@ export default function Event() {
         </Button>
       </div>
 
-      <h1 className="text-3xl font-bold">Anmeldung zu einem Shorai-Do-Kempo Merseburg Event</h1>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center sm:text-left">
+        Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
+      </h1>
       {isLoading ? (
         <p className="text-black text-xl">Seite wird geladen...</p>
       ) : (

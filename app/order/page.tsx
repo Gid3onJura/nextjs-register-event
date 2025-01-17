@@ -173,7 +173,9 @@ export default function Order() {
         </Button>
       </div>
 
-      <h1 className="text-3xl font-bold">Bestellung von Sachartikeln/Ausrüstung</h1>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center sm:text-left">
+        Bestellung von Sachartikeln/Ausrüstung
+      </h1>
       {isLoading ? (
         <p className="text-black text-xl">Seite wird geladen...</p>
       ) : (
@@ -246,7 +248,7 @@ export default function Order() {
                                   control={form.control}
                                   name={`products.${index}.quantity`}
                                   render={({ field }) => (
-                                    <div className="flex flex-row items-center justify-between gap-4">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                       <FormControl>
                                         <Input
                                           type="number"
@@ -261,13 +263,13 @@ export default function Order() {
                                           value={field.value ?? ""} // Ensure a defined value to avoid uncontrolled behavior
                                         />
                                       </FormControl>
-                                      <div className="flex flex-col gap-2 w-full">
+                                      <div className="flex flex-col gap-1 sm:gap-2 w-full">
                                         <FormLabel>{products[index].name}</FormLabel>
                                         <div className="flex flex-wrap text-sm text-gray-600]">
                                           {product.description}
                                         </div>
                                       </div>
-                                      <div className="flex flex-row w-28">{product.cost} €/Stk.</div>
+                                      <div className="flex flex-row sm:w-28 text-sm">{product.cost} €/Stk.</div>
                                     </div>
                                   )}
                                 />

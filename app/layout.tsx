@@ -29,7 +29,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <CookieBanner />
         {children}
         <ToastContainer
           position="top-right"
@@ -43,6 +42,7 @@ export default function RootLayout({
           pauseOnHover
           theme="light"
         />
+        <CookieBanner />
       </body>
     </html>
   )

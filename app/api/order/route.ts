@@ -127,7 +127,7 @@ export async function POST(request: Request) {
   ${orderList.join("")} 
   </table>
   <hr/>
-  <p>Endsumme: ${sum} €</p>
+  <p>Gesamt: ${sum} €</p>
   <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
 
   console.log(htmlMail)

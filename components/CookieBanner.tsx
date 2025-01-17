@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 
 const CookieBanner = () => {
@@ -20,7 +22,9 @@ const CookieBanner = () => {
       <div className="flex items-center justify-between">
         <div className="text-sm">
           <div>
-            Im Sinne des Datenschutzes verweisen wir Sie auf unsere Website:{" "}
+            Diese Website verwendet Cookies, um die Benutzererfahrung zu verbessern. Indem Sie die Website weiterhin
+            nutzen, stimmen Sie der Verwendung von Cookies und unseren Datenschutzbestimmungen zu. Für weitere
+            Informationen verweisen wir Sie auf unsere Website{" "}
             <a
               className="text-blue-400 hover:text-blue-600"
               target="_blank"
@@ -29,8 +33,6 @@ const CookieBanner = () => {
               Datenschutz
             </a>
           </div>
-          Diese Website verwendet Cookies, um die Benutzererfahrung zu verbessern. Indem Sie die Website weiterhin
-          nutzen, stimmen Sie der Verwendung von Cookies und unseren Datenschutzbestimmungen zu.
         </div>
         <button
           onClick={handleAccept}

@@ -3,6 +3,7 @@ import localFont from "next/font/local"
 import "./globals.css"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import CookieBanner from "@/components/CookieBanner"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <CookieBanner />
         {children}
         <ToastContainer
           position="top-right"

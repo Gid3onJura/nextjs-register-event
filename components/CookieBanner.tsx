@@ -26,7 +26,7 @@ const CookieBanner = () => {
             nutzen, stimmen Sie der Verwendung von Cookies und unseren Datenschutzbestimmungen zu. Für weitere
             Informationen verweisen wir Sie auf unsere Website{" "}
             <a
-              className="text-blue-400 hover:text-blue-600"
+              className="hover:text-blue-400 text-blue-600"
               target="_blank"
               href="https://shorai-do-kempo.org/meta/datenschutz.html"
             >
@@ -36,7 +36,7 @@ const CookieBanner = () => {
         </div>
         <button
           onClick={handleAccept}
-          className="ml-4 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded"
+          className="ml-4 px-3 py-2 hover:bg-blue-500 bg-blue-600 text-white text-sm rounded"
         >
           Akzeptieren
         </button>

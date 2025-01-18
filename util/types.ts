@@ -35,11 +35,12 @@ export const formSchemaOrders = zod.object({
   products: zod.array(
     zod.object({
       quantity: zod
-        .number()
-        .optional()
-        .refine((value) => value === undefined || value > 0, {
-          message: "Bitte gib eine Menge größer 0 ein",
-        }),
+        .number({
+          invalid_type_error: "Bitte gib eine gültige Zahl ein",
+        })
+        .min(0)
+        .or(zod.nan()) // Optional, falls NaN-Werte behandelt werden sollen
+        .optional(), // Dies erlaubt, dass das Feld leer sein kann
     })
   ),
   email: zod.string().email({ message: "Bitte gib eine gültige E-Mail Adresse ein" }).optional().or(zod.literal("")),

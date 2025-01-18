@@ -46,12 +46,7 @@ export async function POST(request: Request) {
                 },
                 {},
                 {},
-                {},
-                {},
-                {},
-                {},
-                {},
-                {},
+                ...,
                 {},
                 {
                     "quantity": 1
@@ -85,15 +80,20 @@ export async function POST(request: Request) {
   }
 
   // compare ordered products with products from database
-  orderedProducts?.forEach((product: any, orderIndex: number) => {
+  orderedProducts?.forEach((orderedProduct: any, orderIndex: number) => {
     productList.forEach((item: any, listIndex: number) => {
-      if (orderIndex === listIndex && product.quantity) {
-        orderBill.push({ ...item, quantity: product.quantity })
-        console.log(item.price, product.quantity)
-        sum += item.cost * product.quantity
+      if (orderIndex === listIndex && orderedProduct.quantity && orderedProduct.quantity > 0) {
+        orderBill.push({ ...item, quantity: orderedProduct.quantity })
+        console.log(item.cost, orderedProduct.quantity)
+        sum += item.cost * orderedProduct.quantity
       }
     })
   })
+
+  // seems that no items have been ordered
+  if (orderBill.length === 0) {
+    return NextResponse.json({ error: "Keine Artikel bestellt" }, { status: 400 })
+  }
 
   const orderList = orderBill.map((product: any) => {
     return (

@@ -109,7 +109,7 @@ export default function Order() {
 
       if (responseData.error) {
         console.log("error", responseData.error)
-        notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "error")
+        notify(responseData.error, "error")
       }
     } else {
       console.log("Received non-JSON response")
@@ -247,33 +247,38 @@ export default function Order() {
                                 <Controller
                                   control={form.control}
                                   name={`products.${index}.quantity`}
-                                  render={({ field }) => (
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                      <FormControl>
-                                        <Input
-                                          type="number"
-                                          min={0}
-                                          placeholder="Anzahl"
-                                          className="w-[6em] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                                          {...field}
-                                          onChange={(e) => {
-                                            const value = parseInt(e.target.value, 10) || 0
-                                            field.onChange(value) // Use field.onChange to update form state
-                                          }}
-                                          value={field.value ?? ""} // Ensure a defined value to avoid uncontrolled behavior
-                                        />
-                                      </FormControl>
-                                      <div className="flex flex-col gap-1 sm:gap-2 w-full">
-                                        <FormLabel>{products[index].name}</FormLabel>
-                                        <div className="flex flex-wrap text-sm text-gray-600]">
-                                          {product.description}
+                                  render={({ field, fieldState }) => (
+                                    <FormItem>
+                                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <FormControl>
+                                          <Input
+                                            type="text"
+                                            placeholder="Anzahl"
+                                            min={0}
+                                            className="w-[6em] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                            {...field}
+                                            onChange={(e) => {
+                                              const value = parseInt(e.target.value, 10) || 0
+                                              field.onChange(value) // Use field.onChange to update form state
+                                            }}
+                                            value={field.value ?? ""} // Ensure a defined value to avoid uncontrolled behavior
+                                          />
+                                        </FormControl>
+                                        <div className="flex flex-col gap-1 sm:gap-2 w-full">
+                                          <FormLabel>{products[index].name}</FormLabel>
+                                          <div className="flex flex-wrap text-sm text-gray-600]">
+                                            {product.description}
+                                          </div>
                                         </div>
+                                        <div className="flex flex-row sm:w-28 text-sm">{product.cost} €/Stk.</div>
                                       </div>
-                                      <div className="flex flex-row sm:w-28 text-sm">{product.cost} €/Stk.</div>
-                                    </div>
+                                      <FormMessage>
+                                        {fieldState.error?.message}
+                                        {/* {form.formState.errors.products?.[index]?.quantity?.message} */}
+                                      </FormMessage>
+                                    </FormItem>
                                   )}
                                 />
-                                <FormMessage />
                                 <hr className="w-full border-t border-gray-300" />
                               </div>
                             )

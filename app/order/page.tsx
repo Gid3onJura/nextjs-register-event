@@ -68,7 +68,7 @@ export default function Order() {
     const response = await setOrder(values)
 
     if (!response.ok) {
-      notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "warn")
+      notify("Bestellung fehlgeschlagen! Prüfe deine Eingaben und versuche es erneut.", "warn")
       return
     }
 

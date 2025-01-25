@@ -1,8 +1,19 @@
 import { sendEmail } from "@/util/email"
 import { formSchema } from "@/util/types"
+import { isRateLimited } from "@/util/util"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
+  // rate limiting
+  const ip = request.headers.get("x-forwarded-for") || request.headers.get("remote-addr") || "unknown"
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: "Maximale Anzahl an Anmeldungen erreicht! Versuche es später nochmal." },
+      { status: 429 }
+    )
+  }
+
   const body: unknown = await request.json()
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
 

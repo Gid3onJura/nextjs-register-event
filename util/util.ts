@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import { toast } from "react-toastify"
-import { TFormSchemaOrders } from "./types"
+import { TFormSchema, TFormSchemaOrders } from "./types"
 
 export const isTimestampExpired = (timestamp: number) => {
   const now = Date.now() / 1000
@@ -41,7 +41,23 @@ export const setOrder = async (values: TFormSchemaOrders) => {
     headers: { "Content-Type": "application/json", "api-key": API_KEY },
   })
 
-  // const responseData = await response.json()
+  return response
+}
+
+export const setRegister = async (values: TFormSchema) => {
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
+  const response = await fetch("/api/register", {
+    method: "POST",
+    body: JSON.stringify({
+      name: values.name,
+      event: values.event,
+      email: values.email,
+      dojo: values.dojo,
+      comments: values.comments,
+      captchatoken: values.captchatoken,
+    }),
+    headers: { "Content-Type": "application/json", "api-key": API_KEY },
+  })
 
   return response
 }
@@ -91,4 +107,37 @@ export const notify = (message: string, variant: "success" | "error" | "warn" | 
   if (variant === "info") {
     toast.info(message, options)
   }
+}
+
+const rateLimitMap = new Map<string, { count: number; lastRequest: number }>()
+const RATE_LIMIT_WINDOW = process.env.NEXT_PUBLIC_RATE_LIMIT_WINDOW_MILLISECONDS
+  ? parseInt(process.env.NEXT_PUBLIC_RATE_LIMIT_WINDOW_MILLISECONDS)
+  : 60000 // 1 Minute
+const MAX_REQUESTS = process.env.NEXT_PUBLIC_MAX_REQUESTS ? parseInt(process.env.NEXT_PUBLIC_MAX_REQUESTS) : 10 // 10 Anfragen pro Minute
+
+export const isRateLimited = (ip: string): boolean => {
+  const now = Date.now()
+  const rateData = rateLimitMap.get(ip)
+
+  if (!rateData) {
+    // Erster Zugriff der IP
+    rateLimitMap.set(ip, { count: 1, lastRequest: now })
+    return false
+  }
+
+  if (now - rateData.lastRequest > RATE_LIMIT_WINDOW) {
+    // Fenster ist abgelaufen, Rate-Limit zurücksetzen
+    rateLimitMap.set(ip, { count: 1, lastRequest: now })
+    return false
+  }
+
+  if (rateData.count > MAX_REQUESTS) {
+    // Rate-Limit überschritten
+    return true
+  }
+
+  // Anfrage zählen und speichern
+  rateData.count++
+  rateLimitMap.set(ip, rateData)
+  return false
 }

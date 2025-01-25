@@ -1,9 +1,19 @@
 import { sendEmail } from "@/util/email"
 import { formSchemaOrders } from "@/util/types"
-import { getProducts } from "@/util/util"
+import { getProducts, isRateLimited } from "@/util/util"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
+  // rate limiting
+  const ip = request.headers.get("x-forwarded-for") || request.headers.get("remote-addr") || "unknown"
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: "Maximale Anzahl an Bestellungen erreicht! Versuche es später nochmal." },
+      { status: 429 }
+    )
+  }
+
   const body: unknown = await request.json()
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
 
@@ -34,33 +44,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
 
-  /* Bsp. body:
-  {
-    "result": {
-        "success": true,
-        "data": {
-            "name": "3434",
-            "products": [
-                {
-                    "quantity": 1
-                },
-                {},
-                {},
-                ...,
-                {},
-                {
-                    "quantity": 1
-                }
-            ],
-            "email": "",
-            "comments": "",
-            "captchatoken": ...
-          }
-      }
-  }
-  */
-  // return NextResponse.json({ result }, { status: 200 })
-
   const name = result.data?.name
   const orderedProducts = result.data?.products
   const email = result.data?.email
@@ -84,7 +67,6 @@ export async function POST(request: Request) {
     productList.forEach((item: any, listIndex: number) => {
       if (orderIndex === listIndex && orderedProduct.quantity && orderedProduct.quantity > 0) {
         orderBill.push({ ...item, quantity: orderedProduct.quantity })
-        console.log(item.cost, orderedProduct.quantity)
         sum += item.cost * orderedProduct.quantity
       }
     })
@@ -129,8 +111,6 @@ export async function POST(request: Request) {
   <hr/>
   <p>Gesamt: ${sum} €</p>
   <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
-
-  console.log(htmlMail)
 
   // send email to trainer
   try {

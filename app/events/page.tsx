@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { getEvents } from "@/util/getEvents"
 
 import ReCAPTCHA from "react-google-recaptcha"
-import { notify } from "@/util/util"
+import { notify, setRegister } from "@/util/util"
 import Link from "next/link"
 
 interface Event {
@@ -75,68 +75,59 @@ export default function Event() {
   }, [])
 
   const handleSubmit = async (values: TFormSchema) => {
-    const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
-    const response = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify({
-        name: values.name,
-        event: values.event,
-        email: values.email,
-        dojo: values.dojo,
-        comments: values.comments,
-        captchatoken: values.captchatoken,
-      }),
-      headers: { "Content-Type": "application/json", "api-key": API_KEY },
-    })
+    const response = await setRegister(values)
 
-    const responseData = await response.json()
+    // if (!response.ok) {
+    //   notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "warn")
+    //   return
+    // }
 
-    if (!response.ok) {
-      notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "warn")
-      return
-    }
-
-    if (responseData.errors) {
-      const errors = responseData.errors
-      console.log(errors)
-      if (errors.email) {
-        form.setError("email", {
-          type: "server",
-          message: "Bitte gib eine gültige E-Mail Adresse ein",
-        })
-      } else if (errors.name) {
-        form.setError("name", {
-          type: "server",
-          message: "Bitte gib deinen Namen ein",
-        })
-      } else if (errors.event) {
-        form.setError("event", {
-          type: "server",
-          message: "Bitte wähle ein Event aus",
-        })
-      } else if (errors.dojo) {
-        form.setError("dojo", {
-          type: "server",
-          message: "Bitte wähle ein Dojo aus",
-        })
-      } else if (errors.captchatoken) {
-        form.setError("captchatoken", {
-          type: "server",
-          message: "Bitte gib das Captcha ein",
-        })
-      } else {
-        notify("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.", "error")
-        return
+    if (response.headers.get("Content-Type")?.includes("application/json")) {
+      const responseData = await response.json()
+      if (responseData.errors) {
+        const errors = responseData.errors
+        if (errors.email) {
+          form.setError("email", {
+            type: "server",
+            message: "Bitte gib eine gültige E-Mail Adresse ein",
+          })
+        } else if (errors.name) {
+          form.setError("name", {
+            type: "server",
+            message: "Bitte gib deinen Namen ein",
+          })
+        } else if (errors.event) {
+          form.setError("event", {
+            type: "server",
+            message: "Bitte wähle ein Event aus",
+          })
+        } else if (errors.dojo) {
+          form.setError("dojo", {
+            type: "server",
+            message: "Bitte wähle ein Dojo aus",
+          })
+        } else if (errors.captchatoken) {
+          form.setError("captchatoken", {
+            type: "server",
+            message: "Bitte gib das Captcha ein",
+          })
+        } else {
+          notify("Anmeldung fehlgeschlagen! Bitte prüfe deine Eingaben.", "error")
+          return
+        }
       }
-    }
 
-    if (responseData.message) {
-      notify(responseData.message, "success")
-    }
+      if (responseData.message) {
+        notify(responseData.message, "success")
+      }
 
-    if (responseData.error) {
-      console.log("error", responseData.error)
-      notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
+      if (responseData.error) {
+        console.log("error", responseData.error)
+        notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
+      }
+    } else {
+      console.log("Received non-JSON response")
+      notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }
 
     form.reset({

@@ -67,16 +67,15 @@ export default function Order() {
   const handleSubmit = async (values: TFormSchemaOrders) => {
     const response = await setOrder(values)
 
-    if (!response.ok) {
-      notify("Bestellung fehlgeschlagen! Prüfe deine Eingaben und versuche es erneut.", "warn")
-      return
-    }
+    // if (!response.ok) {
+    //   notify("Bestellung fehlgeschlagen! Prüfe deine Eingaben und versuche es erneut.", "warn")
+    //   return
+    // }
 
     if (response.headers.get("Content-Type")?.includes("application/json")) {
       const responseData = await response.json()
       if (responseData.errors) {
         const errors = responseData.errors
-        console.log(errors)
         if (errors.email) {
           form.setError("email", {
             type: "server",

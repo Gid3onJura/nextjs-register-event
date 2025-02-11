@@ -178,7 +178,7 @@ export default function Event() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-16 p-24">
+    <main className="flex min-h-screen flex-col items-center gap-16 p-24">
       {/* Buttons */}
       <div className="flex gap-4 flex-col">
         <Button asChild>

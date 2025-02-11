@@ -162,7 +162,7 @@ export default function Order() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-16 p-24">
+    <main className="flex min-h-screen flex-col items-center gap-16 p-24">
       {/* Buttons */}
       <div className="flex gap-4 flex-col">
         <Button asChild>
@@ -242,34 +242,36 @@ export default function Order() {
                         <div className="flex flex-col gap-4 w-full">
                           {products.map((product, index) => {
                             return (
-                              <div key={index} className="flex flex-col gap-2">
+                              <div key={index} className="flex flex-col gap-2 shadow-md p-4 rounded-md">
                                 <Controller
                                   control={form.control}
                                   name={`products.${index}.quantity`}
                                   render={({ field, fieldState }) => (
                                     <FormItem>
                                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                                        <FormControl>
-                                          <Input
-                                            type="text"
-                                            placeholder="Anzahl"
-                                            min={0}
-                                            className="w-[6em] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                                            {...field}
-                                            onChange={(e) => {
-                                              const value = parseInt(e.target.value, 10) || 0
-                                              field.onChange(value) // Use field.onChange to update form state
-                                            }}
-                                            value={field.value ?? ""} // Ensure a defined value to avoid uncontrolled behavior
-                                          />
-                                        </FormControl>
                                         <div className="flex flex-col gap-1 sm:gap-2 w-full">
                                           <FormLabel>{products[index].name}</FormLabel>
-                                          <div className="flex flex-wrap text-sm text-gray-600]">
+                                          <div className="flex flex-wrap text-sm text-gray-500">
                                             {product.description}
                                           </div>
                                         </div>
-                                        <div className="flex flex-row sm:w-28 text-sm">{product.cost} €/Stk.</div>
+                                        <div className="flex sm:flex-row items-center w-full justify-between">
+                                          <div className="flex flex-row sm:w-28 text-sm">{product.cost} €/Stk.</div>
+                                          <FormControl>
+                                            <Input
+                                              type="text"
+                                              placeholder="Anzahl"
+                                              min={0}
+                                              className="w-[6em] rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                              {...field}
+                                              onChange={(e) => {
+                                                const value = parseInt(e.target.value, 10) || 0
+                                                field.onChange(value) // Use field.onChange to update form state
+                                              }}
+                                              value={field.value ?? ""} // Ensure a defined value to avoid uncontrolled behavior
+                                            />
+                                          </FormControl>
+                                        </div>
                                       </div>
                                       <FormMessage>
                                         {fieldState.error?.message}
@@ -278,7 +280,7 @@ export default function Order() {
                                     </FormItem>
                                   )}
                                 />
-                                <hr className="w-full border-t border-gray-300" />
+                                {/* <hr className="w-full border-t border-gray-300" /> */}
                               </div>
                             )
                           })}

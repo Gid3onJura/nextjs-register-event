@@ -162,7 +162,7 @@ export default function Order() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-16 p-24">
+    <main className="flex min-h-screen flex-col items-center gap-16 p-16">
       {/* Buttons */}
       <div className="flex gap-4 flex-col">
         <Button asChild>
@@ -172,7 +172,7 @@ export default function Order() {
         </Button>
       </div>
 
-      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center sm:text-left">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
         Bestellung von Sachartikeln/Ausrüstung
       </h1>
       {isLoading ? (
@@ -184,10 +184,7 @@ export default function Order() {
           ) : (
             <Form {...form}>
               {Array.isArray(products) && products.length > 0 && (
-                <form
-                  onSubmit={form.handleSubmit(handleSubmit)}
-                  className="max-w-md w-full flex flex-col gap-4 justify-center"
-                >
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col gap-4 justify-center">
                   {/* Name */}
                   <FormField
                     control={form.control}
@@ -239,16 +236,16 @@ export default function Order() {
                         <div className="mb-4">
                           <FormLabel>Artikel</FormLabel>
                         </div>
-                        <div className="flex flex-col gap-4 w-full">
+                        <div className="flex flex-col md:flex-row flex-wrap gap-4 w-full">
                           {products.map((product, index) => {
                             return (
-                              <div key={index} className="flex flex-col gap-2 shadow-md p-4 rounded-md">
+                              <div key={index} className="flex flex-col gap-2 shadow-md p-4 rounded-md md:max-w-48">
                                 <Controller
                                   control={form.control}
                                   name={`products.${index}.quantity`}
                                   render={({ field, fieldState }) => (
                                     <FormItem>
-                                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                      <div className="flex flex-col md:flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                         <div className="flex flex-col gap-1 sm:gap-2 w-full">
                                           <FormLabel>{products[index].name}</FormLabel>
                                           <div className="flex flex-wrap text-sm text-gray-500">

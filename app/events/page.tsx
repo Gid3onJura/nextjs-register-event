@@ -178,7 +178,7 @@ export default function Event() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-16 p-24">
+    <main className="flex min-h-screen flex-col items-center gap-16 p-16">
       {/* Buttons */}
       <div className="flex gap-4 flex-col">
         <Button asChild>
@@ -188,7 +188,7 @@ export default function Event() {
         </Button>
       </div>
 
-      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center sm:text-left">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
         Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
       </h1>
       {isLoading ? (
@@ -202,7 +202,7 @@ export default function Event() {
               {Array.isArray(events) && events.length > 0 && (
                 <form
                   onSubmit={form.handleSubmit(handleSubmit)}
-                  className="max-w-md w-full flex flex-col gap-4 justify-center"
+                  className="max-w-2xl w-full flex flex-col gap-4 justify-center"
                 >
                   {/* Name */}
                   <FormField

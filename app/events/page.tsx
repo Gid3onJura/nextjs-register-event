@@ -30,6 +30,10 @@ const dojos = [
     name: "Leipzig",
     id: "2",
   },
+  {
+    name: "Halle",
+    id: "3",
+  },
 ]
 
 export default function Event() {
@@ -365,7 +369,7 @@ export default function Event() {
                     render={({ field }) => {
                       return (
                         <FormItem>
-                          <div className="flex flex-col gap-4 items-center justify-center">
+                          <div className="flex flex-col gap-4 items-center justify-center mt-7">
                             <FormLabel>Abfrage *</FormLabel>
                             <FormControl>
                               <ReCAPTCHA

@@ -49,12 +49,22 @@ export async function POST(request: Request) {
   const email = result.data?.email
   const dojo = result.data?.dojo
   const comments = result.data?.comments
+  const option = result.data?.option
+
+  let optionMailText = ""
+
+  if (option) {
+    optionMailText = `nehme am anschließendem Essen teil\n`
+  } else {
+    optionMailText = `nehme <strong>nicht</strong> am anschließendem Essen teil\n`
+  }
 
   const htmlMail = `
   <h1>Anmeldung zum Event: ${event}</h1>\n
   <p>Name: ${name}</p>
   <p>Event: ${event}</p>
   <p>Dojo: ${dojo}</p>
+  <p>Option: ${optionMailText}</p>
   <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
 
   // send email to trainer

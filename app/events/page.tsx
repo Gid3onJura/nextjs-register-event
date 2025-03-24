@@ -14,6 +14,7 @@ import { getEvents } from "@/util/getEvents"
 import ReCAPTCHA from "react-google-recaptcha"
 import { notify, setRegister } from "@/util/util"
 import Link from "next/link"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface Event {
   description: string
@@ -43,6 +44,7 @@ export default function Event() {
       email: "",
       dojo: "",
       comments: "",
+      option: false,
     },
   })
 
@@ -136,6 +138,7 @@ export default function Event() {
       email: "",
       dojo: "",
       comments: "",
+      option: false,
     })
     recaptchaRef.current?.reset()
     setIsVerified(false)
@@ -315,6 +318,34 @@ export default function Event() {
                               className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
                               {...field}
                             />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  {/* Options */}
+                  <FormField
+                    control={form.control}
+                    name="option"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Optionen</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id="terms"
+                                checked={field.value} // Checkbox-Wert direkt aus dem Field nehmen
+                                onCheckedChange={field.onChange} // Wert aktualisieren
+                              />
+                              <label
+                                htmlFor="terms"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                am anschließendem Essen teilnehmen
+                              </label>
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>

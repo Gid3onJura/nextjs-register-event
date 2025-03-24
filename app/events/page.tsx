@@ -194,6 +194,12 @@ export default function Event() {
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
         Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
       </h1>
+      <div className="flex flex-row">
+        <div className="text-red-600 font-medium">
+          Hinweis: Vergesst nicht euch für das anschließende Essen anzumelden! Gerade für die Jubiläumsfeier ist eine
+          genaue Anzahl wichtig!
+        </div>
+      </div>
       {isLoading ? (
         <p className="text-black text-xl">Seite wird geladen...</p>
       ) : (

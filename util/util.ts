@@ -142,3 +142,62 @@ export const isRateLimited = (ip: string): boolean => {
   rateLimitMap.set(ip, rateData)
   return false
 }
+
+export const generateICSFile = (event: { title: string; start: Date; end: Date; description: string }) => {
+  return `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:${event.title}
+DTSTART:${formatICSDate(event.start)}
+DTEND:${formatICSDate(event.end)}
+DESCRIPTION:${event.description}
+END:VEVENT
+END:VCALENDAR`
+}
+
+export const formatICSDate = (date: Date) => {
+  return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z"
+}
+
+export const generateAllDayICSFile = (event: { title: string; start: Date; end: Date; description: string }) => {
+  return `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY:${event.title}
+DTSTART;VALUE=DATE:${formatAllDayDate(event.start)}
+DTEND;VALUE=DATE:${formatAllDayDate(event.end)}
+DESCRIPTION:${event.description}
+END:VEVENT
+END:VCALENDAR`
+}
+
+export const formatAllDayDate = (date: Date) => {
+  return date.toISOString().split("T")[0].replace(/-/g, "")
+}
+
+export const getGoogleCalendarLink = (event: { title: string; start: Date; end: Date; description: string }) => {
+  const baseUrl = "https://www.google.com/calendar/render?action=TEMPLATE"
+  const params = new URLSearchParams({
+    text: event.title,
+    dates: `${formatICSDate(event.start)}/${formatICSDate(event.end)}`,
+    // location: event.location,
+    details: event.description,
+  })
+
+  return `${baseUrl}&${params.toString()}`
+}
+
+export const getOutlookCalendarLink = (event: { title: string; start: Date; end: Date; description: string }) => {
+  const baseUrl = "https://outlook.live.com/calendar/0/deeplink/compose"
+  const params = new URLSearchParams({
+    path: "/calendar/action/compose",
+    rru: "addevent",
+    subject: event.title,
+    startdt: event.start.toISOString(),
+    enddt: event.end.toISOString(),
+    // location: event.location,
+    body: event.description,
+  })
+
+  return `${baseUrl}?${params.toString()}`
+}

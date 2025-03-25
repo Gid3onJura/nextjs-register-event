@@ -274,7 +274,7 @@ export default function Event() {
                               </SelectTrigger>
                               <SelectContent>
                                 {events.map((event, index) => (
-                                  <SelectItem key={index} value={event.description + " " + event.eventyear}>
+                                  <SelectItem key={index} value={event.description}>
                                     {event.description + " " + event.eventyear}
                                   </SelectItem>
                                 ))}

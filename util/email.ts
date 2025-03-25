@@ -10,7 +10,20 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-export const sendEmail = async (to: string, bcc: string, subject: string, text: string, html: string) => {
+interface TAttachments {
+  filename: string
+  content: string
+  contentType: string
+}
+
+export const sendEmail = async (
+  to: string,
+  bcc: string,
+  subject: string,
+  text: string,
+  html: string,
+  attachments: TAttachments[]
+) => {
   await transporter.sendMail({
     from: process.env.NEXT_PUBLIC_SMTP_USER,
     to,
@@ -18,5 +31,6 @@ export const sendEmail = async (to: string, bcc: string, subject: string, text: 
     subject,
     text,
     html,
+    attachments,
   })
 }

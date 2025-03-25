@@ -1,7 +1,14 @@
 import { sendEmail } from "@/util/email"
+import { getEvents } from "@/util/getEvents"
 import { formSchema } from "@/util/types"
-import { isRateLimited } from "@/util/util"
+import { generateICSFile, getGoogleCalendarLink, getOutlookCalendarLink, isRateLimited } from "@/util/util"
 import { NextResponse } from "next/server"
+
+interface EventData {
+  description: string
+  eventyear: string
+  eventdate: string
+}
 
 export async function POST(request: Request) {
   // rate limiting
@@ -51,6 +58,33 @@ export async function POST(request: Request) {
   const comments = result.data?.comments
   const option = result.data?.option
 
+  const eventsResponse = await getEvents()
+
+  const eventsData: EventData[] = await eventsResponse.json()
+
+  let eventExists = null
+
+  if (eventsData) {
+    eventExists = eventsData.find((item: EventData) => item.description === event)
+  }
+
+  if (!eventExists) {
+    return NextResponse.json({ error: "Event nicht gefunden" }, { status: 404 })
+  }
+
+  let endDate = new Date(eventExists.eventdate)
+  endDate.setHours(endDate.getHours() + 4)
+
+  const calendarEvent = {
+    title: event,
+    description: event,
+    start: new Date(eventExists.eventdate),
+    end: endDate,
+  }
+
+  const googleLink = getGoogleCalendarLink(calendarEvent)
+  const outlookLink = getOutlookCalendarLink(calendarEvent)
+
   let optionMailText = ""
 
   if (option) {
@@ -65,7 +99,23 @@ export async function POST(request: Request) {
   <p>Event: ${event}</p>
   <p>Dojo: ${dojo}</p>
   <p>Option: ${optionMailText}</p>
-  <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
+  <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>
+  <hr/>
+  <p>Hier ist dein Kalendereintrag für das Event. Prüfe bitte das Start- und End-Datum des Kalendereintrags mit deiner Einladung zum Event. Wir wollen ja nicht, dass du zu spät kommt 😉</p>
+      <ul>
+        <li><a href="${googleLink}">📅 Google Calendar</a></li>
+        <li><a href="${outlookLink}">📅 Outlook</a></li>
+      </ul>
+      <p>Für Apple-Nutzer empfehlen wir den .ics-Download im Anhang.</p>`
+
+  // attachments
+  const attachments = [
+    {
+      filename: "event.ics",
+      content: generateICSFile(calendarEvent),
+      contentType: "text/calendar",
+    },
+  ]
 
   // send email to trainer
   try {
@@ -74,7 +124,8 @@ export async function POST(request: Request) {
       email || "",
       `Anmeldung ${event}: ${name}`,
       `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nKommentare: ${comments}`,
-      htmlMail
+      htmlMail,
+      attachments
     )
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })
   } catch (error) {

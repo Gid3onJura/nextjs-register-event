@@ -201,3 +201,22 @@ export const getOutlookCalendarLink = (event: { title: string; start: Date; end:
 
   return `${baseUrl}?${params.toString()}`
 }
+
+export const convertToISOFormat = (datestring: string) => {
+  const dateTimeString = datestring
+
+  // Zahlen extrahieren (Tag, Monat, Jahr, Stunde, Minute, Sekunde)
+  const match = dateTimeString.match(/\d+/g)
+  if (!match) {
+    return ""
+  }
+  const [day, month, year, hours, minutes, seconds] = match.map(Number)
+
+  // Date-Objekt erstellen (Monate in JS starten bei 0)
+  const date = new Date(year, month - 1, day, hours, minutes, seconds)
+
+  // ISO-String generieren (UTC)
+  const isoString = date.toISOString()
+
+  return isoString // "2025-03-23T11:10:00.000Z"
+}

@@ -1,13 +1,21 @@
 import { sendEmail } from "@/util/email"
 import { getEvents } from "@/util/getEvents"
 import { formSchema } from "@/util/types"
-import { generateICSFile, getGoogleCalendarLink, getOutlookCalendarLink, isRateLimited } from "@/util/util"
+import {
+  convertToISOFormat,
+  generateICSFile,
+  getGoogleCalendarLink,
+  getOutlookCalendarLink,
+  isRateLimited,
+} from "@/util/util"
 import { NextResponse } from "next/server"
 
 interface EventData {
   description: string
   eventyear: string
   eventdate: string
+  eventdatetimefrom: string
+  eventdatetimeto: string
 }
 
 export async function POST(request: Request) {
@@ -57,6 +65,8 @@ export async function POST(request: Request) {
   const dojo = result.data?.dojo
   const comments = result.data?.comments
   const option = result.data?.option
+  let googleLink
+  let outlookLink
 
   const eventsResponse = await getEvents()
 
@@ -72,18 +82,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Event nicht gefunden" }, { status: 404 })
   }
 
-  let endDate = new Date(eventExists.eventdate)
-  endDate.setHours(endDate.getHours() + 4)
-
   const calendarEvent = {
     title: event,
     description: event,
-    start: new Date(eventExists.eventdate),
-    end: endDate,
+    start: new Date(convertToISOFormat(eventExists.eventdatetimefrom)),
+    end: new Date(convertToISOFormat(eventExists.eventdatetimeto)),
   }
 
-  const googleLink = getGoogleCalendarLink(calendarEvent)
-  const outlookLink = getOutlookCalendarLink(calendarEvent)
+  googleLink = getGoogleCalendarLink(calendarEvent)
+  outlookLink = getOutlookCalendarLink(calendarEvent)
 
   let optionMailText = ""
 
@@ -99,9 +106,31 @@ export async function POST(request: Request) {
   <p>Event: ${event}</p>
   <p>Dojo: ${dojo}</p>
   <p>Option: ${optionMailText}</p>
+  <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
+
+  // send email to trainer
+  try {
+    await sendEmail(
+      emailTo,
+      "",
+      `Anmeldung ${event}: ${name}`,
+      `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nKommentare: ${comments}`,
+      htmlMail,
+      []
+    )
+  } catch (error) {
+    return NextResponse.json({ error: "Anmeldung fehlgeschlagen:" + JSON.stringify(error) }, { status: 500 })
+  }
+
+  const htmlMailToUser = `
+  <h1>Anmeldung zum Event: ${event}</h1>\n
+  <p>Name: ${name}</p>
+  <p>Event: ${event}</p>
+  <p>Dojo: ${dojo}</p>
+  <p>Option: ${optionMailText}</p>
   <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>
   <hr/>
-  <p>Hier ist dein Kalendereintrag für das Event. Prüfe bitte das Start- und End-Datum des Kalendereintrags mit deiner Einladung zum Event. Wir wollen ja nicht, dass du zu spät kommt 😉</p>
+  <p>Hier ist dein Kalendereintrag für das Event. Prüfe bitte das Start- und End-Datum des Kalendereintrags mit deiner Einladung zum Event, bevor du ihn zu deinem Kalender hinzufügst. Wir wollen ja nicht, dass du zu spät kommst 😉</p>
       <ul>
         <li><a href="${googleLink}">📅 Google Calendar</a></li>
         <li><a href="${outlookLink}">📅 Outlook</a></li>
@@ -109,7 +138,7 @@ export async function POST(request: Request) {
       <p>Für Apple-Nutzer empfehlen wir den .ics-Download im Anhang.</p>`
 
   // attachments
-  const attachments = [
+  const attachmentsForUser = [
     {
       filename: "event.ics",
       content: generateICSFile(calendarEvent),
@@ -117,18 +146,24 @@ export async function POST(request: Request) {
     },
   ]
 
-  // send email to trainer
-  try {
-    await sendEmail(
-      emailTo,
-      email || "",
-      `Anmeldung ${event}: ${name}`,
-      `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nKommentare: ${comments}`,
-      htmlMail,
-      attachments
-    )
-    return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })
-  } catch (error) {
-    return NextResponse.json({ error: "Anmeldung fehlgeschlagen:" + JSON.stringify(error) }, { status: 500 })
+  // send email to user
+  if (email) {
+    try {
+      await sendEmail(
+        email,
+        "",
+        `Anmeldung ${event}: ${name}`,
+        `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nKommentare: ${comments}`,
+        htmlMailToUser,
+        attachmentsForUser
+      )
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Senden der Bestätigung fehlgeschlagen:" + JSON.stringify(error) },
+        { status: 500 }
+      )
+    }
   }
+
+  return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })
 }

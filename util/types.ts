@@ -1,7 +1,8 @@
 import * as zod from "zod"
 
 export const formSchema = zod.object({
-  name: zod.string().min(1, { message: "Bitte gib deinen Namen ein" }),
+  firstname: zod.string().min(1, { message: "Bitte gib deinen Vornamen ein" }),
+  lastname: zod.string().min(1, { message: "Bitte gib deinen Nachnamen ein" }),
   event: zod.string().refine(
     (value) => {
       if (value === "") {

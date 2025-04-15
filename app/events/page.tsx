@@ -36,14 +36,21 @@ const dojos = [
   },
 ]
 
+const defaultEvents = [
+  {
+    description: "Jubiläumsfeier",
+    eventyear: "2025",
+  },
+]
+
 export default function Event() {
   const [events, setEvents] = useState<Event[]>([])
-  // const [accessToken, setAccessToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      firstname: "",
+      lastname: "",
       event: "",
       email: "",
       dojo: "",
@@ -58,18 +65,21 @@ export default function Event() {
 
   // placeholder text
   const placeholderEvent = "Wähle ein Event"
-  const placeholderDojo = "Wähle ein Dojo"
+  const placeholderDojo = "Zu welchem Dojo gehörst du?"
 
   // get events from api
   useEffect(() => {
     setIsLoading(true)
     const fetchEvents = async () => {
       try {
-        const eventsResponse = await getEvents()
+        // TODO: wieder aktivieren sobald die Anmeldung zur Feier beendet ist 🙄
+        // const eventsResponse = await getEvents()
 
-        const eventsData = await eventsResponse.json()
+        // const eventsData = await eventsResponse.json()
 
-        setEvents(eventsData)
+        // setEvents(eventsData)
+
+        setEvents(defaultEvents)
         setIsLoading(false)
       } catch (error) {
         console.log(error)
@@ -97,10 +107,15 @@ export default function Event() {
             type: "server",
             message: "Bitte gib eine gültige E-Mail Adresse ein",
           })
-        } else if (errors.name) {
-          form.setError("name", {
+        } else if (errors.firstname) {
+          form.setError("firstname", {
             type: "server",
-            message: "Bitte gib deinen Namen ein",
+            message: "Bitte gib deinen Vornamen ein",
+          })
+        } else if (errors.lastname) {
+          form.setError("lastname", {
+            type: "server",
+            message: "Bitte gib deinen Nachnamen ein",
           })
         } else if (errors.event) {
           form.setError("event", {
@@ -137,7 +152,8 @@ export default function Event() {
     }
 
     form.reset({
-      name: "",
+      firstname: "",
+      lastname: "",
       event: "",
       email: "",
       dojo: "",
@@ -217,18 +233,39 @@ export default function Event() {
                   onSubmit={form.handleSubmit(handleSubmit)}
                   className="max-w-2xl w-full flex flex-col gap-4 justify-center"
                 >
-                  {/* Name */}
+                  {/* Firstname */}
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="firstname"
                     render={({ field }) => {
                       return (
                         <FormItem>
-                          <FormLabel>Name *</FormLabel>
+                          <FormLabel>Vorname *</FormLabel>
                           <FormControl>
                             <Input
                               type="text"
-                              placeholder="Name"
+                              placeholder="Vorname"
+                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  {/* Lastname */}
+                  <FormField
+                    control={form.control}
+                    name="lastname"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <FormLabel>Nachname *</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Nachname"
                               className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
                               {...field}
                             />

@@ -44,7 +44,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
 
-  const name = result.data?.name
+  const firstname = result.data?.firstname
+  const lastname = result.data?.lastname
   const event = result.data?.event
   const email = result.data?.email
   const dojo = result.data?.dojo
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
 
   const htmlMail = `
   <h1>Anmeldung zum Event: ${event}</h1>\n
-  <p>Name: ${name}</p>
+  <p>Name: ${firstname} ${lastname}</p>
   <p>Event: ${event}</p>
   <p>Dojo: ${dojo}</p>
   <p>Option: ${optionMailText}</p>
@@ -72,8 +73,11 @@ export async function POST(request: Request) {
     await sendEmail(
       emailTo,
       email || "",
-      `Anmeldung ${event}: ${name}`,
-      `Name: ${name}\nEvent: ${event}\nDojo: ${dojo}\nKommentare: ${comments}`,
+      `Anmeldung ${event}: ${firstname} ${lastname}`,
+      `Name: ${firstname} ${lastname}\n
+      Event: ${event}\n
+      Dojo: ${dojo}\n
+      Kommentare: ${comments}`,
       htmlMail
     )
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })

@@ -49,7 +49,8 @@ export const setRegister = async (values: TFormSchema) => {
   const response = await fetch("/api/register", {
     method: "POST",
     body: JSON.stringify({
-      name: values.name,
+      firstname: values.firstname,
+      lastname: values.lastname,
       event: values.event,
       email: values.email,
       dojo: values.dojo,

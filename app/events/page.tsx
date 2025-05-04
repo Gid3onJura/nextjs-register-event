@@ -220,9 +220,9 @@ export default function Event() {
           genaue Anzahl wichtig!
         </div>
         <div className="text-red-600 font-medium">
-          Für alle Diejenigen die nur am anschließende Essen teilnehmen, meldet euch dennoch mit eurem Namen an und
-          setzt den Haken für "am anschließendem Essen teilnehmen". Gebt zusätzlich in den Kommentaren an, dass ihr nur
-          am anschließendem Essen teilnehmen wollt und wieviele ihr mitbringen wollt.
+          Für alle Diejenigen die nur am anschließenden Essen teilnehmen wollen, meldet euch dennoch mit eurem Namen an
+          und setzt den Haken für "am anschließendem Essen teilnehmen". Gebt zusätzlich in den Kommentaren an, dass ihr
+          nur am anschließenden Essen teilnehmen wollt und wieviele ihr mitbringen wollt.
         </div>
       </div>
       {isLoading ? (

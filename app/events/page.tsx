@@ -214,10 +214,15 @@ export default function Event() {
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
         Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
       </h1>
-      <div className="flex flex-row">
+      <div className="flex flex-col gap-3 items-center justify-center">
         <div className="text-red-600 font-medium">
           Hinweis: Vergesst nicht euch für das anschließende Essen anzumelden! Gerade für die Jubiläumsfeier ist eine
           genaue Anzahl wichtig!
+        </div>
+        <div className="text-red-600 font-medium">
+          Für alle Diejenigen die nur am anschließende Essen teilnehmen, meldet euch dennoch mit eurem Namen an und
+          setzt den Haken für "am anschließendem Essen teilnehmen". Gebt zusätzlich in den Kommentaren an, dass ihr nur
+          am anschließendem Essen teilnehmen wollt und wieviele ihr mitbringen wollt.
         </div>
       </div>
       {isLoading ? (

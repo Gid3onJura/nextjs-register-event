@@ -1,6 +1,6 @@
 import { sendEmail } from "@/util/email"
 import { formSchema } from "@/util/types"
-import { isRateLimited } from "@/util/util"
+import { createEmailTemplate, isRateLimited } from "@/util/util"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
@@ -60,13 +60,10 @@ export async function POST(request: Request) {
     optionMailText = `nehme <strong>nicht</strong> am anschließendem Essen teil\n`
   }
 
-  const htmlMail = `
-  <h1>Anmeldung zum Event: ${event}</h1>\n
-  <p>Name: ${firstname} ${lastname}</p>
-  <p>Event: ${event}</p>
-  <p>Dojo: ${dojo}</p>
-  <p>Option: ${optionMailText}</p>
-  <p>Kommentare: <br>${comments?.replace(/\n/g, "<br>")}</p>`
+  // const logoUrl = `data:image/png;base64,${kamizaBase64}`
+  const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`
+
+  const htmlMail = createEmailTemplate(firstname, lastname, event, dojo, comments, optionMailText, logoUrl)
 
   // send email to trainer
   try {

@@ -18,5 +18,12 @@ export const sendEmail = async (to: string, bcc: string, subject: string, text: 
     subject,
     text,
     html,
+    attachments: [
+      {
+        filename: "kamiza.png",
+        path: `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`,
+        cid: "kamiza", // Diese CID referenziert das Bild im HTML
+      },
+    ],
   })
 }

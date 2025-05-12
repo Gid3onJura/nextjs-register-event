@@ -15,6 +15,8 @@ import ReCAPTCHA from "react-google-recaptcha"
 import { notify, setRegister } from "@/util/util"
 import Link from "next/link"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowLeft } from "lucide-react"
 
 interface Event {
   description: string
@@ -33,13 +35,6 @@ const dojos = [
   {
     name: "Halle",
     id: "3",
-  },
-]
-
-const defaultEvents = [
-  {
-    description: "Jubiläumsfeier",
-    eventyear: "2025",
   },
 ]
 
@@ -72,14 +67,11 @@ export default function Event() {
     setIsLoading(true)
     const fetchEvents = async () => {
       try {
-        // TODO: wieder aktivieren sobald die Anmeldung zur Feier beendet ist 🙄
-        // const eventsResponse = await getEvents()
+        const eventsResponse = await getEvents()
 
-        // const eventsData = await eventsResponse.json()
+        const eventsData = await eventsResponse.json()
 
-        // setEvents(eventsData)
-
-        setEvents(defaultEvents)
+        setEvents(eventsData)
         setIsLoading(false)
       } catch (error) {
         console.log(error)
@@ -92,11 +84,6 @@ export default function Event() {
 
   const handleSubmit = async (values: TFormSchema) => {
     const response = await setRegister(values)
-
-    // if (!response.ok) {
-    //   notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "warn")
-    //   return
-    // }
 
     if (response.headers.get("Content-Type")?.includes("application/json")) {
       const responseData = await response.json()
@@ -201,245 +188,257 @@ export default function Event() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-16 p-16">
-      {/* Buttons */}
-      <div className="flex gap-4 flex-col">
-        <Button asChild>
-          <Link href="/" className="">
-            Zurück zur Auswahl
-          </Link>
-        </Button>
-      </div>
-
-      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
-        Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
-      </h1>
-      <div className="flex flex-col gap-3 items-center justify-center">
-        <div className="text-red-600 font-medium">
-          Hinweis: Vergesst nicht euch für das anschließende Essen anzumelden! Gerade für die Jubiläumsfeier ist eine
-          genaue Anzahl wichtig!
+    <main className="flex min-h-screen flex-col items-center gap-2 p-16 bg-discreet-gradient">
+      <div className="flex flex-col gap-4">
+        {/* Buttons */}
+        <div className="flex flex-row">
+          <Button asChild>
+            <Link href="/" title="zurück">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
         </div>
-        <div className="text-red-600 font-medium">
-          Für alle Diejenigen die nur am anschließenden Essen teilnehmen wollen, meldet euch dennoch mit eurem Namen an
-          und setzt den Haken für "am anschließendem Essen teilnehmen". Gebt zusätzlich in den Kommentaren an, dass ihr
-          nur am anschließenden Essen teilnehmen wollt und wieviele ihr mitbringen wollt.
-        </div>
-      </div>
-      {isLoading ? (
-        <p className="text-black text-xl">Seite wird geladen...</p>
-      ) : (
-        <>
-          {!Array.isArray(events) ? (
-            <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>
+        <Card className="shadow-xl">
+          <CardHeader>
+            <CardTitle>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
+                Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
+              </h1>
+            </CardTitle>
+            {/* <CardDescription>Card Description</CardDescription> */}
+          </CardHeader>
+          {/* <CardDescription>
+            <div className="flex flex-col gap-3 items-center justify-center p-12">
+              <div className="text-red-600 font-medium">
+                Hinweis: Vergesst nicht euch für das anschließende Essen anzumelden! Gerade für die Jubiläumsfeier ist
+                eine genaue Anzahl wichtig!
+              </div>
+              <div className="text-red-600 font-medium">
+                Für alle Diejenigen die nur am anschließenden Essen teilnehmen wollen, meldet euch dennoch mit eurem
+                Namen an und setzt den Haken für "am anschließendem Essen teilnehmen". Gebt zusätzlich in den
+                Kommentaren an, dass ihr nur am anschließenden Essen teilnehmen wollt und wieviele ihr mitbringen wollt.
+              </div>
+            </div>
+          </CardDescription> */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center gap-4">
+              <p className="text-black text-xl">Seite wird geladen...</p>
+            </div>
           ) : (
-            <Form {...form}>
-              {Array.isArray(events) && events.length > 0 && (
-                <form
-                  onSubmit={form.handleSubmit(handleSubmit)}
-                  className="max-w-2xl w-full flex flex-col gap-4 justify-center"
-                >
-                  {/* Firstname */}
-                  <FormField
-                    control={form.control}
-                    name="firstname"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Vorname *</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder="Vorname"
-                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Lastname */}
-                  <FormField
-                    control={form.control}
-                    name="lastname"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Nachname *</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="text"
-                              placeholder="Nachname"
-                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Email */}
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Bestätigungs E-Mail</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="E-Mail"
-                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Event */}
-                  <FormField
-                    control={form.control}
-                    name="event"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Event *</FormLabel>
-                          <FormControl>
-                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                              <SelectTrigger>
-                                {field.value ? <SelectValue placeholder={placeholderEvent} /> : placeholderEvent}
-                              </SelectTrigger>
-                              <SelectContent>
-                                {events.map((event, index) => (
-                                  <SelectItem key={index} value={event.description + " " + event.eventyear}>
-                                    {event.description + " " + event.eventyear}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Dojo */}
-                  <FormField
-                    control={form.control}
-                    name="dojo"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Dojo *</FormLabel>
-                          <FormControl>
-                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                              <SelectTrigger>
-                                {field.value ? <SelectValue placeholder={placeholderDojo} /> : placeholderDojo}
-                              </SelectTrigger>
-                              <SelectContent className="">
-                                {dojos.map((dojo) => (
-                                  <SelectItem key={dojo.id} value={dojo.name}>
-                                    {dojo.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Comments */}
-                  <FormField
-                    control={form.control}
-                    name="comments"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Bemerkungen</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              rows={5}
-                              placeholder="Bemerkungen (optional)"
-                              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Options */}
-                  <FormField
-                    control={form.control}
-                    name="option"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <FormLabel>Optionen</FormLabel>
-                          <FormControl>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox
-                                id="terms"
-                                checked={field.value} // Checkbox-Wert direkt aus dem Field nehmen
-                                onCheckedChange={field.onChange} // Wert aktualisieren
-                              />
-                              <label
-                                htmlFor="terms"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              >
-                                am anschließendem Essen teilnehmen
-                              </label>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )
-                    }}
-                  />
-                  {/* Captcha */}
-                  <FormField
-                    control={form.control}
-                    name="captchatoken"
-                    render={({ field }) => {
-                      return (
-                        <FormItem>
-                          <div className="flex flex-col gap-4 items-center justify-center mt-7">
-                            <FormLabel>Abfrage *</FormLabel>
-                            <FormControl>
-                              <ReCAPTCHA
-                                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
-                                ref={recaptchaRef}
-                                onChange={(token) => {
-                                  handleChange(token)
-                                  field.onChange(token)
-                                }}
-                                onExpired={handleExpired}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )
-                    }}
-                  />
+            <CardContent className="flex flex-col items-center gap-16">
+              {!Array.isArray(events) ? (
+                <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>
+              ) : (
+                <Form {...form}>
+                  {Array.isArray(events) && events.length > 0 && (
+                    <form
+                      onSubmit={form.handleSubmit(handleSubmit)}
+                      className="max-w-2xl w-full flex flex-col gap-4 justify-center"
+                    >
+                      {/* Firstname */}
+                      <FormField
+                        control={form.control}
+                        name="firstname"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <FormLabel>Vorname *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="Vorname"
+                                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                      {/* Lastname */}
+                      <FormField
+                        control={form.control}
+                        name="lastname"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <FormLabel>Nachname *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="Nachname"
+                                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                      {/* Email */}
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <FormLabel>Bestätigungs E-Mail</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="email"
+                                  placeholder="E-Mail"
+                                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                      {/* Event */}
+                      <FormField
+                        control={form.control}
+                        name="event"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <FormLabel>Event *</FormLabel>
+                              <FormControl>
+                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                  <SelectTrigger>
+                                    {field.value ? <SelectValue placeholder={placeholderEvent} /> : placeholderEvent}
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {events.map((event, index) => (
+                                      <SelectItem key={index} value={event.description + " " + event.eventyear}>
+                                        {event.description + " " + event.eventyear}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                      {/* Dojo */}
+                      <FormField
+                        control={form.control}
+                        name="dojo"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <FormLabel>Dojo *</FormLabel>
+                              <FormControl>
+                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                  <SelectTrigger>
+                                    {field.value ? <SelectValue placeholder={placeholderDojo} /> : placeholderDojo}
+                                  </SelectTrigger>
+                                  <SelectContent className="">
+                                    {dojos.map((dojo) => (
+                                      <SelectItem key={dojo.id} value={dojo.name}>
+                                        {dojo.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                      {/* Comments */}
+                      <FormField
+                        control={form.control}
+                        name="comments"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <FormLabel>Bemerkungen</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  rows={5}
+                                  placeholder="Bemerkungen (optional)"
+                                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                      {/* Options */}
+                      <FormField
+                        control={form.control}
+                        name="option"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <FormLabel>Optionen</FormLabel>
+                              <FormControl>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id="terms"
+                                    checked={field.value} // Checkbox-Wert direkt aus dem Field nehmen
+                                    onCheckedChange={field.onChange} // Wert aktualisieren
+                                  />
+                                  <label
+                                    htmlFor="terms"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    am anschließendem Essen teilnehmen
+                                  </label>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )
+                        }}
+                      />
+                      {/* Captcha */}
+                      <FormField
+                        control={form.control}
+                        name="captchatoken"
+                        render={({ field }) => {
+                          return (
+                            <FormItem>
+                              <div className="flex flex-col gap-4 items-center justify-center mt-7">
+                                <FormLabel>Abfrage *</FormLabel>
+                                <FormControl>
+                                  <ReCAPTCHA
+                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                                    ref={recaptchaRef}
+                                    onChange={(token) => {
+                                      handleChange(token)
+                                      field.onChange(token)
+                                    }}
+                                    onExpired={handleExpired}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )
+                        }}
+                      />
 
-                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || !isVerified}>
-                    Absenden
-                  </Button>
-                </form>
+                      <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || !isVerified}>
+                        Absenden
+                      </Button>
+                    </form>
+                  )}
+                </Form>
               )}
-            </Form>
+            </CardContent>
           )}
-        </>
-      )}
+        </Card>
+      </div>
     </main>
   )
 }

@@ -70,3 +70,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.bg-discreet-gradient {
+  @apply bg-gradient-to-br from-white via-orange-200 to-orange-300;
+}

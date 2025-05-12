@@ -6,7 +6,7 @@ import Link from "next/link"
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-16 p-6 sm:p-12">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-16 p-6 sm:p-12 bg-discreet-gradient">
       {/* Buttons */}
       <KamizaImage />
       <div className="flex flex-col gap-4 w-full max-w-md">

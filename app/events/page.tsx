@@ -319,26 +319,31 @@ export default function Event() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     {events.map((event, index) => {
-                                      const deadline = new Date(event.deadline)
-                                      const now = new Date()
-
-                                      const diffMs = deadline.getTime() - now.getTime()
-                                      const diffDays = diffMs / (1000 * 60 * 60 * 24)
-
-                                      const deadlinePassed = diffMs < 0
-                                      const tooEarlyToRegister = diffDays > 21
-
                                       let statusText = ""
+                                      let isSelectable = true
+                                      let deadlinePassed = false
+                                      let tooEarlyToRegister = false
 
-                                      if (deadlinePassed) {
-                                        statusText = "Geschlossen"
-                                      } else if (tooEarlyToRegister) {
-                                        statusText = "nicht freigeschaltet"
-                                      } else {
-                                        statusText = `Anmeldung – ${formatRelativeDeadline(event.deadline)}`
+                                      if (event.deadline !== null) {
+                                        const deadline = new Date(event.deadline)
+                                        const now = new Date()
+
+                                        const diffMs = deadline.getTime() - now.getTime()
+                                        const diffDays = diffMs / (1000 * 60 * 60 * 24)
+
+                                        deadlinePassed = diffMs < 0
+                                        tooEarlyToRegister = diffDays > 21
+
+                                        if (deadlinePassed) {
+                                          statusText = "Geschlossen"
+                                        } else if (tooEarlyToRegister) {
+                                          statusText = "nicht freigeschaltet"
+                                        } else {
+                                          statusText = `Anmeldung – ${formatRelativeDeadline(event.deadline)}`
+                                        }
+
+                                        isSelectable = !deadlinePassed && !tooEarlyToRegister
                                       }
-
-                                      const isSelectable = !deadlinePassed && !tooEarlyToRegister
 
                                       return (
                                         <SelectItem

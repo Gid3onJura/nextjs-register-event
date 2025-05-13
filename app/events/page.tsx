@@ -12,15 +12,21 @@ import { Textarea } from "@/components/ui/textarea"
 import { getEvents } from "@/util/getEvents"
 
 import ReCAPTCHA from "react-google-recaptcha"
-import { notify, setRegister } from "@/util/util"
+import { formatDeadline, formatRelativeDeadline, notify, setRegister } from "@/util/util"
 import Link from "next/link"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface Event {
-  description: string
+  eventid: number
   eventyear: string
+  description: string
+  eventdate: string
+  eventdatetimefrom: string
+  eventdatetimeto: string
+  deadline: string
 }
 
 const dojos = [
@@ -312,11 +318,53 @@ export default function Event() {
                                     {field.value ? <SelectValue placeholder={placeholderEvent} /> : placeholderEvent}
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {events.map((event, index) => (
-                                      <SelectItem key={index} value={event.description + " " + event.eventyear}>
-                                        {event.description + " " + event.eventyear}
-                                      </SelectItem>
-                                    ))}
+                                    {events.map((event, index) => {
+                                      const deadline = new Date(event.deadline)
+                                      const now = new Date()
+
+                                      const diffMs = deadline.getTime() - now.getTime()
+                                      const diffDays = diffMs / (1000 * 60 * 60 * 24)
+
+                                      const deadlinePassed = diffMs < 0
+                                      const tooEarlyToRegister = diffDays > 21
+
+                                      let statusText = ""
+
+                                      if (deadlinePassed) {
+                                        statusText = "Geschlossen"
+                                      } else if (tooEarlyToRegister) {
+                                        statusText = "nicht freigeschaltet"
+                                      } else {
+                                        statusText = `Anmeldung – ${formatRelativeDeadline(event.deadline)}`
+                                      }
+
+                                      const isSelectable = !deadlinePassed && !tooEarlyToRegister
+
+                                      return (
+                                        <SelectItem
+                                          key={index}
+                                          value={`${event.description} ${event.eventyear}`}
+                                          disabled={!isSelectable}
+                                          className="flex justify-between items-center text-sm"
+                                        >
+                                          <div className="flex justify-between items-center">
+                                            <div className={cn("flex", deadlinePassed && "line-through")}>
+                                              {event.description} {event.eventyear}
+                                            </div>
+                                            <div
+                                              className={cn(
+                                                "text-muted-foreground text-right ml-2 mr-2",
+                                                deadlinePassed && "text-red-300",
+                                                tooEarlyToRegister && "text-red-800",
+                                                isSelectable && "text-green-500"
+                                              )}
+                                            >
+                                              {statusText}
+                                            </div>
+                                          </div>
+                                        </SelectItem>
+                                      )
+                                    })}
                                   </SelectContent>
                                 </Select>
                               </FormControl>

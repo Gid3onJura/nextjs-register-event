@@ -332,7 +332,8 @@ export default function Event() {
                                         const diffDays = diffMs / (1000 * 60 * 60 * 24)
 
                                         deadlinePassed = diffMs < 0
-                                        tooEarlyToRegister = diffDays > 21
+                                        tooEarlyToRegister =
+                                          diffDays > parseInt(process.env.NEXT_PUBLIC_REGISTRATION_PERIOD_DAYS ?? "21")
 
                                         if (deadlinePassed) {
                                           statusText = "Geschlossen"

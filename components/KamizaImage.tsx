@@ -10,7 +10,7 @@ const KamizaImage = () => {
           width={300} // Desired width
           height={100} // Desired height
           className="rounded-lg object-cover"
-          priority // Preload image
+          // priority // Preload image
         />
       </div>
     </div>

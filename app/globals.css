@@ -72,5 +72,9 @@ body {
 }
 
 .bg-discreet-gradient {
-  @apply bg-gradient-to-br from-white via-orange-200 to-orange-300;
+  @apply bg-gradient-to-br from-white via-gray-400 to-gray-700;
+}
+
+.btn-color-interaction {
+  @apply hover:bg-gray-500 bg-gray-800;
 }

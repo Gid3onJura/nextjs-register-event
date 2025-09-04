@@ -27,7 +27,7 @@ const ScrollUpButton = () => {
     showButton && (
       <button
         onClick={scrollToTop}
-        className="fixed bottom-5 right-5 hover:bg-gray-500 bg-gray-800 text-white p-3 rounded-full shadow-md focus:outline-none"
+        className="fixed bottom-5 right-5 btn-color-interaction text-white p-3 rounded-full shadow-md focus:outline-none"
         aria-label="Scroll to top"
       >
         <ArrowUp className="h-5 w-5" />

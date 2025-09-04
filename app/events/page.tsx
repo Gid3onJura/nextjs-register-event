@@ -198,13 +198,13 @@ export default function Event() {
       <div className="flex flex-col gap-4">
         {/* Buttons */}
         <div className="flex flex-row">
-          <Button asChild>
+          <Button asChild className="btn-color-interaction">
             <Link href="/" title="zurück">
               <ArrowLeft className="h-5 w-5" />
             </Link>
           </Button>
         </div>
-        <Card className="shadow-xl">
+        <Card className="shadow-xl w-full">
           <CardHeader>
             <CardTitle>
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
@@ -213,19 +213,16 @@ export default function Event() {
             </CardTitle>
             {/* <CardDescription>Card Description</CardDescription> */}
           </CardHeader>
-          {/* <CardDescription>
-            <div className="flex flex-col gap-3 items-center justify-center p-12">
-              <div className="text-red-600 font-medium">
-                Hinweis: Vergesst nicht euch für das anschließende Essen anzumelden! Gerade für die Jubiläumsfeier ist
-                eine genaue Anzahl wichtig!
+          {
+            <CardDescription>
+              <div className="flex flex-col gap-3 items-center justify-center p-12">
+                <div className="text-red-600 font-medium">
+                  Hinweis zum Lehrgang: Bitte gib die Anzahl und Namen der Teilnehmer im Bemerkungsfeld mit an. Zu dem
+                  wäre es wichtig deinen Budo-Pass zum Lehrgang mitzubringen.
+                </div>
               </div>
-              <div className="text-red-600 font-medium">
-                Für alle Diejenigen die nur am anschließenden Essen teilnehmen wollen, meldet euch dennoch mit eurem
-                Namen an und setzt den Haken für "am anschließendem Essen teilnehmen". Gebt zusätzlich in den
-                Kommentaren an, dass ihr nur am anschließenden Essen teilnehmen wollt und wieviele ihr mitbringen wollt.
-              </div>
-            </div>
-          </CardDescription> */}
+            </CardDescription>
+          }
           {isLoading ? (
             <div className="flex flex-col items-center justify-center gap-4">
               <p className="text-black text-xl">Seite wird geladen...</p>
@@ -324,7 +321,7 @@ export default function Event() {
                                       let deadlinePassed = false
                                       let tooEarlyToRegister = false
 
-                                      if (event.deadline !== null) {
+                                      if (event.deadline && event.deadline !== null && event.deadline !== undefined) {
                                         const deadline = new Date(event.deadline)
                                         const now = new Date()
 
@@ -355,7 +352,7 @@ export default function Event() {
                                         >
                                           <div className="flex justify-between items-center">
                                             <div className={cn("flex", deadlinePassed && "line-through")}>
-                                              {event.description} {event.eventyear}
+                                              {event.description}
                                             </div>
                                             <div
                                               className={cn(
@@ -428,7 +425,7 @@ export default function Event() {
                         }}
                       />
                       {/* Options */}
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name="option"
                         render={({ field }) => {
@@ -454,7 +451,7 @@ export default function Event() {
                             </FormItem>
                           )
                         }}
-                      />
+                      /> */}
                       {/* Captcha */}
                       <FormField
                         control={form.control}

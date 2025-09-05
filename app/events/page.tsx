@@ -16,7 +16,7 @@ import { formatDeadline, formatRelativeDeadline, notify, setRegister } from "@/u
 import Link from "next/link"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Event {
@@ -198,9 +198,13 @@ export default function Event() {
       <div className="flex flex-col gap-4">
         {/* Buttons */}
         <div className="flex flex-row">
-          <Button asChild className="btn-color-interaction">
+          <Button
+            asChild
+            variant={"interaction"}
+            className="text-white p-3 rounded-full shadow-md focus:outline-none hover:shadow-lg text-lg sm:text-base"
+          >
             <Link href="/" title="zurück">
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5" strokeWidth={3} />
             </Link>
           </Button>
         </div>
@@ -479,7 +483,12 @@ export default function Event() {
                         }}
                       />
 
-                      <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || !isVerified}>
+                      <Button
+                        type="submit"
+                        className="shadow-md hover:shadow-lg w-full rounded-lg sm:rounded-2xl p-4 text-lg sm:text-base"
+                        disabled={form.formState.isSubmitting || !isVerified}
+                        variant={"interaction"}
+                      >
                         Absenden
                       </Button>
                     </form>

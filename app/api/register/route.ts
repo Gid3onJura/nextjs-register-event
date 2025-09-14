@@ -54,11 +54,11 @@ export async function POST(request: Request) {
 
   let optionMailText = ""
 
-  if (option) {
-    optionMailText = `nehme am anschließendem Essen teil\n`
-  } else {
-    optionMailText = `nehme <strong>nicht</strong> am anschließendem Essen teil\n`
-  }
+  // if (option) {
+  //   optionMailText = `nehme am anschließendem Essen teil\n`
+  // } else {
+  //   optionMailText = `nehme <strong>nicht</strong> am anschließendem Essen teil\n`
+  // }
 
   // const logoUrl = `data:image/png;base64,${kamizaBase64}`
   const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`

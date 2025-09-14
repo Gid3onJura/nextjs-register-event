@@ -165,7 +165,7 @@ export const createEmailTemplate = (
         <p style="margin: 8px 0;"><strong>Name:</strong> ${firstname} ${lastname}</p>
         <p style="margin: 8px 0;"><strong>Event:</strong> ${event}</p>
         <p style="margin: 8px 0;"><strong>Dojo:</strong> ${dojo}</p>
-        <p style="margin: 8px 0;"><strong>Option:</strong> ${optionMailText}</p>
+        <!-- <p style="margin: 8px 0;"><strong>Option:</strong> ${optionMailText}</p> -->
         <p style="margin: 8px 0;"><strong>Kommentare:</strong><br>${comments?.replace(/\n/g, "<br>") || ""}</p>
       </div>
       <div style="background-color: #f1f5f9; text-align: center; padding: 15px; font-size: 12px; color: #64748b;">

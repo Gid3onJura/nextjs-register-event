@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   const comments = result.data?.comments
   const option = result.data?.option
 
-  let optionMailText = ""
+  // let optionMailText = ""
 
   // if (option) {
   //   optionMailText = `nehme am anschließendem Essen teil\n`
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
   // const logoUrl = `data:image/png;base64,${kamizaBase64}`
   const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`
 
-  const htmlMail = createEmailTemplate(firstname, lastname, event, dojo, comments, optionMailText, logoUrl)
+  const htmlMail = createEmailTemplate(firstname, lastname, event, dojo, comments, "", logoUrl)
 
   // send email to trainer
   try {

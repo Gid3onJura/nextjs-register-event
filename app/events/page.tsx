@@ -20,7 +20,7 @@ import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Event {
-  eventid: number
+  id: number
   eventyear: string
   description: string
   eventdate: string
@@ -349,7 +349,7 @@ export default function Event() {
 
                                       return (
                                         <SelectItem
-                                          key={index}
+                                          key={event.id}
                                           value={`${event.description} ${event.eventyear}`}
                                           disabled={!isSelectable}
                                           className="flex justify-between items-center text-sm"

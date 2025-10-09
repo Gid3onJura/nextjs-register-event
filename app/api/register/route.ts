@@ -1,4 +1,5 @@
 import { sendEmail } from "@/util/email"
+import { getEvents } from "@/util/getEvents"
 import { formSchema } from "@/util/types"
 import { createEmailTemplate, isRateLimited } from "@/util/util"
 import { NextResponse } from "next/server"
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
       { status: 429 }
     )
   }
+
+  const allEventsResponse = await getEvents()
+  const allEvents = await allEventsResponse.json()
 
   const body: unknown = await request.json()
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
@@ -44,39 +48,55 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
 
-  const firstname = result.data?.firstname
-  const lastname = result.data?.lastname
-  const event = result.data?.event
-  const email = result.data?.email
-  const dojo = result.data?.dojo
-  const comments = result.data?.comments
-  const option = result.data?.option
+  const { firstname, lastname, event: eventName, email, dojo, comments, options: selectedOptionIds } = result.data
 
-  // let optionMailText = ""
+  // const firstname = result.data?.firstname
+  // const lastname = result.data?.lastname
+  // const event = result.data?.event
+  // const email = result.data?.email
+  // const dojo = result.data?.dojo
+  // const comments = result.data?.comments
+  // const options = result.data?.options
 
-  // if (option) {
-  //   optionMailText = `nehme am anschließendem Essen teil\n`
-  // } else {
-  //   optionMailText = `nehme <strong>nicht</strong> am anschließendem Essen teil\n`
-  // }
+  const eventObj = allEvents.find((e: any) => `${e.description} ${e.eventyear}` === eventName)
+  let optionMailText = ""
+
+  if (eventObj) {
+    if (eventObj.options.length > 0) {
+      if (selectedOptionIds && selectedOptionIds.length > 0) {
+        // nur ausgewählte Optionen, die tatsächlich beim Event verfügbar sind
+        const selectedOptionDescriptions = eventObj.options
+          .filter((opt: any) => selectedOptionIds.includes(opt.id))
+          .map((opt: any) => opt.description)
+
+        if (selectedOptionDescriptions.length > 0) {
+          optionMailText = `Gewählte Optionen:<br>- ${selectedOptionDescriptions.join("<br>- ")}`
+        } else {
+          optionMailText = "Keine Option gewählt.\n"
+        }
+      } else {
+        optionMailText = "Keine Option gewählt.\n"
+      }
+    } else {
+      // Event hat gar keine Optionen → nichts anzeigen
+      optionMailText = ""
+    }
+  }
 
   // const logoUrl = `data:image/png;base64,${kamizaBase64}`
   const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`
 
-  const htmlMail = createEmailTemplate(firstname, lastname, event, dojo, comments, "", logoUrl)
+  const htmlMail = createEmailTemplate(firstname, lastname, eventName, dojo, comments, optionMailText, logoUrl)
+  const plainMail = `Name: ${firstname} ${lastname}
+                    Event: ${eventName}
+                    Dojo: ${dojo}
+                    Kommentare: ${comments}
+                    ${optionMailText}`
 
-  // send email to trainer
+  // send email
   try {
-    await sendEmail(
-      emailTo,
-      email || "",
-      `Anmeldung ${event}: ${firstname} ${lastname}`,
-      `Name: ${firstname} ${lastname}\n
-      Event: ${event}\n
-      Dojo: ${dojo}\n
-      Kommentare: ${comments}`,
-      htmlMail
-    )
+    await sendEmail(emailTo, email || "", `Anmeldung ${eventName}: ${firstname} ${lastname}`, plainMail, htmlMail)
+
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })
   } catch (error) {
     return NextResponse.json({ error: "Anmeldung fehlgeschlagen:" + JSON.stringify(error) }, { status: 500 })

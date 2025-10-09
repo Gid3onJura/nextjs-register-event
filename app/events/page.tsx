@@ -19,6 +19,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+interface EventOption {
+  id: number
+  description: string
+}
 interface Event {
   id: number
   eventyear: string
@@ -27,6 +31,7 @@ interface Event {
   eventdatetimefrom: string
   eventdatetimeto: string
   deadline: string
+  options: EventOption[]
 }
 
 const dojos = [
@@ -56,13 +61,16 @@ export default function Event() {
       email: "",
       dojo: "",
       comments: "",
-      option: false,
+      options: [],
     },
   })
 
   // captcha
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const [isVerified, setIsVerified] = useState(false)
+
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const selectedOptions: number[] = form.watch("options") || []
 
   // placeholder text
   const placeholderEvent = "Wähle ein Event"
@@ -151,10 +159,12 @@ export default function Event() {
       email: "",
       dojo: "",
       comments: "",
-      option: false,
+      options: [],
     })
+
     recaptchaRef.current?.reset()
     setIsVerified(false)
+    setSelectedEvent(null)
     return
   }
 
@@ -314,7 +324,18 @@ export default function Event() {
                             <FormItem>
                               <FormLabel>Event *</FormLabel>
                               <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                <Select
+                                  onValueChange={(value) => {
+                                    field.onChange(value)
+                                    const event = events.find((e) => {
+                                      return String(e.description + " " + e.eventyear) === value
+                                    })
+                                    setSelectedEvent(event || null)
+                                    form.setValue("options", []) // Optionen zurücksetzen
+                                  }}
+                                  defaultValue={field.value}
+                                  value={field.value}
+                                >
                                   <SelectTrigger>
                                     {field.value ? <SelectValue placeholder={placeholderEvent} /> : placeholderEvent}
                                   </SelectTrigger>
@@ -429,33 +450,41 @@ export default function Event() {
                         }}
                       />
                       {/* Options */}
-                      {/* <FormField
-                        control={form.control}
-                        name="option"
-                        render={({ field }) => {
-                          return (
-                            <FormItem>
-                              <FormLabel>Optionen</FormLabel>
-                              <FormControl>
-                                <div className="flex items-center space-x-2">
+                      {selectedEvent && (
+                        <FormItem>
+                          <FormLabel>Optionen</FormLabel>
+                          <div className="space-y-2 rounded-lg p-3 bg-card">
+                            {selectedEvent.options?.length > 0 ? (
+                              selectedEvent.options.map((opt) => (
+                                <div key={opt.id} className="flex items-center space-x-2">
                                   <Checkbox
-                                    id="terms"
-                                    checked={field.value} // Checkbox-Wert direkt aus dem Field nehmen
-                                    onCheckedChange={field.onChange} // Wert aktualisieren
+                                    id={`option-${opt.id}`}
+                                    checked={selectedOptions.includes(opt.id)}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        form.setValue("options", [...selectedOptions, opt.id])
+                                      } else {
+                                        form.setValue(
+                                          "options",
+                                          selectedOptions.filter((id) => id !== opt.id)
+                                        )
+                                      }
+                                    }}
                                   />
                                   <label
-                                    htmlFor="terms"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    htmlFor={`option-${opt.id}`}
+                                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                   >
-                                    am anschließendem Essen teilnehmen
+                                    {opt.description}
                                   </label>
                                 </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )
-                        }}
-                      /> */}
+                              ))
+                            ) : (
+                              <p className="text-muted-foreground text-sm">Keine Optionen verfügbar.</p>
+                            )}
+                          </div>
+                        </FormItem>
+                      )}
                       {/* Captcha */}
                       <FormField
                         control={form.control}

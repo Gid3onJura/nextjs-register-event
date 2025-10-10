@@ -18,7 +18,7 @@ export default function CopyrightComponent() {
         className="flex items-center justify-start bg-secondary text-black rounded-full shadow-md px-1 overflow-hidden"
         animate={{
           backgroundColor: hovered ? "#F54927" : "#4b5563",
-          width: hovered ? 150 : 22,
+          width: hovered ? 180 : 22,
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
@@ -34,7 +34,7 @@ export default function CopyrightComponent() {
           }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          made by G.J. {new Date().getFullYear()}
+          made by Gideon {new Date().getFullYear()}
         </motion.span>
       </motion.div>
     </motion.div>

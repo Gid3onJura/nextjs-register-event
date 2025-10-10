@@ -10,7 +10,26 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-export const sendEmail = async (to: string, bcc: string, subject: string, text: string, html: string) => {
+export const sendEmail = async (
+  to: string,
+  bcc: string,
+  subject: string,
+  text: string,
+  html: string,
+  iscfile?: any | null
+) => {
+  const attachments = [
+    {
+      filename: "kamiza.png",
+      path: `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`,
+      cid: "kamiza",
+    },
+  ]
+
+  if (iscfile) {
+    attachments.push(iscfile)
+  }
+
   await transporter.sendMail({
     from: process.env.NEXT_PUBLIC_SMTP_USER,
     to,
@@ -18,12 +37,6 @@ export const sendEmail = async (to: string, bcc: string, subject: string, text: 
     subject,
     text,
     html,
-    attachments: [
-      {
-        filename: "kamiza.png",
-        path: `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`,
-        cid: "kamiza", // Diese CID referenziert das Bild im HTML
-      },
-    ],
+    attachments,
   })
 }

@@ -1,7 +1,8 @@
 import { sendEmail } from "@/util/email"
 import { getEvents } from "@/util/getEvents"
+import { Event } from "@/util/interfaces"
 import { formSchema } from "@/util/types"
-import { createEmailTemplate, isRateLimited } from "@/util/util"
+import { createEmailTemplate, createICalEvent, isRateLimited } from "@/util/util"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
@@ -48,18 +49,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
 
+  // payload is valid
   const { firstname, lastname, event: eventName, email, dojo, comments, options: selectedOptionIds } = result.data
 
-  // const firstname = result.data?.firstname
-  // const lastname = result.data?.lastname
-  // const event = result.data?.event
-  // const email = result.data?.email
-  // const dojo = result.data?.dojo
-  // const comments = result.data?.comments
-  // const options = result.data?.options
+  // const logoUrl = `data:image/png;base64,${kamizaBase64}`
+  const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`
 
-  const eventObj = allEvents.find((e: any) => `${e.description} ${e.eventyear}` === eventName)
   let optionMailText = ""
+  let icsFile = null
+
+  // find event
+  const eventObj = allEvents.find((e: Event) => `${e.description} ${e.eventyear}` === eventName)
 
   if (eventObj) {
     if (eventObj.options.length > 0) {
@@ -83,8 +83,16 @@ export async function POST(request: Request) {
     }
   }
 
-  // const logoUrl = `data:image/png;base64,${kamizaBase64}`
-  const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`
+  // create ical
+  const icsFileBuffer: Buffer | null = await createICalEvent(eventObj, emailTo)
+
+  icsFile = icsFileBuffer
+    ? {
+        filename: "event.ics",
+        content: icsFileBuffer,
+        contentType: "text/calendar",
+      }
+    : null
 
   const htmlMail = createEmailTemplate(firstname, lastname, eventName, dojo, comments, optionMailText, logoUrl)
   const plainMail = `Name: ${firstname} ${lastname}
@@ -95,10 +103,17 @@ export async function POST(request: Request) {
 
   // send email
   try {
-    await sendEmail(emailTo, email || "", `Anmeldung ${eventName}: ${firstname} ${lastname}`, plainMail, htmlMail)
+    // email for trainer
+    await sendEmail(emailTo, "", `Anmeldung ${eventName}: ${firstname} ${lastname}`, plainMail, htmlMail)
+
+    // email for user
+    if (email) {
+      await sendEmail(email, "", `Anmeldung ${eventName}: ${firstname} ${lastname}`, plainMail, htmlMail, icsFile)
+    }
 
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })
   } catch (error) {
+    console.log("Error sending email:", error)
     return NextResponse.json({ error: "Anmeldung fehlgeschlagen:" + JSON.stringify(error) }, { status: 500 })
   }
 }

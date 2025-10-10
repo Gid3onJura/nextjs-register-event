@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken"
 import { toast } from "react-toastify"
 import { TFormSchema, TFormSchemaOrders } from "./types"
+import ical from "ical-generator"
+import { fromZonedTime, toZonedTime } from "date-fns-tz"
+import { Event } from "./interfaces"
 
 export const isTimestampExpired = (timestamp: number) => {
   const now = Date.now() / 1000
@@ -175,6 +178,42 @@ export const createEmailTemplate = (
   </div>`
 
   return htmlMail
+}
+
+export const createICalEvent = async (event: Event, emailOganizer: string) => {
+  // 📅 ICS-Kalendereintrag erzeugen (wenn Event-Zeiten vorhanden)
+  if (!event?.eventdatetimefrom || !event?.eventdatetimeto) {
+    return null
+  }
+
+  const timeZone = "Europe/Berlin"
+
+  // Lokale Zeit (Berlin) → UTC konvertieren für Kalender
+  const startUtc = fromZonedTime(new Date(event.eventdatetimefrom), timeZone)
+  const endUtc = fromZonedTime(new Date(event.eventdatetimeto), timeZone)
+
+  // Kalender erstellen
+  const cal = ical({
+    name: `Event: ${event.description}`,
+    timezone: timeZone,
+    // prodId: "//dein-verein.de//Event-System//DE",
+  })
+
+  // Event hinzufügen
+  cal.createEvent({
+    start: startUtc,
+    end: endUtc,
+    summary: event.description,
+    description: `Ein Event des Shorai-Do-Kempo Merseburg`,
+    location: "Ort wird noch bekannt gegeben",
+    organizer: {
+      name: "Shorai-Do-Kempo Merseburg",
+      email: emailOganizer,
+    },
+  })
+
+  // ICS-Datei als Buffer zurückgeben (z. B. für Mailanhang)
+  return Buffer.from(cal.toString())
 }
 
 export function formatDeadline(dateString: string): string {

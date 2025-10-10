@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { formSchema, TFormSchema } from "@/util/types"
 import { Textarea } from "@/components/ui/textarea"
 import { getEvents } from "@/util/getEvents"
+import { type Event } from "@/util/interfaces"
 
 import ReCAPTCHA from "react-google-recaptcha"
 import { formatDeadline, formatRelativeDeadline, notify, setRegister } from "@/util/util"
@@ -18,21 +19,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-interface EventOption {
-  id: number
-  description: string
-}
-interface Event {
-  id: number
-  eventyear: string
-  description: string
-  eventdate: string
-  eventdatetimefrom: string
-  eventdatetimeto: string
-  deadline: string
-  options: EventOption[]
-}
 
 const dojos = [
   {

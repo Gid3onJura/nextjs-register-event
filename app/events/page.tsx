@@ -387,6 +387,44 @@ export default function Event() {
                           )
                         }}
                       />
+
+                      {/* Options */}
+                      {selectedEvent && (
+                        <FormItem>
+                          <FormLabel>Optionen</FormLabel>
+                          <div className="space-y-3 rounded-lg ps-3 bg-card">
+                            {selectedEvent.options?.length > 0 ? (
+                              selectedEvent.options.map((opt) => (
+                                <div key={opt.id} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`option-${opt.id}`}
+                                    checked={selectedOptions.includes(opt.id)}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        form.setValue("options", [...selectedOptions, opt.id])
+                                      } else {
+                                        form.setValue(
+                                          "options",
+                                          selectedOptions.filter((id) => id !== opt.id)
+                                        )
+                                      }
+                                    }}
+                                  />
+                                  <label
+                                    htmlFor={`option-${opt.id}`}
+                                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    {opt.description}
+                                  </label>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-muted-foreground text-sm">Keine Optionen verfügbar.</p>
+                            )}
+                          </div>
+                        </FormItem>
+                      )}
+
                       {/* Dojo */}
                       <FormField
                         control={form.control}
@@ -435,42 +473,7 @@ export default function Event() {
                           )
                         }}
                       />
-                      {/* Options */}
-                      {selectedEvent && (
-                        <FormItem>
-                          <FormLabel>Optionen</FormLabel>
-                          <div className="space-y-2 rounded-lg p-3 bg-card">
-                            {selectedEvent.options?.length > 0 ? (
-                              selectedEvent.options.map((opt) => (
-                                <div key={opt.id} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`option-${opt.id}`}
-                                    checked={selectedOptions.includes(opt.id)}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        form.setValue("options", [...selectedOptions, opt.id])
-                                      } else {
-                                        form.setValue(
-                                          "options",
-                                          selectedOptions.filter((id) => id !== opt.id)
-                                        )
-                                      }
-                                    }}
-                                  />
-                                  <label
-                                    htmlFor={`option-${opt.id}`}
-                                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                  >
-                                    {opt.description}
-                                  </label>
-                                </div>
-                              ))
-                            ) : (
-                              <p className="text-muted-foreground text-sm">Keine Optionen verfügbar.</p>
-                            )}
-                          </div>
-                        </FormItem>
-                      )}
+
                       {/* Captcha */}
                       <FormField
                         control={form.control}

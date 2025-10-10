@@ -190,7 +190,7 @@ export default function Event() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-2 p-16 bg-discreet-gradient">
+    <main className="flex min-h-screen flex-col items-center gap-2 p-16 bg-gray-600">
       <div className="flex flex-col gap-4">
         {/* Buttons */}
         <div className="flex flex-row">

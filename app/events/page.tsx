@@ -197,7 +197,7 @@ export default function Event() {
           <Button
             asChild
             variant={"interaction"}
-            className="text-white p-3 rounded-full shadow-md focus:outline-none hover:shadow-lg text-lg sm:text-base"
+            className="text-white p-3 ms-2 rounded-full shadow-md focus:outline-none hover:shadow-lg text-lg sm:text-base"
           >
             <Link href="/" title="zurück">
               <ArrowLeft className="h-5 w-5" strokeWidth={3} />
@@ -325,7 +325,7 @@ export default function Event() {
                                   <SelectTrigger>
                                     {field.value ? <SelectValue placeholder={placeholderEvent} /> : placeholderEvent}
                                   </SelectTrigger>
-                                  <SelectContent>
+                                  <SelectContent className="max-w-[90vw] w-full" position="popper">
                                     {events.map((event, index) => {
                                       let statusText = ""
                                       let isSelectable = true

@@ -207,22 +207,20 @@ export default function Event() {
         <Card className="shadow-xl w-full">
           <CardHeader>
             <CardTitle>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center mb-8">
                 Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
               </h1>
             </CardTitle>
             {/* <CardDescription>Card Description</CardDescription> */}
           </CardHeader>
-          {
-            <CardDescription>
-              <div className="flex flex-col gap-3 items-center justify-center p-12">
+          <CardDescription>
+            {/* <div className="flex flex-col gap-3 items-center justify-center p-12">
                 <div className="text-red-600 font-medium">
                   Hinweis zum Lehrgang: Bitte gib die Anzahl und Namen der Teilnehmer im Bemerkungsfeld mit an. Zu dem
                   wäre es wichtig deinen Budo-Pass zum Lehrgang mitzubringen.
                 </div>
-              </div>
-            </CardDescription>
-          }
+              </div> */}
+          </CardDescription>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center gap-4">
               <p className="text-black text-xl">Seite wird geladen...</p>
@@ -388,6 +386,12 @@ export default function Event() {
                         }}
                       />
 
+                      {selectedEvent && selectedEvent.note && (
+                        <div className="flex flex-col gap-3 justify-center p-2">
+                          <div className="text-red-600 font-bold">Hinweis zum Event: {selectedEvent?.note}</div>
+                        </div>
+                      )}
+
                       {/* Options */}
                       {selectedEvent && (
                         <FormItem>
@@ -412,7 +416,7 @@ export default function Event() {
                                   />
                                   <label
                                     htmlFor={`option-${opt.id}`}
-                                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
                                   >
                                     {opt.description}
                                   </label>

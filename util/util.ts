@@ -234,12 +234,15 @@ export function formatRelativeDeadline(dateString: string): string {
     const deadline = new Date(dateString)
     const now = new Date()
     const diffMs = deadline.getTime() - now.getTime()
+    const diffMinutes = Math.floor(diffMs / (1000 * 60))
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffHours / 24)
 
     if (diffMs > 0) {
       // Noch bevorstehend
-      if (diffHours < 24) {
+      if (diffMinutes < 60) {
+        return `noch ${diffMinutes} ${diffMinutes === 1 ? "Minute" : "Minuten"}`
+      } else if (diffHours < 24) {
         return `noch ${diffHours} ${diffHours === 1 ? "Stunde" : "Stunden"}`
       } else if (diffDays === 1) {
         return "noch 1 Tag"

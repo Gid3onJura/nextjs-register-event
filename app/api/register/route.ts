@@ -49,8 +49,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
 
+  console.log("====================================")
+  console.log(result.data)
+  console.log("====================================")
+
   // payload is valid
-  const { firstname, lastname, event: eventName, email, dojo, comments, options: selectedOptionIds } = result.data
+  const {
+    firstname,
+    lastname,
+    event: eventName,
+    email,
+    dojo,
+    comments,
+    options: selectedOptionIds,
+    optionValues: selectedOptionValues,
+  } = result.data
+
+  return NextResponse.json({ message: "stop" }, { status: 200 })
 
   // const logoUrl = `data:image/png;base64,${kamizaBase64}`
   const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`

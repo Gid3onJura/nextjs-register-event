@@ -48,6 +48,7 @@ export default function Event() {
       dojo: "",
       comments: "",
       options: [],
+      optionValues: {},
     },
   })
 
@@ -138,19 +139,19 @@ export default function Event() {
       notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }
 
-    form.reset({
-      firstname: "",
-      lastname: "",
-      event: "",
-      email: "",
-      dojo: "",
-      comments: "",
-      options: [],
-    })
+    // form.reset({
+    //   firstname: "",
+    //   lastname: "",
+    //   event: "",
+    //   email: "",
+    //   dojo: "",
+    //   comments: "",
+    //   options: [],
+    // })
 
     recaptchaRef.current?.reset()
     setIsVerified(false)
-    setSelectedEvent(null)
+    // setSelectedEvent(null)
     return
   }
 
@@ -314,6 +315,7 @@ export default function Event() {
                                     const event = events.find((e) => {
                                       return String(e.description + " " + e.eventyear) === value
                                     })
+
                                     setSelectedEvent(event || null)
                                     form.setValue("options", []) // Optionen zurücksetzen
                                   }}
@@ -399,27 +401,54 @@ export default function Event() {
                           <div className="space-y-3 rounded-lg ps-3 bg-card">
                             {selectedEvent.options?.length > 0 ? (
                               selectedEvent.options.map((opt) => (
-                                <div key={opt.id} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`option-${opt.id}`}
-                                    checked={selectedOptions.includes(opt.id)}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        form.setValue("options", [...selectedOptions, opt.id])
-                                      } else {
-                                        form.setValue(
-                                          "options",
-                                          selectedOptions.filter((id) => id !== opt.id)
-                                        )
-                                      }
-                                    }}
-                                  />
-                                  <label
-                                    htmlFor={`option-${opt.id}`}
-                                    className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
-                                  >
-                                    {opt.description}
-                                  </label>
+                                <div key={opt.id} className="flex flex-col space-y-1">
+                                  {opt.type === "boolean" && (
+                                    <div key={opt.id} className="flex items-center space-x-2">
+                                      <Checkbox
+                                        id={`option-${opt.id}`}
+                                        checked={selectedOptions.includes(opt.id)}
+                                        onCheckedChange={(checked) => {
+                                          if (checked) {
+                                            form.setValue("options", [...selectedOptions, opt.id])
+                                          } else {
+                                            form.setValue(
+                                              "options",
+                                              selectedOptions.filter((id) => id !== opt.id)
+                                            )
+                                          }
+                                        }}
+                                      />
+                                      <label
+                                        htmlFor={`option-${opt.id}`}
+                                        className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
+                                      >
+                                        {opt.description}
+                                      </label>
+                                    </div>
+                                  )}
+
+                                  {opt.type === "number" && (
+                                    <div className="flex flex-row items-center justify-start gap-4">
+                                      <label
+                                        htmlFor={`option-${opt.id}`}
+                                        className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
+                                      >
+                                        {opt.description}
+                                      </label>
+                                      <Input
+                                        id={`option-${opt.id}`}
+                                        type="number"
+                                        min={0}
+                                        className="w-24"
+                                        placeholder="Anzahl"
+                                        value={form.watch(`optionValues.${opt.id}`) || ""}
+                                        onChange={(e) => {
+                                          const value = e.target.value ? parseInt(e.target.value, 10) : null
+                                          form.setValue(`optionValues.${opt.id}`, value)
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               ))
                             ) : (
@@ -467,7 +496,7 @@ export default function Event() {
                               <FormControl>
                                 <Textarea
                                   rows={5}
-                                  placeholder="Bemerkungen (optional)"
+                                  placeholder="Bemerkungen"
                                   className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
                                   {...field}
                                 />

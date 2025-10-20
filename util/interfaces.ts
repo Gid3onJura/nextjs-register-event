@@ -1,6 +1,8 @@
 export interface EventOption {
   id: number
   description: string
+  slug: string
+  type: string
 }
 export interface Event {
   id: number

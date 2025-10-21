@@ -65,33 +65,68 @@ export async function POST(request: Request) {
     const eventOptions = eventObj.options || []
 
     if (eventOptions.length > 0) {
-      const selectedOptionDescriptions = Object.entries(selectedOptions)
-        .map(([id, value]) => {
-          const opt = eventOptions.find((o: any) => o.id === Number(id))
-          if (!opt) return null
+      const selectedOptionDescriptions: string[] = []
+      const personOptions: { description: string; value: number }[] = []
 
-          // Entscheidung nach Typ:
-          switch (opt.type) {
-            case "boolean":
-              // Nur anzeigen, wenn true
-              return value ? `${opt.description}` : null
-            case "number":
-              // Zahl anzeigen, wenn > 0 oder nicht null
-              return value != 0 && value != null && value !== "" ? `${opt.description}: ${value}` : null
-            case "string":
-              // Text nur, wenn nicht leer
-              return value ? `${opt.description}: ${value}` : null
-            default:
-              // Fallback (falls unbekannter Typ)
-              return value ? `${opt.description}: ${value}` : null
+      Object.entries(selectedOptions).forEach(([id, value]) => {
+        const opt = eventOptions.find((o: any) => o.id === Number(id))
+        if (!opt) return
+
+        const slug = opt.slug || ""
+        const type = opt.type || typeof value
+
+        // 🔹 Sonderfall: Personen zählen
+        if (slug.includes("count_persons")) {
+          const numericValue = typeof value === "number" ? value : parseInt(value as any, 10)
+          if (!isNaN(numericValue) && numericValue > 0) {
+            personOptions.push({ description: opt.description, value: numericValue })
           }
-        })
-        .filter(Boolean)
+          return // Skip reguläre Ausgabe unten
+        }
 
-      if (selectedOptionDescriptions.length > 0) {
-        optionMailText = `Gewählte Optionen:<br>- ${selectedOptionDescriptions.join("<br>- ")}`
+        // 🔹 Normale Optionen
+        switch (type) {
+          case "boolean":
+            if (value) selectedOptionDescriptions.push(`${opt.description}`)
+            break
+          case "number":
+            if (value != 0 && value != null && value !== "")
+              selectedOptionDescriptions.push(`${opt.description}: ${value}`)
+            break
+          case "string":
+            if (value) selectedOptionDescriptions.push(`${opt.description}: ${value}`)
+            break
+          default:
+            if (value) selectedOptionDescriptions.push(`${opt.description}: ${value}`)
+            break
+        }
+      })
+
+      // 🔹 Personenabschnitt bauen (falls vorhanden)
+      let personsSection = ""
+      if (personOptions.length > 0) {
+        const total = personOptions.reduce((sum, p) => sum + p.value, 0)
+        personsSection = `
+        <p><strong>Teilnehmende Personen:</strong></p>
+        <ul>
+          ${personOptions.map((p) => `<li>${p.description}: ${p.value}</li>`).join("")}
+        </ul>
+        <p><strong>Personen insgesamt:</strong> ${total}</p>
+      `
+      }
+
+      // 🔹 Zusammenbauen des Mailtexts
+      if (selectedOptionDescriptions.length > 0 || personsSection) {
+        optionMailText = `
+        ${
+          selectedOptionDescriptions.length > 0
+            ? `<ul>${selectedOptionDescriptions.map((desc) => `<li>${desc}</li>`).join("")}</ul>`
+            : ""
+        }
+        ${personsSection}
+      `
       } else {
-        optionMailText = "Keine Option gewählt.<br>"
+        optionMailText = "<p>Keine Option gewählt.</p>"
       }
     } else {
       optionMailText = ""

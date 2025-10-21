@@ -205,7 +205,7 @@ export const createICalEvent = async (event: Event, emailOganizer: string) => {
     end: endUtc,
     summary: event.description,
     description: `Ein Event des Shorai-Do-Kempo Merseburg`,
-    location: "Ort wird noch bekannt gegeben",
+    location: "steht in der Einladung - bitte hier ergänzen",
     organizer: {
       name: "Shorai-Do-Kempo Merseburg",
       email: emailOganizer,

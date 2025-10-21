@@ -441,6 +441,31 @@ export default function Event() {
                                       />
                                     </div>
                                   )}
+
+                                  {opt.type === "string" && (
+                                    <div className="flex flex-row items-center justify-start gap-4">
+                                      <label
+                                        htmlFor={`option-${opt.id}`}
+                                        className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
+                                      >
+                                        {opt.description}
+                                      </label>
+                                      <Input
+                                        id={`option-${opt.id}`}
+                                        type="text"
+                                        className="w-full"
+                                        value={(() => {
+                                          const val = form.watch(`options.${opt.id}`)
+                                          if (typeof val === "string" || typeof val === "number") return val
+                                          return "" // boolean/null werden hier ausgefiltert
+                                        })()}
+                                        onChange={(e) => {
+                                          const value = e.target.value || ""
+                                          form.setValue(`options.${opt.id}`, value)
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               ))
                             ) : (

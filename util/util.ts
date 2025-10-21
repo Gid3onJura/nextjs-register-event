@@ -60,7 +60,6 @@ export const setRegister = async (values: TFormSchema) => {
       comments: values.comments,
       captchatoken: values.captchatoken,
       options: values.options,
-      optionValues: values.optionValues,
     }),
     headers: { "Content-Type": "application/json", "api-key": API_KEY },
   })

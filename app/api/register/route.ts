@@ -49,23 +49,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
   }
 
-  console.log("====================================")
-  console.log(result.data)
-  console.log("====================================")
-
   // payload is valid
-  const {
-    firstname,
-    lastname,
-    event: eventName,
-    email,
-    dojo,
-    comments,
-    options: selectedOptionIds,
-    optionValues: selectedOptionValues,
-  } = result.data
-
-  return NextResponse.json({ message: "stop" }, { status: 200 })
+  const { firstname, lastname, event: eventName, email, dojo, comments, options: selectedOptions } = result.data
 
   // const logoUrl = `data:image/png;base64,${kamizaBase64}`
   const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`
@@ -77,23 +62,38 @@ export async function POST(request: Request) {
   const eventObj = allEvents.find((e: Event) => `${e.description} ${e.eventyear}` === eventName)
 
   if (eventObj) {
-    if (eventObj.options.length > 0) {
-      if (selectedOptionIds && selectedOptionIds.length > 0) {
-        // nur ausgewählte Optionen, die tatsächlich beim Event verfügbar sind
-        const selectedOptionDescriptions = eventObj.options
-          .filter((opt: any) => selectedOptionIds.includes(opt.id))
-          .map((opt: any) => opt.description)
+    const eventOptions = eventObj.options || []
 
-        if (selectedOptionDescriptions.length > 0) {
-          optionMailText = `Gewählte Optionen:<br>- ${selectedOptionDescriptions.join("<br>- ")}`
-        } else {
-          optionMailText = "Keine Option gewählt.\n"
-        }
+    if (eventOptions.length > 0) {
+      const selectedOptionDescriptions = Object.entries(selectedOptions)
+        .map(([id, value]) => {
+          const opt = eventOptions.find((o: any) => o.id === Number(id))
+          if (!opt) return null
+
+          // Entscheidung nach Typ:
+          switch (opt.type) {
+            case "boolean":
+              // Nur anzeigen, wenn true
+              return value ? `${opt.description}` : null
+            case "number":
+              // Zahl anzeigen, wenn > 0 oder nicht null
+              return value != 0 && value != null && value !== "" ? `${opt.description}: ${value}` : null
+            case "string":
+              // Text nur, wenn nicht leer
+              return value ? `${opt.description}: ${value}` : null
+            default:
+              // Fallback (falls unbekannter Typ)
+              return value ? `${opt.description}: ${value}` : null
+          }
+        })
+        .filter(Boolean)
+
+      if (selectedOptionDescriptions.length > 0) {
+        optionMailText = `Gewählte Optionen:<br>- ${selectedOptionDescriptions.join("<br>- ")}`
       } else {
-        optionMailText = "Keine Option gewählt.\n"
+        optionMailText = "Keine Option gewählt.<br>"
       }
     } else {
-      // Event hat gar keine Optionen → nichts anzeigen
       optionMailText = ""
     }
   }

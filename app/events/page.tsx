@@ -47,8 +47,7 @@ export default function Event() {
       email: "",
       dojo: "",
       comments: "",
-      options: [],
-      optionValues: {},
+      options: {},
     },
   })
 
@@ -57,7 +56,7 @@ export default function Event() {
   const [isVerified, setIsVerified] = useState(false)
 
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
-  const selectedOptions: number[] = form.watch("options") || []
+  // const selectedOptions: number[] = form.watch("options") || []
 
   // placeholder text
   const placeholderEvent = "Wähle ein Event"
@@ -317,7 +316,7 @@ export default function Event() {
                                     })
 
                                     setSelectedEvent(event || null)
-                                    form.setValue("options", []) // Optionen zurücksetzen
+                                    form.setValue("options", {}) // Optionen zurücksetzen
                                   }}
                                   defaultValue={field.value}
                                   value={field.value}
@@ -406,16 +405,9 @@ export default function Event() {
                                     <div key={opt.id} className="flex items-center space-x-2">
                                       <Checkbox
                                         id={`option-${opt.id}`}
-                                        checked={selectedOptions.includes(opt.id)}
+                                        checked={!!form.watch(`options.${opt.id}`)} // boolean cast
                                         onCheckedChange={(checked) => {
-                                          if (checked) {
-                                            form.setValue("options", [...selectedOptions, opt.id])
-                                          } else {
-                                            form.setValue(
-                                              "options",
-                                              selectedOptions.filter((id) => id !== opt.id)
-                                            )
-                                          }
+                                          form.setValue(`options.${opt.id}`, !!checked)
                                         }}
                                       />
                                       <label
@@ -441,10 +433,10 @@ export default function Event() {
                                         min={0}
                                         className="w-24"
                                         placeholder="Anzahl"
-                                        value={form.watch(`optionValues.${opt.id}`) || ""}
+                                        value={Number(form.watch(`options.${opt.id}`)) || ""}
                                         onChange={(e) => {
                                           const value = e.target.value ? parseInt(e.target.value, 10) : null
-                                          form.setValue(`optionValues.${opt.id}`, value)
+                                          form.setValue(`options.${opt.id}`, value)
                                         }}
                                       />
                                     </div>

@@ -23,8 +23,7 @@ export const formSchema = zod.object({
     { message: "Bitte wähle ein Dojo aus" }
   ),
   comments: zod.string().optional(),
-  options: zod.array(zod.number()).default([]),
-  optionValues: zod.record(zod.number().nullable()).default({}),
+  options: zod.record(zod.union([zod.number(), zod.boolean(), zod.string(), zod.null()])).default({}),
   captchatoken: zod.string({ message: "Bitte gib das Captcha ein" }),
 })
 

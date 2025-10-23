@@ -338,16 +338,16 @@ export default function Event() {
                                         const diffMs = deadline.getTime() - now.getTime()
                                         const diffDays = diffMs / (1000 * 60 * 60 * 24)
 
-                                        deadlinePassed = diffMs < 0
+                                        deadlinePassed = diffMs <= 0
                                         tooEarlyToRegister =
                                           diffDays > parseInt(process.env.NEXT_PUBLIC_REGISTRATION_PERIOD_DAYS ?? "21")
 
                                         if (deadlinePassed) {
-                                          statusText = "Geschlossen"
+                                          statusText = "Anmeldung Geschlossen"
                                         } else if (tooEarlyToRegister) {
-                                          statusText = "nicht freigeschaltet"
+                                          statusText = "Anmeldung nicht freigeschaltet"
                                         } else {
-                                          statusText = `Anmeldung – ${formatRelativeDeadline(event.deadline)}`
+                                          statusText = `${formatRelativeDeadline(event.deadline)}`
                                         }
 
                                         isSelectable = !deadlinePassed && !tooEarlyToRegister
@@ -358,15 +358,15 @@ export default function Event() {
                                           key={event.id}
                                           value={`${event.description} ${event.eventyear}`}
                                           disabled={!isSelectable}
-                                          className="flex justify-between items-center text-sm"
+                                          className="w-full flex justify-between items-center text-sm"
                                         >
-                                          <div className="flex justify-between items-center">
+                                          <div className="flex justify-between items-center w-full">
                                             <div className={cn("flex", deadlinePassed && "line-through")}>
                                               {event.description}
                                             </div>
                                             <div
                                               className={cn(
-                                                "text-muted-foreground text-right ml-2 mr-2",
+                                                "text-muted-foreground text-right ml-2",
                                                 deadlinePassed && "text-red-300",
                                                 tooEarlyToRegister && "text-red-800",
                                                 isSelectable && "text-green-500"

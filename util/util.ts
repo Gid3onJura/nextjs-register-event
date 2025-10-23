@@ -241,28 +241,17 @@ export function formatRelativeDeadline(dateString: string): string {
     if (diffMs > 0) {
       // Noch bevorstehend
       if (diffMinutes < 60) {
-        return `noch ${diffMinutes} ${diffMinutes === 1 ? "Minute" : "Minuten"}`
+        return `Anmeldung noch ${diffMinutes} ${diffMinutes === 1 ? "Minute" : "Minuten"} möglich`
       } else if (diffHours < 24) {
-        return `noch ${diffHours} ${diffHours === 1 ? "Stunde" : "Stunden"}`
+        return `Anmeldung noch ${diffHours} ${diffHours === 1 ? "Stunde" : "Stunden"} möglich`
       } else if (diffDays === 1) {
-        return "noch 1 Tag"
+        return "Anmeldung noch 1 Tag möglich"
       } else {
-        return `noch ${diffDays} Tage`
-      }
-    } else {
-      // Bereits abgelaufen
-      const absMs = Math.abs(diffMs)
-      const absHours = Math.floor(absMs / (1000 * 60 * 60))
-      const absDays = Math.floor(absHours / 24)
-
-      if (absDays >= 2) {
-        return "abgelaufen"
-      } else if (absDays === 1) {
-        return "vor 1 Tag abgelaufen"
-      } else {
-        return `vor ${absHours} ${absHours === 1 ? "Stunde" : "Stunden"} abgelaufen`
+        return `Anmeldung noch ${diffDays} Tage möglich`
       }
     }
+
+    return ""
   } catch (error) {
     console.log("Error parsing date:", error)
     return ""

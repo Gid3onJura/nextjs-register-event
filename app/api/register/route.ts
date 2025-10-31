@@ -57,12 +57,21 @@ export async function POST(request: Request) {
 
   let optionMailText = ""
   let icsFile = null
+  let eventHinweis = ""
 
   // find event
   const eventObj = allEvents.find((e: Event) => `${e.description} ${e.eventyear}` === eventName)
 
+  if (!eventObj) {
+    return NextResponse.json(
+      { error: "Event existiert scheinbar nicht! Melde dich gerne für ein anderes Event an." },
+      { status: 404 }
+    )
+  }
+
   if (eventObj) {
     const eventOptions = eventObj.options || []
+    eventHinweis = eventObj.note || ""
 
     if (eventOptions.length > 0) {
       const selectedOptionDescriptions: string[] = []
@@ -144,7 +153,16 @@ export async function POST(request: Request) {
       }
     : null
 
-  const htmlMail = createEmailTemplate(firstname, lastname, eventName, dojo, comments, optionMailText, logoUrl)
+  const htmlMail = createEmailTemplate(
+    firstname,
+    lastname,
+    eventName,
+    eventHinweis,
+    dojo,
+    comments,
+    optionMailText,
+    logoUrl
+  )
   const plainMail = `Name: ${firstname} ${lastname}
                     Event: ${eventName}
                     Dojo: ${dojo}

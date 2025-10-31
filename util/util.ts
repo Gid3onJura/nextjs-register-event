@@ -151,6 +151,7 @@ export const createEmailTemplate = (
   firstname: string,
   lastname: string,
   event: string,
+  note: string,
   dojo: string,
   comments: string | undefined,
   optionMailText: string,
@@ -167,6 +168,7 @@ export const createEmailTemplate = (
         <h2 style="color: #1e293b;">Teilnehmerdaten</h2>
         <p style="margin: 8px 0;"><strong>Name:</strong> ${firstname} ${lastname}</p>
         <p style="margin: 8px 0;"><strong>Event:</strong> ${event}</p>
+        ${note ? `<p style="margin: 8px 0; color: red;"><strong>Hinweis:</strong> ${note}</p>` : ""}
         <p style="margin: 8px 0;"><strong>Dojo:</strong> ${dojo}</p>
         ${optionMailText ? `<p style="margin: 8px 0;"><strong>Optionen:</strong><br>${optionMailText}</p>` : ""}
         <p style="margin: 8px 0;"><strong>Kommentare:</strong><br>${comments?.replace(/\n/g, "<br>") || ""}</p>

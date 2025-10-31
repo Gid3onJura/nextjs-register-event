@@ -138,19 +138,19 @@ export default function Event() {
       notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }
 
-    // form.reset({
-    //   firstname: "",
-    //   lastname: "",
-    //   event: "",
-    //   email: "",
-    //   dojo: "",
-    //   comments: "",
-    //   options: [],
-    // })
+    form.reset({
+      firstname: "",
+      lastname: "",
+      event: "",
+      email: "",
+      dojo: "",
+      comments: "",
+      options: {},
+    })
 
     recaptchaRef.current?.reset()
     setIsVerified(false)
-    // setSelectedEvent(null)
+    setSelectedEvent(null)
     return
   }
 

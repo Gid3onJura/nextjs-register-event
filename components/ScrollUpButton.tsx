@@ -8,7 +8,7 @@ const ScrollUpButton = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 300) {
+      if (window.scrollY > 40) {
         setShowButton(true)
       } else {
         setShowButton(false)
@@ -27,7 +27,7 @@ const ScrollUpButton = () => {
     showButton && (
       <button
         onClick={scrollToTop}
-        className="fixed bottom-5 right-5 btn-color-interaction text-white p-3 rounded-full shadow-md focus:outline-none hover:shadow-lg text-lg sm:text-base"
+        className="fixed bottom-4 right-4 btn-color-interaction text-white p-3 rounded-full shadow-md focus:outline-none hover:shadow-lg text-lg sm:text-base"
         aria-label="Scroll to top"
       >
         <ArrowUp className="h-5 w-5" />

@@ -13,11 +13,11 @@ import { getEvents } from "@/util/getEvents"
 import { type Event } from "@/util/interfaces"
 
 import ReCAPTCHA from "react-google-recaptcha"
-import { formatDeadline, formatRelativeDeadline, notify, setRegister } from "@/util/util"
+import { formatRelativeDeadline, notify, setRegister } from "@/util/util"
 import Link from "next/link"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const dojos = [
@@ -207,26 +207,21 @@ export default function Event() {
         <Card className="shadow-xl w-full">
           <CardHeader>
             <CardTitle>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center mb-8">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center">
                 Anmeldung zu einem Shorai-Do-Kempo Merseburg Event
               </h1>
             </CardTitle>
             {/* <CardDescription>Card Description</CardDescription> */}
           </CardHeader>
-          <CardDescription>
-            {/* <div className="flex flex-col gap-3 items-center justify-center p-12">
-                <div className="text-red-600 font-medium">
-                  Hinweis zum Lehrgang: Bitte gib die Anzahl und Namen der Teilnehmer im Bemerkungsfeld mit an. Zu dem
-                  wäre es wichtig deinen Budo-Pass zum Lehrgang mitzubringen.
-                </div>
-              </div> */}
-          </CardDescription>
+        </Card>
+
+        <Card className="shadow-xl w-full pt-7">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center gap-4">
               <p className="text-black text-xl">Seite wird geladen...</p>
             </div>
           ) : (
-            <CardContent className="flex flex-col items-center gap-16">
+            <CardContent className="flex flex-col items-center gap-16 px-4 md:px-0">
               {!Array.isArray(events) ? (
                 <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>
               ) : (
@@ -234,7 +229,7 @@ export default function Event() {
                   {Array.isArray(events) && events.length > 0 && (
                     <form
                       onSubmit={form.handleSubmit(handleSubmit)}
-                      className="max-w-2xl w-full flex flex-col gap-4 justify-center"
+                      className="max-w-2xl w-full flex flex-col gap-4 justify-center mb-10"
                     >
                       {/* Firstname */}
                       <FormField

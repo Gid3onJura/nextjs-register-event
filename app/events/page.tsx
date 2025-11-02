@@ -190,7 +190,7 @@ export default function Event() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-2 p-2 bg-gray-600">
+    <main className="flex min-h-screen flex-col items-center gap-2 p-3 bg-gray-600">
       <div className="flex flex-col gap-4">
         {/* Buttons */}
         <div className="flex flex-row">
@@ -536,10 +536,11 @@ export default function Event() {
                         render={({ field }) => {
                           return (
                             <FormItem>
-                              <div className="flex flex-col gap-4 items-center justify-center mt-7">
+                              <div className="flex flex-col gap-4 items-center justify-center w-full mt-4">
                                 <FormLabel>Abfrage *</FormLabel>
                                 <FormControl>
                                   <ReCAPTCHA
+                                    size="normal"
                                     sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
                                     ref={recaptchaRef}
                                     onChange={(token) => {

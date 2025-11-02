@@ -190,7 +190,7 @@ export default function Event() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-2 p-16 bg-gray-600">
+    <main className="flex min-h-screen flex-col items-center gap-2 p-2 bg-gray-600">
       <div className="flex flex-col gap-4">
         {/* Buttons */}
         <div className="flex flex-row">
@@ -387,92 +387,97 @@ export default function Event() {
                         }}
                       />
 
-                      {selectedEvent && selectedEvent.note && (
-                        <div className="flex flex-col gap-3 justify-center p-2">
-                          <div className="text-red-600 font-bold">Hinweis zum Event: {selectedEvent?.note}</div>
-                        </div>
-                      )}
-
-                      {/* Options */}
                       {selectedEvent && (
-                        <FormItem>
-                          <FormLabel>Optionen</FormLabel>
-                          <div className="space-y-3 rounded-lg ps-3 bg-card">
-                            {selectedEvent.options?.length > 0 ? (
-                              selectedEvent.options.map((opt) => (
-                                <div key={opt.id} className="flex flex-col space-y-1">
-                                  {opt.type === "boolean" && (
-                                    <div key={opt.id} className="flex items-center space-x-2">
-                                      <Checkbox
-                                        id={`option-${opt.id}`}
-                                        checked={!!form.watch(`options.${opt.id}`)} // boolean cast
-                                        onCheckedChange={(checked) => {
-                                          form.setValue(`options.${opt.id}`, !!checked)
-                                        }}
-                                      />
-                                      <label
-                                        htmlFor={`option-${opt.id}`}
-                                        className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
-                                      >
-                                        {opt.description}
-                                      </label>
-                                    </div>
-                                  )}
+                        <div className="rounded-md shadow-md px-3 py-2 border border-gray-100">
+                          {/* Event Note */}
+                          {selectedEvent && selectedEvent.note && (
+                            <div className="flex flex-col gap-3 justify-center p-2">
+                              <div className="text-red-600 font-bold">Hinweis zum Event: {selectedEvent?.note}</div>
+                            </div>
+                          )}
 
-                                  {opt.type === "number" && (
-                                    <div className="flex flex-row items-center justify-start gap-4">
-                                      <label
-                                        htmlFor={`option-${opt.id}`}
-                                        className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
-                                      >
-                                        {opt.description}
-                                      </label>
-                                      <Input
-                                        id={`option-${opt.id}`}
-                                        type="number"
-                                        min={0}
-                                        className="w-24"
-                                        placeholder="Anzahl"
-                                        value={Number(form.watch(`options.${opt.id}`)) || ""}
-                                        onChange={(e) => {
-                                          const value = e.target.value ? parseInt(e.target.value, 10) : null
-                                          form.setValue(`options.${opt.id}`, value)
-                                        }}
-                                      />
-                                    </div>
-                                  )}
+                          {/* Options */}
+                          {selectedEvent && (
+                            <FormItem>
+                              <FormLabel>Optionen</FormLabel>
+                              <div className="space-y-3 rounded-lg ps-3 bg-card">
+                                {selectedEvent.options?.length > 0 ? (
+                                  selectedEvent.options.map((opt) => (
+                                    <div key={opt.id} className="flex flex-col space-y-1">
+                                      {opt.type === "boolean" && (
+                                        <div key={opt.id} className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`option-${opt.id}`}
+                                            checked={!!form.watch(`options.${opt.id}`)} // boolean cast
+                                            onCheckedChange={(checked) => {
+                                              form.setValue(`options.${opt.id}`, !!checked)
+                                            }}
+                                          />
+                                          <label
+                                            htmlFor={`option-${opt.id}`}
+                                            className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
+                                          >
+                                            {opt.description}
+                                          </label>
+                                        </div>
+                                      )}
 
-                                  {opt.type === "string" && (
-                                    <div className="flex flex-row items-center justify-start gap-4">
-                                      <label
-                                        htmlFor={`option-${opt.id}`}
-                                        className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
-                                      >
-                                        {opt.description}
-                                      </label>
-                                      <Input
-                                        id={`option-${opt.id}`}
-                                        type="text"
-                                        className="w-full"
-                                        value={(() => {
-                                          const val = form.watch(`options.${opt.id}`)
-                                          if (typeof val === "string" || typeof val === "number") return val
-                                          return "" // boolean/null werden hier ausgefiltert
-                                        })()}
-                                        onChange={(e) => {
-                                          const value = e.target.value || ""
-                                          form.setValue(`options.${opt.id}`, value)
-                                        }}
-                                      />
+                                      {opt.type === "number" && (
+                                        <div className="flex flex-row items-center justify-start gap-4">
+                                          <label
+                                            htmlFor={`option-${opt.id}`}
+                                            className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
+                                          >
+                                            {opt.description}
+                                          </label>
+                                          <Input
+                                            id={`option-${opt.id}`}
+                                            type="number"
+                                            min={0}
+                                            className="w-24"
+                                            placeholder="Anzahl"
+                                            value={Number(form.watch(`options.${opt.id}`)) || ""}
+                                            onChange={(e) => {
+                                              const value = e.target.value ? parseInt(e.target.value, 10) : null
+                                              form.setValue(`options.${opt.id}`, value)
+                                            }}
+                                          />
+                                        </div>
+                                      )}
+
+                                      {opt.type === "string" && (
+                                        <div className="flex flex-row items-center justify-start gap-4">
+                                          <label
+                                            htmlFor={`option-${opt.id}`}
+                                            className="text-sm leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70 break-words whitespace-normal"
+                                          >
+                                            {opt.description}
+                                          </label>
+                                          <Input
+                                            id={`option-${opt.id}`}
+                                            type="text"
+                                            className="w-full"
+                                            value={(() => {
+                                              const val = form.watch(`options.${opt.id}`)
+                                              if (typeof val === "string" || typeof val === "number") return val
+                                              return "" // boolean/null werden hier ausgefiltert
+                                            })()}
+                                            onChange={(e) => {
+                                              const value = e.target.value || ""
+                                              form.setValue(`options.${opt.id}`, value)
+                                            }}
+                                          />
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
-                                </div>
-                              ))
-                            ) : (
-                              <p className="text-muted-foreground text-sm">Keine Optionen verfügbar.</p>
-                            )}
-                          </div>
-                        </FormItem>
+                                  ))
+                                ) : (
+                                  <p className="text-muted-foreground text-sm">Keine Optionen verfügbar.</p>
+                                )}
+                              </div>
+                            </FormItem>
+                          )}
+                        </div>
                       )}
 
                       {/* Dojo */}

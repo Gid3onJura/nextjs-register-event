@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import CookieBanner from "@/components/CookieBanner"
 import ScrollUpButton from "@/components/ScrollUpButton"
+import Toolbar from "@/components/Toolbar"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,7 +31,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <Toolbar />
+        <main>{children}</main>
         <ToastContainer
           position="top-right"
           autoClose={5000}

@@ -190,10 +190,10 @@ export default function Event() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-2 p-3 bg-gray-600">
+    <div className="flex min-h-screen flex-col items-center gap-2 p-3 pt-5 bg-gray-600">
       <div className="flex flex-col gap-4">
         {/* Buttons */}
-        <div className="flex flex-row">
+        {/* <div className="flex flex-row">
           <Button
             asChild
             variant={"interaction"}
@@ -203,7 +203,7 @@ export default function Event() {
               <ArrowLeft className="h-5 w-5" strokeWidth={3} />
             </Link>
           </Button>
-        </div>
+        </div> */}
         <Card className="shadow-xl w-full">
           <CardHeader>
             <CardTitle>
@@ -568,6 +568,6 @@ export default function Event() {
           )}
         </Card>
       </div>
-    </main>
+    </div>
   )
 }

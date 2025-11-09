@@ -9,7 +9,7 @@ export default function CopyrightComponent() {
 
   return (
     <motion.div
-      className="fixed bottom-4 right-4 text-sm cursor-default select-none z-50"
+      className="fixed bottom-4 left-4 text-sm cursor-default select-none z-50"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       initial={false}

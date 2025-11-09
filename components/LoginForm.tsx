@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 
 export default function LoginForm() {
   const router = useRouter()
@@ -51,7 +52,12 @@ export default function LoginForm() {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        <button className="bg-blue-600 text-white p-2 rounded">Login</button>
+        <Button
+          className="shadow-md hover:shadow-lg w-full rounded-lg sm:rounded-2xl p-4 text-lg sm:text-base"
+          variant={"interaction"}
+        >
+          Login
+        </Button>
       </form>
     </div>
   )

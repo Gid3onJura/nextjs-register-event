@@ -7,7 +7,7 @@ import Link from "next/link"
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-16 p-6 sm:p-12 bg-gray-600">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-16 p-6 sm:p-12 bg-gray-600">
       {/* Buttons */}
       <CopyrightComponent />
       <KamizaImage />
@@ -23,6 +23,6 @@ export default function Home() {
           <Link href="/order">Bestellung aufgeben</Link>
         </Button> */}
       </div>
-    </main>
+    </div>
   )
 }

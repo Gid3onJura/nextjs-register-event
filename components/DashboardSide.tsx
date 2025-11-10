@@ -66,7 +66,7 @@ export default function DashboardSide() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold">Buch ausleihen</h2>
 
-        <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <Input placeholder="Wer leiht aus?" value={name} onChange={(e) => setName(e.target.value)} />
 
         <select value={book} onChange={(e) => setBook(e.target.value)} className="border p-2 rounded">
           <option value="">-- Buch auswählen --</option>
@@ -81,7 +81,7 @@ export default function DashboardSide() {
           Ausleihen
         </Button>
 
-        {message && <p className="text-sm text-red-600 mt-2">{message}</p>}
+        {message && <p className="text-sm text-orange-400 mt-2">{message}</p>}
       </form>
 
       {/* Übersicht */}

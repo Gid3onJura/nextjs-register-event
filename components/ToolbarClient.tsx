@@ -18,9 +18,8 @@ export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
     >
       <div className="max-w-5xl mx-auto flex justify-between items-center p-4">
         {/* Left: Logo / Home */}
-        <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-          <Home size={20} />
-          Startseite
+        <Link href="/" className="flex items-center gap-1 hover:text-gray-500">
+          <Home size={20} /> Startseite
         </Link>
 
         {/* Mobile Button */}
@@ -31,7 +30,7 @@ export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         {/* Desktop Links */}
         <nav className="hidden md:flex items-center gap-6">
           {isLoggedIn && (
-            <Link href="/dashboard" className="flex items-center gap-1 hover:text-blue-300">
+            <Link href="/dashboard" className="flex items-center gap-1 hover:text-gray-500">
               <LayoutDashboard size={20} /> Dashboard
             </Link>
           )}

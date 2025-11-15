@@ -1,5 +1,4 @@
 import { sendEmail } from "@/util/email"
-import { getEvents } from "@/util/getEvents"
 import { Event } from "@/util/interfaces"
 import { formSchema } from "@/util/types"
 import { createEmailTemplate, createICalEvent, isRateLimited } from "@/util/util"
@@ -16,8 +15,13 @@ export async function POST(request: Request) {
     )
   }
 
-  const allEventsResponse = await getEvents()
-  const allEvents = await allEventsResponse.json()
+  const url = new URL("/api/events", request.url)
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  })
+
+  const allEvents = await response.json()
 
   const body: unknown = await request.json()
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""

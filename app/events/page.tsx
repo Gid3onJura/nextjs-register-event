@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { formSchema, TFormSchema } from "@/util/types"
 import { Textarea } from "@/components/ui/textarea"
-import { getEvents } from "@/util/getEvents"
 import { type Event } from "@/util/interfaces"
 
 import ReCAPTCHA from "react-google-recaptcha"
@@ -67,9 +66,12 @@ export default function Event() {
     setIsLoading(true)
     const fetchEvents = async () => {
       try {
-        const eventsResponse = await getEvents()
+        const response = await fetch("/api/events", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        })
 
-        const eventsData = await eventsResponse.json()
+        const eventsData = await response.json()
 
         setEvents(eventsData)
         setIsLoading(false)
@@ -135,7 +137,7 @@ export default function Event() {
       }
     } else {
       console.log("Received non-JSON response")
-      notify("Bestellung fehlgeschlagen! Bitte versuche es erneut.", "error")
+      notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }
 
     form.reset({

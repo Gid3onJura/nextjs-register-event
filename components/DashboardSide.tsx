@@ -207,7 +207,7 @@ export default function DashboardSide() {
                       }}
                       className="absolute top-2 right-2 text-sm px-1 py-1 text-white rounded transition"
                     >
-                      <BookmarkX color="#db3b0a" className="w-5 h-5" />
+                      <BookmarkX color="#db3b0a" size={20} />
                     </button>
                   )}
 

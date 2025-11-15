@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, Home, LogIn, LogOut, LayoutDashboard } from "lucide-react"
+import { Menu, X, Home, LogIn, LogOut, LayoutDashboard, Tickets } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
@@ -20,6 +20,10 @@ export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         {/* Left: Logo / Home */}
         <Link href="/" className="flex items-center gap-1 hover:text-gray-500">
           <Home size={20} /> Startseite
+        </Link>
+
+        <Link href="/events" className="flex items-center gap-1 hover:text-gray-500">
+          <Tickets size={20} /> Anmeldung
         </Link>
 
         {/* Mobile Button */}

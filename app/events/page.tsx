@@ -192,7 +192,7 @@ export default function Event() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-2 p-3 pt-5 bg-gray-600">
+    <div className="flex min-h-screen flex-col items-center gap-2 p-2 pt-5 bg-white">
       <div className="flex flex-col gap-4">
         {/* Buttons */}
         {/* <div className="flex flex-row">

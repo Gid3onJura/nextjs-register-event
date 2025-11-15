@@ -16,9 +16,9 @@ export default function CopyrightComponent() {
     >
       <motion.div
         className="flex items-center justify-start bg-secondary text-black rounded-full px-1 overflow-hidden"
-        initial={{ backgroundColor: "#4b5563", width: 22 }}
+        initial={{ backgroundColor: "#ffffff", width: 22 }}
         animate={{
-          backgroundColor: hovered ? "#F54927" : "#4b5563",
+          backgroundColor: hovered ? "#F54927" : "#ffffff",
           width: hovered ? 180 : 22,
           boxShadow: hovered ? "0px 4px 12px rgba(0, 0, 0, 0.3)" : "0px 0px 0px rgba(0, 0, 0, 0.2)",
         }}

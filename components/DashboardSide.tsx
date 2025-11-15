@@ -134,11 +134,13 @@ export default function DashboardSide() {
 
   return (
     <>
-      <div className="p-8 max-w-4xl mx-auto flex flex-col gap-8">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+      <div className="flex flex-col gap-8 p-3 pt-5 bg-white min-h-screen">
+        <h1 className="shadow-md w-full text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center bg-white p-4 rounded">
+          Dashboard
+        </h1>
 
         {/* Formular */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded shadow-md">
           <h2 className="text-xl font-semibold">Buch ausleihen</h2>
 
           <Input placeholder="Wer leiht aus?" value={name} onChange={(e) => setName(e.target.value)} />
@@ -174,8 +176,8 @@ export default function DashboardSide() {
         </form>
 
         {/* Übersicht Ausgeliehene */}
-        <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold">Ausgeliehene Bücher</h2>
+        <div className="flex flex-col gap-4 ">
+          <h2 className="text-xl font-semibold leading-tight text-center bg-white p-4 rounded">Ausgeliehene Bücher</h2>
 
           {rentaledBooks.length === 0 && <p className="text-gray-500">Keine Bücher ausgeliehen.</p>}
 

@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
   cookieStore.delete("auth_token")
 
-  const redirectUrl = new URL("/", request.url)
+  const redirectUrl = new URL("/login", request.url)
 
   return NextResponse.redirect(redirectUrl)
   // return NextResponse.json({ success: true })

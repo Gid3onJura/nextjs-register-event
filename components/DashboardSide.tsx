@@ -240,7 +240,7 @@ export default function DashboardSide() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Buch zurückgeben?</DialogTitle>
-            <DialogDescription>Sind Sie sicher, dass Sie dieses Buch zurückgeben möchten?</DialogDescription>
+            <DialogDescription>Bist du sicher, dass dieses Buch zurückgeben wurde?</DialogDescription>
           </DialogHeader>
 
           <DialogFooter className="flex justify-end gap-2 mt-4">
@@ -255,7 +255,7 @@ export default function DashboardSide() {
                 handleReturn()
               }}
             >
-              Ja, zurückgeben
+              Ja
             </Button>
           </DialogFooter>
         </DialogContent>

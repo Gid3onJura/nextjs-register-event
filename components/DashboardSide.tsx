@@ -188,13 +188,20 @@ export default function DashboardSide() {
 
               const diffTime = now.getTime() - rentalDate.getTime()
               const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-              const diffWeeks = (diffDays / 7).toFixed(1) // z. B. 1.3 Wochen
+
+              // Ganze Wochen + Resttage
+              const weeks = Math.floor(diffDays / 7)
+              const days = diffDays % 7
 
               let durationDisplay = ""
-              if (diffDays >= 7) {
-                durationDisplay = `${diffWeeks} Wochen`
-              } else if (diffDays >= 1) {
-                durationDisplay = `${diffDays} Tage`
+
+              if (weeks > 0) {
+                durationDisplay = `${weeks} Woche${weeks > 1 ? "n" : ""}`
+                if (days > 0) {
+                  durationDisplay += ` ${days} Tag${days > 1 ? "e" : ""}`
+                }
+              } else if (days > 0) {
+                durationDisplay = `${days} Tag${days > 1 ? "e" : ""}`
               }
 
               return (

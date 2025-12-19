@@ -31,7 +31,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 - there should be the following code in this file: `` program.command("start").description("Starts Next.js in production mode. The application should be compiled with `next build` first.").argument("[directory]", `A directory on which to start the application. ${(0, _picocolors.italic)("If no directory is provided, the current directory will be used.")}`).addOption(new _commander.Option("-p, --port <port>", "Specify a port number on which to start the application.").argParser(_utils.myParseInt).default(3000).env("PORT")).option("-H, --hostname <hostname>", "Specify a hostname on which to start the application (default: 0.0.0.0).").addOption(new _commander.Option("--keepAliveTimeout <keepAliveTimeout>", "Specify the maximum amount of milliseconds to wait before closing inactive connections.").argParser(_utils.myParseInt)).action((directory, options)=>import("../cli/next-start.js").then((mod)=>mod.nextStart(options, directory))).usage("[directory] [options]"); ``
 - edit line: `` program.command("start", {
     isDefault: true
-}).description("Starts Next.js in production mode. The application should be compiled with `next build`  `` to `isDefault: false`
+}).description("Starts Next.js in production mode. The application should be compiled with `next build`  `` to `isDefault: true`
 - run `npm install` and `npm build`
 
 ### Important - Update Project

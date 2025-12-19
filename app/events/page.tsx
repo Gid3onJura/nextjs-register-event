@@ -191,9 +191,6 @@ export default function Event() {
     setIsVerified(false)
   }
 
-  // debug
-  console.log(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY)
-
   return (
     <div className="flex min-h-screen flex-col items-center gap-2 p-2 pt-5 bg-white">
       <div className="flex flex-col gap-4">

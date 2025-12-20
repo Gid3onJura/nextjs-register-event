@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, Home, LogIn, LogOut, LayoutDashboard, Tickets } from "lucide-react"
+import { Menu, X, Home, LogIn, LogOut, LayoutDashboard, Tickets, TreePine } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
@@ -25,6 +25,10 @@ export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         <Link href="/events" className="flex items-center gap-1 hover:text-gray-500">
           <Tickets size={20} /> Anmeldung
         </Link>
+
+        {/* <Link href="/adventcalendar" className="flex items-center gap-1 hover:text-gray-500">
+          <TreePine size={20} /> Adventskalender
+        </Link> */}
 
         {/* Mobile Button */}
         <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">

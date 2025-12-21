@@ -98,16 +98,16 @@ export default function Home() {
         </>
       )}
 
-      <div className="flex flex-row gap-3 mt-1">
-        {/* 🌗 Toggle */}
-        <motion.button
+      <div className="flex flex-row gap-3 mt-1 ml-2">
+        {/* Tag/Nacht-Toggle */}
+        {/* <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setMode((m) => (m === "night" ? "day" : "night"))}
           className="rounded-full bg-black/20 backdrop-blur px-3 py-3 shadow-lg text-sm text-yellow-400"
         >
           {mode === "night" ? <Sun /> : <Moon />}
-        </motion.button>
+        </motion.button> */}
 
         {/* Toggle Blowing */}
         {openedDays.length > 0 && !blowing && (

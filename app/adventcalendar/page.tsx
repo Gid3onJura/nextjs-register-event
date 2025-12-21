@@ -5,6 +5,8 @@ import { motion, useScroll, useTransform } from "framer-motion"
 // import Lottie from "lottie-react"
 // import snowAnimation from "../../public/snow.json"
 import SnowCanvas from "@/components/SnowCanvas"
+import Candle from "@/components/Candle"
+import { Wind, Sun, Moon } from "lucide-react"
 
 function getModeByTime(date = new Date()): "day" | "night" {
   const hour = date.getHours()
@@ -22,37 +24,51 @@ function getTodayAdventDay() {
   return Math.min(day, 24)
 }
 
-/* 🔀 Türchen zufällig, aber stabil */
-const useRandomDays = () =>
-  useMemo(() => {
-    const arr = Array.from({ length: 24 }, (_, i) => i + 1)
-
-    // Fisher-Yates Shuffle
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[arr[i], arr[j]] = [arr[j], arr[i]]
-    }
-
-    return arr
-  }, [])
-
 export default function Home() {
-  const days = useRandomDays()
+  const days = [17, 4, 22, 9, 1, 14, 6, 19, 11, 3, 24, 8, 15, 2, 20, 7, 13, 10, 5, 18, 16, 12, 23, 21]
   const [openDay, setOpenDay] = useState<number | null>(null)
   const [mode, setMode] = useState<"day" | "night">("night")
   const [today, setToday] = useState<number>(0)
+  const [openedDays, setOpenedDays] = useState<number[]>([])
+  const [blowing, setBlowing] = useState(false)
 
   useEffect(() => {
     setMode(getModeByTime())
     setToday(getTodayAdventDay())
 
+    // open days
+    const stored = localStorage.getItem("opened-days")
+    if (stored) setOpenedDays(JSON.parse(stored))
+
     // Optional: alle 5 Minuten neu prüfen
     const interval = setInterval(() => {
       setMode(getModeByTime())
-    }, 5 * 60 * 1000)
+    }, 1 * 60 * 1000)
 
     return () => clearInterval(interval)
   }, [])
+
+  function openDoor(day: number) {
+    setOpenDay(day)
+
+    setOpenedDays((prev) => {
+      if (prev.includes(day)) return prev
+      const next = [...prev, day]
+      localStorage.setItem("opened-days", JSON.stringify(next))
+      return next
+    })
+  }
+
+  function blowOutCandles() {
+    setBlowing(true)
+
+    setTimeout(() => {
+      setOpenDay(null)
+      setOpenedDays([])
+      localStorage.removeItem("opened-days")
+      setBlowing(false)
+    }, 400)
+  }
 
   return (
     <main
@@ -82,28 +98,29 @@ export default function Home() {
         </>
       )}
 
-      {/* 🌗 Toggle */}
-      {/* <button
-        onClick={() => setMode((m) => (m === "night" ? "day" : "night"))}
-        className="
-          rounded-full
-          bg-black/20
-          backdrop-blur
-          px-3 py-2
-          shadow-lg
-          text-sm
-        "
-      >
-        {mode === "night" ? "☀️" : "🌙"}
-      </button> */}
+      <div className="flex flex-row gap-3 mt-1">
+        {/* 🌗 Toggle */}
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setMode((m) => (m === "night" ? "day" : "night"))}
+          className="rounded-full bg-black/20 backdrop-blur px-3 py-3 shadow-lg text-sm text-yellow-400"
+        >
+          {mode === "night" ? <Sun /> : <Moon />}
+        </motion.button>
 
-      {/* Nebel */}
-      {/* {mode === "night" && <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-6" />} */}
-
-      {/* Sterne */}
-      {/* {mode === "night" && (
-        <div className="absolute inset-0 bg-[radial-gradient(white_1px,transparent_1px)] bg-[size:3px_3px] opacity-20" />
-      )} */}
+        {/* Toggle Blowing */}
+        {openedDays.length > 0 && !blowing && (
+          <motion.button
+            onClick={blowOutCandles}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 px-3 py-3 rounded-full bg-white/80 backdrop-blur shadow-lg text-lg"
+          >
+            <Wind />
+          </motion.button>
+        )}
+      </div>
 
       {/* 🎄 Inhalt */}
       <section className="relative z-10 max-w-5xl mx-auto px-4 py-16 mb-20">
@@ -120,6 +137,7 @@ export default function Home() {
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-6 justify-items-center">
           {days.map((day) => {
             const isLocked = day > today
+            const isOpened = openedDays.includes(day)
 
             return (
               <motion.button
@@ -127,7 +145,7 @@ export default function Home() {
                 disabled={isLocked}
                 whileHover={!isLocked ? { scale: 1.08 } : undefined}
                 whileTap={!isLocked ? { scale: 0.95 } : undefined}
-                onClick={() => !isLocked && setOpenDay(day)}
+                onClick={() => !isLocked && openDoor(day)}
                 className={`
                 h-24
                 w-24
@@ -145,7 +163,7 @@ export default function Home() {
                 ${isLocked ? "bg-white/5 text-white/40 cursor-not-allowed" : "bg-white/15 text-white shadow-lg"}
               `}
               >
-                {isLocked ? "🔒" : day}
+                {isOpened ? <Candle day={day} /> : isLocked ? "🔒" : day}
               </motion.button>
             )
           })}

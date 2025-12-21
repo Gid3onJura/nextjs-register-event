@@ -11,6 +11,17 @@ function getModeByTime(date = new Date()): "day" | "night" {
   return hour >= 7 && hour < 18 ? "day" : "night"
 }
 
+function getTodayAdventDay() {
+  const now = new Date()
+  const month = now.getMonth() // 0 = Januar
+  const day = now.getDate()
+
+  // Nur im Dezember
+  if (month !== 11) return 0
+
+  return Math.min(day, 24)
+}
+
 /* 🔀 Türchen zufällig, aber stabil */
 const useRandomDays = () =>
   useMemo(() => {
@@ -29,9 +40,11 @@ export default function Home() {
   const days = useRandomDays()
   const [openDay, setOpenDay] = useState<number | null>(null)
   const [mode, setMode] = useState<"day" | "night">("night")
+  const [today, setToday] = useState<number>(0)
 
   useEffect(() => {
     setMode(getModeByTime())
+    setToday(getTodayAdventDay())
 
     // Optional: alle 5 Minuten neu prüfen
     const interval = setInterval(() => {
@@ -105,13 +118,17 @@ export default function Home() {
 
         {/* 📱 Responsives Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-6 justify-items-center">
-          {days.map((day) => (
-            <motion.button
-              key={day}
-              whileHover={{ scale: 1.08, rotate: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setOpenDay(day)}
-              className="
+          {days.map((day) => {
+            const isLocked = day > today
+
+            return (
+              <motion.button
+                key={day}
+                disabled={isLocked}
+                whileHover={!isLocked ? { scale: 1.08 } : undefined}
+                whileTap={!isLocked ? { scale: 0.95 } : undefined}
+                onClick={() => !isLocked && setOpenDay(day)}
+                className={`
                 h-24
                 w-24
                 rounded-2xl
@@ -124,11 +141,14 @@ export default function Home() {
                 text-3xl
                 sm:text-4xl
                 cursor-pointer
-              "
-            >
-              {day}
-            </motion.button>
-          ))}
+
+                ${isLocked ? "bg-white/5 text-white/40 cursor-not-allowed" : "bg-white/15 text-white shadow-lg"}
+              `}
+              >
+                {isLocked ? "🔒" : day}
+              </motion.button>
+            )
+          })}
         </div>
       </section>
 

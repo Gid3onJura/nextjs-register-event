@@ -6,7 +6,7 @@ import { motion, useScroll, useTransform } from "framer-motion"
 // import snowAnimation from "../../public/snow.json"
 import SnowCanvas from "@/components/SnowCanvas"
 import Candle from "@/components/Candle"
-import { Wind, Sun, Moon } from "lucide-react"
+import { Wind, Sun, Moon, DoorClosed } from "lucide-react"
 
 function getModeByTime(date = new Date()): "day" | "night" {
   const hour = date.getHours()
@@ -163,7 +163,7 @@ export default function Home() {
                 ${isLocked ? "bg-white/5 text-white/40 cursor-not-allowed" : "bg-white/15 text-white shadow-lg"}
               `}
               >
-                {isOpened ? <Candle day={day} /> : isLocked ? "🔒" : day}
+                {isOpened ? <Candle day={day} /> : isLocked ? <DoorClosed size={34} /> : day}
               </motion.button>
             )
           })}

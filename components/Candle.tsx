@@ -2,7 +2,7 @@ import { motion } from "framer-motion"
 
 export default function Candle({ day }: { day: number }) {
   return (
-    <div className="relative flex flex-col items-center">
+    <div className="relative flex flex-col items-center pb-6">
       {/* 🔥 innere Flamme */}
       <motion.div
         className="absolute w-3 h-7 bg-white/80 rounded-full blur-[0.5px]"

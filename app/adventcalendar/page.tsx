@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import SnowCanvas from "@/components/SnowCanvas"
 import Candle from "@/components/Candle"
 import { Wind, Sun, Moon, DoorClosed } from "lucide-react"
+import { Great_Vibes } from "next/font/google"
 
 function getModeByTime(date = new Date()): "day" | "night" {
   const hour = date.getHours()
@@ -19,10 +20,15 @@ function getTodayAdventDay() {
   const day = now.getDate()
 
   // Nur im Dezember
-  if (month !== 11) return 0
+  if (month !== 0) return 0
 
   return Math.min(day, 24)
 }
+
+const greatVibes = Great_Vibes({
+  subsets: ["latin"],
+  weight: "400",
+})
 
 export default function Home() {
   const days = [17, 4, 22, 9, 1, 14, 6, 19, 11, 3, 24, 8, 15, 2, 20, 7, 13, 10, 5, 18, 16, 12, 23, 21]
@@ -124,17 +130,37 @@ export default function Home() {
 
       {/* 🎄 Inhalt */}
       <section className="relative z-10 max-w-5xl mx-auto px-4 py-16 mb-20">
-        <h1
-          className={`
-            text-center text-3xl sm:text-5xl md:text-6xl mb-12
+        <div className="flex flex-row text-center text-5xl sm:text-6xl md:text-7xl mb-12 justify-between items-center gap-1">
+          <p>🎄</p>
+          <motion.h1
+            className={`
+            ${greatVibes.className}
             ${mode === "night" ? "text-white" : "text-blue-900"}
           `}
-        >
-          🎄 Adventskalender 🎄
-        </h1>
+            animate={{
+              opacity: [1, 0.95, 1],
+              textShadow: [
+                // ruhig
+                "0 0 10px rgba(255,180,90,0.35), 0 0 25px rgba(255,140,60,0.25)",
+                // starkes Aufglühen
+                "0 0 18px rgba(255,210,120,0.65), 0 0 45px rgba(255,160,80,0.45)",
+                // zurück
+                "0 0 10px rgba(255,180,90,0.35), 0 0 25px rgba(255,140,60,0.25)",
+              ],
+            }}
+            transition={{
+              duration: 3.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            SDKM - Adventskalender
+          </motion.h1>
+          <p>🎄</p>
+        </div>
 
         {/* 📱 Responsives Grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-6 justify-items-center">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-items-center">
           {days.map((day) => {
             const isLocked = day > today
             const isOpened = openedDays.includes(day)
@@ -147,8 +173,8 @@ export default function Home() {
                 whileTap={!isLocked ? { scale: 0.95 } : undefined}
                 onClick={() => !isLocked && openDoor(day)}
                 className={`
-                h-24
-                w-24
+                h-20
+                w-20
                 rounded-2xl
                 bg-white/10
                 backdrop-blur

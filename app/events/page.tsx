@@ -36,7 +36,7 @@ const dojos = [
 
 export default function Event() {
   const [events, setEvents] = useState<Event[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -219,13 +219,13 @@ export default function Event() {
 
         <Card className="shadow-xl w-full pt-7">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center gap-4">
+            <CardContent className="flex flex-col items-center gap-16 px-4 md:px-0">
               <p className="text-black text-xl">Seite wird geladen...</p>
-            </div>
+            </CardContent>
           ) : (
             <CardContent className="flex flex-col items-center gap-16 px-4 md:px-0">
-              {!Array.isArray(events) ? (
-                <p className="text-red-500 text-xl">Die Anmeldung ist zur Zeit nicht möglich!</p>
+              {!Array.isArray(events) || events.length === 0 ? (
+                <p className="text-red-500 text-xl">Aktuell sind keine Event geplant.</p>
               ) : (
                 <Form {...form}>
                   {Array.isArray(events) && events.length > 0 && (

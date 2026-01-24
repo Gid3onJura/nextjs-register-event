@@ -1,8 +1,8 @@
-import DashboardOverview from "@/components/DashboardOverview"
+import BookRentalDashboard from "@/components/BookRentalDashboard"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
-export default async function DashboardPage() {
+export default async function RentalPage() {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth_token")?.value
 
@@ -10,5 +10,5 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
-  return <DashboardOverview />
+  return <BookRentalDashboard />
 }

@@ -24,7 +24,7 @@ interface BookRental {
   } | null
 }
 
-export default function DashboardSide() {
+export default function BookRentalDashboard() {
   const [name, setName] = useState("")
   const [book, setBook] = useState("") // ausgewähltes Buch
   const [bookRentals, setBookRentals] = useState<BookRental[]>([])
@@ -136,7 +136,7 @@ export default function DashboardSide() {
     <>
       <div className="flex flex-col gap-8 p-3 pt-5 bg-white min-h-screen">
         <h1 className="shadow-md w-full text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center bg-white p-4 rounded">
-          Dashboard
+          Bibliothek
         </h1>
 
         {/* Formular */}

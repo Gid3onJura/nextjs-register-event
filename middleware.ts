@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { ProtectedRoute } from "./util/interfaces"
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("auth_token")?.value
@@ -12,10 +13,16 @@ export async function middleware(req: NextRequest) {
     "api-key": API_KEY,
   }
 
-  const protectedRoutes = ["/dashboard", "/dashboard/settings", "/dashboard/profile"]
+  // Definiere geschützte Routes mit erforderlichen Rollen
+  const protectedRoutes: ProtectedRoute[] = [
+    { path: "/dashboard", allowedRoles: ["user"] },
+    { path: "/dashboard/settings", allowedRoles: ["admin"] },
+    { path: "/dashboard/profile", allowedRoles: ["user"] },
+  ]
 
-  const isProtected = protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route))
-  // const isProtected = req.nextUrl.pathname.startsWith("/dashboard")
+  const isProtected = protectedRoutes.some((route) => req.nextUrl.pathname.startsWith(route.path))
+
+  const matchedRoute = protectedRoutes.find((route) => req.nextUrl.pathname.startsWith(route.path))
 
   if (isProtected && !token) {
     return NextResponse.redirect(new URL("/login", req.url))
@@ -34,10 +41,20 @@ export async function middleware(req: NextRequest) {
       }
 
       const response = await responseValidation.json()
+
       const isValid = response.valid
+      const userRoles = response.user.roles
 
       if (!isValid) {
         return NextResponse.redirect(new URL("/login", req.url))
+      }
+
+      // Prüfe Rolle vom Server
+      if (
+        matchedRoute &&
+        (!Array.isArray(userRoles) || !userRoles.some((role) => matchedRoute.allowedRoles.includes(role)))
+      ) {
+        return NextResponse.redirect(new URL("/", req.url))
       }
 
       return NextResponse.next()

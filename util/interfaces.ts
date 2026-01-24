@@ -15,3 +15,13 @@ export interface Event {
   options: EventOption[]
   note: string
 }
+export interface User {
+  id: number
+  nickname: string
+  roles: string
+}
+
+export interface ProtectedRoute {
+  path: string
+  allowedRoles: string[]
+}

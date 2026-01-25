@@ -1,8 +1,8 @@
-import BookRentalClient from "@/components/BookRentalClient"
+import ProfilePageClient from "@/components/ProfilePageClient"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
-export default async function RentalPage() {
+export default async function ProfilPage() {
   const cookieStore = await cookies()
   const token = cookieStore.get("auth_token")?.value
 
@@ -10,5 +10,5 @@ export default async function RentalPage() {
     redirect("/login")
   }
 
-  return <BookRentalClient />
+  return <ProfilePageClient />
 }

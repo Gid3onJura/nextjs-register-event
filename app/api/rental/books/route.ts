@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   } catch (error) {
     return Response.json(
       { error: JSON.stringify(error), message: "[GET all book rentals]: Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return Response.json(
       { error: JSON.stringify(error), message: "[POST book rentals]: Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -102,7 +102,7 @@ export async function DELETE(request: Request) {
   } catch (error) {
     return Response.json(
       { error: JSON.stringify(error), message: "[DELETE book rentals]: Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

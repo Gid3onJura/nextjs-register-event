@@ -25,3 +25,11 @@ export interface ProtectedRoute {
   path: string
   allowedRoles: string[]
 }
+
+export interface DashboardCard {
+  title: string
+  description: string
+  icon: React.ReactNode
+  href: string
+  allowedRoles: string[]
+}

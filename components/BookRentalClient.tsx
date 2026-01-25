@@ -13,6 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import DashboardPageHeader from "./DashboardPageHeader"
 
 interface BookRental {
   id: number
@@ -24,7 +25,7 @@ interface BookRental {
   } | null
 }
 
-export default function BookRentalDashboard() {
+export default function BookRentalClient() {
   const [name, setName] = useState("")
   const [book, setBook] = useState("") // ausgewähltes Buch
   const [bookRentals, setBookRentals] = useState<BookRental[]>([])
@@ -75,14 +76,30 @@ export default function BookRentalDashboard() {
         body: JSON.stringify({ book, name }),
       })
 
+      const data = await res.json()
+
       if (!res.ok) {
         setMessage("Fehler beim Ausleihen")
         return
       }
 
+      if (data.status > 200) {
+        switch (data.status) {
+          case 409:
+            setMessage("Das Buch wurde bereits ausgeliehen")
+            alert("Das Buch wurde bereits ausgeliehen")
+            break
+          default:
+            setMessage("Fehler beim Ausleihen")
+            alert("Das Buch wurde bereits ausgeliehen")
+            break
+        }
+      } else {
+        setMessage("Buch erfolgreich ausgeliehen")
+      }
+
       setName("")
       setBook("")
-      setMessage("Buch erfolgreich ausgeliehen")
 
       // nach erfolgreicher Ausleihe wieder Bücher laden
       const response = await fetch("/api/rental/books", {
@@ -135,9 +152,7 @@ export default function BookRentalDashboard() {
   return (
     <>
       <div className="flex flex-col gap-8 p-3 pt-5 bg-white min-h-screen">
-        <h1 className="shadow-md w-full text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center bg-white p-4 rounded">
-          Bibliothek
-        </h1>
+        <DashboardPageHeader title="Bibliothek" />
 
         {/* Formular */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded shadow-md">

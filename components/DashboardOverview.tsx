@@ -2,55 +2,81 @@
 
 import Link from "next/link"
 import { BookOpen, Settings, User } from "lucide-react"
-
-interface DashboardCard {
-  title: string
-  description: string
-  icon: React.ReactNode
-  href: string
-  color: string
-}
+import { useEffect, useState } from "react"
+import { DashboardCard } from "@/util/interfaces"
 
 export default function DashboardOverview() {
-  const cards: DashboardCard[] = [
+  const [userRoles, setUserRoles] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchUserRoles = async () => {
+      try {
+        const response = await fetch("/api/user/roles")
+        if (response.ok) {
+          const data = await response.json()
+          setUserRoles(data.roles || [])
+        }
+      } catch (error) {
+        console.error("Error fetching user roles:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserRoles()
+  }, [])
+
+  const allCards: DashboardCard[] = [
     {
-      title: "Bücherverwaltung",
-      description: "Verwalte ausgeliehene Bücher und Rentals",
-      icon: <BookOpen className="w-8 h-8" />,
+      title: "Bibliothek",
+      description: "Verwalte ausgeliehene Bücher",
+      icon: <BookOpen />,
       href: "/dashboard/rental",
-      color: "bg-blue-50 hover:bg-blue-100",
+      allowedRoles: ["admin", "sensei"],
     },
     {
       title: "Profil",
       description: "Bearbeite dein Profil und deine Daten",
-      icon: <User className="w-8 h-8" />,
+      icon: <User />,
       href: "/dashboard/profile",
-      color: "bg-green-50 hover:bg-green-100",
+      allowedRoles: ["user", "admin", "staff"],
     },
     {
       title: "Einstellungen",
       description: "Konfiguriere deine Einstellungen",
-      icon: <Settings className="w-8 h-8" />,
+      icon: <Settings />,
       href: "/dashboard/settings",
-      color: "bg-purple-50 hover:bg-purple-100",
+      allowedRoles: ["admin"],
     },
   ]
 
+  // Filtere Kacheln basierend auf User-Rollen
+  const visibleCards = allCards.filter((card) => card.allowedRoles.some((role) => userRoles.includes(role)))
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-8 p-3 pt-5 bg-white min-h-screen justify-center items-center">
+        <p className="text-center text-xl text-gray-800">Wird geladen...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-8 p-3 pt-5 bg-white min-h-screen">
-      <h1 className="shadow-md w-full text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center bg-white p-4 rounded">
+      {/* <h1 className="shadow-md w-full text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-center bg-white p-4 rounded">
         Übersicht
-      </h1>
+      </h1> */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cards.map((card) => (
+        {visibleCards.map((card) => (
           <Link key={card.href} href={card.href}>
-            <div className={`${card.color} p-6 rounded-lg shadow-md cursor-pointer flex flex-col gap-4 h-full`}>
-              <div className="text-blue-600">{card.icon}</div>
-              <div>
-                <h2 className="text-xl font-semibold">{card.title}</h2>
-                <p className="text-gray-600 text-sm mt-2">{card.description}</p>
+            <div className="bg-blue-50 hover:bg-blue-100 p-3 rounded-lg shadow-md cursor-pointer flex flex-col gap-2 h-full">
+              <div className="flex flex-row gap-2 items-center">
+                <div className="w-8 h-8 text-gray-800 flex justify-center items-center">{card.icon}</div>
+                <div className="text-xl font-semibold">{card.title}</div>
               </div>
+              <p className="text-gray-600 text-sm">{card.description}</p>
             </div>
           </Link>
         ))}

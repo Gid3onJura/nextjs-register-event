@@ -15,11 +15,11 @@ export interface Event {
   options: EventOption[]
   note: string
 }
-export interface User {
-  id: number
-  nickname: string
-  roles: string
-}
+// export interface UserInToken {
+//   id: number
+//   nickname: string
+//   roles: string
+// }
 
 export interface ProtectedRoute {
   path: string
@@ -32,4 +32,25 @@ export interface DashboardCard {
   icon: React.ReactNode
   href: string
   allowedRoles: string[]
+}
+
+export interface Exam {
+  id: number
+  rank: number
+  category: string
+  color: string
+  user: number
+  graduatedon: string
+}
+
+export interface User {
+  id: number
+  nickname: string
+  name: string
+  email: string | null
+  dojo: number
+  activated: boolean
+  birth: string
+  roles: string[]
+  exams: Exam[]
 }

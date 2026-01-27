@@ -35,13 +35,13 @@ export default function BookRentalClient() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingReturn, setPendingReturn] = useState<{ rentalid: number; bookid: number } | null>(null)
 
-  const [showTooltip, setShowTooltip] = useState<number | null>(null)
+  const [showTooltip, setShowTooltip] = useState<string | null>(null)
 
   // Beim Start Bücher laden
   useEffect(() => {
     const fetchBookRentals = async () => {
       try {
-        const response = await fetch("/api/rental/books", {
+        const response = await fetch("/api/books/rental", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         })
@@ -73,7 +73,7 @@ export default function BookRentalClient() {
     }
 
     try {
-      const res = await fetch("/api/rental/books", {
+      const res = await fetch("/api/books/rental", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ book, name }),
@@ -105,7 +105,7 @@ export default function BookRentalClient() {
       setBook("")
 
       // nach erfolgreicher Ausleihe wieder Bücher laden
-      const response = await fetch("/api/rental/books", {
+      const response = await fetch("/api/books/rental", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
@@ -129,7 +129,7 @@ export default function BookRentalClient() {
     }
 
     try {
-      const res = await fetch("/api/rental/books", {
+      const res = await fetch("/api/books/rental", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ book, name }),
@@ -161,7 +161,7 @@ export default function BookRentalClient() {
       setBook("")
 
       // nach erfolgreicher Ausleihe wieder Bücher laden
-      const response = await fetch("/api/rental/books", {
+      const response = await fetch("/api/books/rental", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
@@ -181,7 +181,7 @@ export default function BookRentalClient() {
     const { rentalid, bookid } = pendingReturn
 
     try {
-      const res = await fetch("/api/rental/books", {
+      const res = await fetch("/api/books/rental", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rentalid, bookid }),
@@ -195,7 +195,7 @@ export default function BookRentalClient() {
       setMessage("Buch erfolgreich zurückgegeben")
 
       // Bücher neu laden
-      const response = await fetch("/api/rental/books", {
+      const response = await fetch("/api/books/rental", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
@@ -217,17 +217,8 @@ export default function BookRentalClient() {
         <form className="flex flex-col gap-4 bg-white p-6 rounded shadow-md">
           <h2 className="text-xl font-semibold">Buch ausleihen</h2>
 
-          <Input placeholder="Wer leiht aus?" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input placeholder="Wer reserviert oder leiht aus?" value={name} onChange={(e) => setName(e.target.value)} />
 
-          {/* <select value={book} onChange={(e) => setBook(e.target.value)} className="border p-2 rounded">
-            <option value="">-- Buch auswählen --</option>
-
-            {availableBooks.map((b) => (
-              <option key={b.id} value={b.id} disabled={b.bookrental !== null}>
-                {b.bookname} {b.bookrental ? "(ausgeliehen)" : ""}
-              </option>
-            ))}
-          </select> */}
           <Select onValueChange={(value) => setBook(value)} value={book}>
             <SelectTrigger>
               <SelectValue placeholder="Welches Buch?" />
@@ -290,7 +281,7 @@ export default function BookRentalClient() {
                     <button
                       onContextMenu={(e) => {
                         e.preventDefault()
-                        setShowTooltip(book.id)
+                        setShowTooltip(`${book.id}-return`)
                         setTimeout(() => setShowTooltip(null), 1500)
                       }}
                       onClick={() => {
@@ -303,7 +294,7 @@ export default function BookRentalClient() {
                       <IconWithTooltip tooltip="Buch zurückgeben">
                         <BookmarkX color="#db3b0a" size={20} />
                       </IconWithTooltip>
-                      {showTooltip === book.id && (
+                      {showTooltip === `${book.id}-return` && (
                         <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
                           Buch zurückgeben
                         </div>

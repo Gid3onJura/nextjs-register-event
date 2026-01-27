@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { BookmarkX } from "lucide-react"
+import { BookMarked, BookmarkX } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ interface BookRental {
     id: number
     readername: string
     rentaldate: string
+    reservationdate: string
   } | null
 }
 
@@ -276,31 +277,61 @@ export default function BookRentalClient() {
 
               return (
                 <div key={book.id} className="bg-white p-4 rounded-lg shadow flex flex-col gap-2 relative">
-                  {/* Rückgabe-Button */}
-                  {book.bookrental && (
-                    <button
-                      onContextMenu={(e) => {
-                        e.preventDefault()
-                        setShowTooltip(`${book.id}-return`)
-                        setTimeout(() => setShowTooltip(null), 1500)
-                      }}
-                      onClick={() => {
-                        setPendingReturn({ rentalid: book.bookrental!.id, bookid: book.id })
-                        setConfirmOpen(true)
-                        // handleReturn(book.bookrental!.id, book.id)
-                      }}
-                      className="absolute top-2 right-2 text-sm px-1 py-1 text-white rounded transition"
-                    >
-                      <IconWithTooltip tooltip="Buch zurückgeben">
-                        <BookmarkX color="#db3b0a" size={20} />
-                      </IconWithTooltip>
-                      {showTooltip === `${book.id}-return` && (
-                        <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
-                          Buch zurückgeben
-                        </div>
+                  <div className="absolute top-2 right-2 text-sm text-white">
+                    <div className="flex flex-row justify-center items-center gap-2 item">
+                      {/* Reservierung aufheben */}
+                      {book.bookrental?.reservationdate && !book.bookrental?.rentaldate && (
+                        <button
+                          onContextMenu={(e) => {
+                            e.preventDefault()
+                            setShowTooltip(`${book.id}-reserved`)
+                            setTimeout(() => setShowTooltip(null), 1500)
+                          }}
+                          onClick={() => {
+                            setPendingReturn({ rentalid: book.bookrental!.id, bookid: book.id })
+                            setConfirmOpen(true)
+                            // handleReturn(book.bookrental!.id, book.id)
+                          }}
+                          className=""
+                        >
+                          <IconWithTooltip tooltip="Reservierung aufheben">
+                            <BookMarked color="#1F9136" size={25} />
+                          </IconWithTooltip>
+                          {showTooltip === `${book.id}-reserved` && (
+                            <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                              Reservierung aufheben
+                            </div>
+                          )}
+                        </button>
                       )}
-                    </button>
-                  )}
+
+                      {/* Buch zurück geben */}
+                      {book.bookrental?.rentaldate && (
+                        <button
+                          onContextMenu={(e) => {
+                            e.preventDefault()
+                            setShowTooltip(`${book.id}-return`)
+                            setTimeout(() => setShowTooltip(null), 1500)
+                          }}
+                          onClick={() => {
+                            setPendingReturn({ rentalid: book.bookrental!.id, bookid: book.id })
+                            setConfirmOpen(true)
+                            // handleReturn(book.bookrental!.id, book.id)
+                          }}
+                          className=""
+                        >
+                          <IconWithTooltip tooltip="Buch zurückgeben">
+                            <BookmarkX color="#db3b0a" size={25} />
+                          </IconWithTooltip>
+                          {showTooltip === `${book.id}-return` && (
+                            <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                              Buch zurückgeben
+                            </div>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
                   <p className="pr-11">
                     <span className="font-semibold">Das Buch:</span> {book.bookname}

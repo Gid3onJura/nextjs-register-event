@@ -7,7 +7,7 @@ import Link from "next/link"
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-16 p-6 sm:p-12 bg-white">
+    <div className="flex min-h-96 flex-col items-center gap-16 p-6 sm:p-12 mt-8 bg-white">
       {/* Buttons */}
       <CopyrightComponent />
       <KamizaImage />

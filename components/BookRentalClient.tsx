@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import DashboardPageHeader from "./DashboardPageHeader"
+import { IconWithTooltip } from "./IconWithTooltip"
 
 interface BookRental {
   id: number
@@ -33,6 +34,8 @@ export default function BookRentalClient() {
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingReturn, setPendingReturn] = useState<{ rentalid: number; bookid: number } | null>(null)
+
+  const [showTooltip, setShowTooltip] = useState<number | null>(null)
 
   // Beim Start Bücher laden
   useEffect(() => {
@@ -60,7 +63,63 @@ export default function BookRentalClient() {
   // verfügbare Bücher filtern
   const availableBooks = bookRentals
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleRental(e: React.FormEvent) {
+    e.preventDefault()
+    setMessage("")
+
+    if (!name || !book) {
+      setMessage("Bitte Name und Buch angeben")
+      return
+    }
+
+    try {
+      const res = await fetch("/api/rental/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ book, name }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setMessage("Fehler beim Ausleihen")
+        return
+      }
+
+      if (data.status > 200) {
+        switch (data.status) {
+          case 409:
+            setMessage("Das Buch wurde bereits ausgeliehen")
+            alert("Das Buch wurde bereits ausgeliehen")
+            break
+          default:
+            setMessage("Fehler beim Ausleihen")
+            alert("Das Buch wurde bereits ausgeliehen")
+            break
+        }
+      } else {
+        setMessage("Buch erfolgreich ausgeliehen")
+      }
+
+      setName("")
+      setBook("")
+
+      // nach erfolgreicher Ausleihe wieder Bücher laden
+      const response = await fetch("/api/rental/books", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const bookRentalData = await response.json()
+
+      setBookRentals(bookRentalData)
+    } catch (error) {
+      console.log(error)
+      setMessage("Fehler beim Ausleihen")
+    }
+  }
+
+  async function handleReservation(e: React.FormEvent) {
     e.preventDefault()
     setMessage("")
 
@@ -155,7 +214,7 @@ export default function BookRentalClient() {
         <DashboardPageHeader title="Bibliothek" />
 
         {/* Formular */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white p-6 rounded shadow-md">
+        <form className="flex flex-col gap-4 bg-white p-6 rounded shadow-md">
           <h2 className="text-xl font-semibold">Buch ausleihen</h2>
 
           <Input placeholder="Wer leiht aus?" value={name} onChange={(e) => setName(e.target.value)} />
@@ -183,9 +242,14 @@ export default function BookRentalClient() {
             </SelectContent>
           </Select>
 
-          <Button type="submit" className="w-full">
-            Ausleihen
-          </Button>
+          <div className="flex flex-row gap-2 justify-center items-center">
+            <Button variant={"outline"} className="w-1/2" onClick={handleReservation}>
+              Reservieren
+            </Button>
+            <Button variant={"default"} className="w-1/2" onClick={handleRental}>
+              Ausleihen
+            </Button>
+          </div>
 
           {message && <p className="text-sm text-orange-400 mt-2">{message}</p>}
         </form>
@@ -221,9 +285,14 @@ export default function BookRentalClient() {
 
               return (
                 <div key={book.id} className="bg-white p-4 rounded-lg shadow flex flex-col gap-2 relative">
-                  {/* Rückgabe-Button oben rechts */}
+                  {/* Rückgabe-Button */}
                   {book.bookrental && (
                     <button
+                      onContextMenu={(e) => {
+                        e.preventDefault()
+                        setShowTooltip(book.id)
+                        setTimeout(() => setShowTooltip(null), 1500)
+                      }}
                       onClick={() => {
                         setPendingReturn({ rentalid: book.bookrental!.id, bookid: book.id })
                         setConfirmOpen(true)
@@ -231,7 +300,14 @@ export default function BookRentalClient() {
                       }}
                       className="absolute top-2 right-2 text-sm px-1 py-1 text-white rounded transition"
                     >
-                      <BookmarkX color="#db3b0a" size={20} />
+                      <IconWithTooltip tooltip="Buch zurückgeben">
+                        <BookmarkX color="#db3b0a" size={20} />
+                      </IconWithTooltip>
+                      {showTooltip === book.id && (
+                        <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                          Buch zurückgeben
+                        </div>
+                      )}
                     </button>
                   )}
 

@@ -1,39 +1,7 @@
 import { cookies } from "next/headers"
 
-export async function GET(request: Request) {
-  const cookieStore = await cookies()
-  const authToken = cookieStore.get("auth_token")?.value
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
-  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
-
-  const headers = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-    "api-key": API_KEY,
-    Authorization: "Bearer " + authToken,
-  }
-
-  const url = "bookrental"
-
-  try {
-    const response = await fetch(API_BASE_URL + "/" + url, {
-      method: "GET",
-      headers: headers,
-    })
-
-    const data = await response.json()
-
-    return Response.json(data, { status: 200 })
-  } catch (error) {
-    return Response.json(
-      { error: JSON.stringify(error), message: "[GET all book rentals]: Something went wrong" },
-      { status: 500 },
-    )
-  }
-}
-
 export async function POST(request: Request) {
-  const { book, userid } = await request.json()
+  const { book, name } = await request.json()
 
   const cookieStore = await cookies()
   const authToken = cookieStore.get("auth_token")?.value
@@ -55,7 +23,7 @@ export async function POST(request: Request) {
     const response = await fetch(API_BASE_URL + "/" + url, {
       method: "POST",
       headers: headers,
-      body: JSON.stringify({ bookid: book, userid, rentaldate: new Date().toISOString() }),
+      body: JSON.stringify({ bookid: book, readername: name, reservationdate: new Date().toISOString() }),
     })
 
     const data = await response.json()

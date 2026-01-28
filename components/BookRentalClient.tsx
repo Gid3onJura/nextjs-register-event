@@ -15,6 +15,7 @@ import {
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import DashboardPageHeader from "./DashboardPageHeader"
 import { IconWithTooltip } from "./IconWithTooltip"
+import { User } from "@/util/interfaces"
 
 interface BookRental {
   id: number
@@ -28,9 +29,10 @@ interface BookRental {
 }
 
 export default function BookRentalClient() {
-  const [name, setName] = useState("")
   const [book, setBook] = useState("") // ausgewähltes Buch
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
   const [bookRentals, setBookRentals] = useState<BookRental[]>([])
+  const [userData, setUserData] = useState<User[]>([])
   const [message, setMessage] = useState("")
 
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -38,24 +40,42 @@ export default function BookRentalClient() {
 
   const [showTooltip, setShowTooltip] = useState<string | null>(null)
 
+  const fetchBookRentals = async () => {
+    try {
+      const response = await fetch("/api/books/rental", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const bookRentalData = await response.json()
+
+      setBookRentals(bookRentalData)
+    } catch (error) {
+      console.log(error)
+      setBookRentals([])
+    }
+  }
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch("/api/user", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const userDataFromApi = await response.json()
+
+      setUserData(userDataFromApi)
+    } catch (error) {
+      console.log(error)
+      setUserData([])
+    }
+  }
+
   // Beim Start Bücher laden
   useEffect(() => {
-    const fetchBookRentals = async () => {
-      try {
-        const response = await fetch("/api/books/rental", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        })
-
-        const bookRentalData = await response.json()
-
-        setBookRentals(bookRentalData)
-      } catch (error) {
-        console.log(error)
-        setBookRentals([])
-      }
-    }
     fetchBookRentals()
+    fetchUser()
   }, [])
 
   // ausgeliehene Bücher filtern
@@ -68,7 +88,9 @@ export default function BookRentalClient() {
     e.preventDefault()
     setMessage("")
 
-    if (!name || !book) {
+    const selectedUser = userData.find((u) => u.id === selectedUserId) ?? null
+
+    if (!selectedUser || !book) {
       setMessage("Bitte Name und Buch angeben")
       return
     }
@@ -77,7 +99,7 @@ export default function BookRentalClient() {
       const res = await fetch("/api/books/rental", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ book, name }),
+        body: JSON.stringify({ book, userid: selectedUserId }),
       })
 
       const data = await res.json()
@@ -99,10 +121,10 @@ export default function BookRentalClient() {
             break
         }
       } else {
-        setMessage("Buch erfolgreich ausgeliehen")
+        setMessage(`Buch erfolgreich ausgeliehen an ${name}`)
       }
 
-      setName("")
+      setSelectedUserId(null)
       setBook("")
 
       // nach erfolgreicher Ausleihe wieder Bücher laden
@@ -130,7 +152,7 @@ export default function BookRentalClient() {
     }
 
     try {
-      const res = await fetch("/api/books/rental", {
+      const res = await fetch("/api/books/reservation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ book, name }),
@@ -139,26 +161,26 @@ export default function BookRentalClient() {
       const data = await res.json()
 
       if (!res.ok) {
-        setMessage("Fehler beim Ausleihen")
+        setMessage("Fehler beim Reservieren")
         return
       }
 
       if (data.status > 200) {
         switch (data.status) {
           case 409:
-            setMessage("Das Buch wurde bereits ausgeliehen")
-            alert("Das Buch wurde bereits ausgeliehen")
+            setMessage("Das Buch wurde bereits reserviert")
+            alert("Das Buch wurde bereits reserviert")
             break
           default:
-            setMessage("Fehler beim Ausleihen")
-            alert("Das Buch wurde bereits ausgeliehen")
+            setMessage("Fehler beim Reservieren")
+            alert("Das Buch wurde bereits reserviert")
             break
         }
       } else {
-        setMessage("Buch erfolgreich ausgeliehen")
+        setMessage(`Buch erfolgreich reserviert für ${name}`)
       }
 
-      setName("")
+      setSelectedUserId(null)
       setBook("")
 
       // nach erfolgreicher Ausleihe wieder Bücher laden
@@ -209,6 +231,7 @@ export default function BookRentalClient() {
     }
   }
 
+  //#region Render
   return (
     <>
       <div className="flex flex-col gap-8 p-3 pt-5 bg-white min-h-screen">
@@ -218,8 +241,25 @@ export default function BookRentalClient() {
         <form className="flex flex-col gap-4 bg-white p-6 rounded shadow-md">
           <h2 className="text-xl font-semibold">Buch ausleihen</h2>
 
-          <Input placeholder="Wer reserviert oder leiht aus?" value={name} onChange={(e) => setName(e.target.value)} />
+          {/* User Auswahl */}
+          <Select
+            onValueChange={(value) => setSelectedUserId(Number(value))}
+            value={selectedUserId ? String(selectedUserId) : ""}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wer reserviert oder leiht aus?" />
+            </SelectTrigger>
 
+            <SelectContent className="max-w-[90vw] w-full" position="popper">
+              {userData.map((user) => (
+                <SelectItem key={user.id} value={String(user.id)}>
+                  {user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Buch Auswahl */}
           <Select onValueChange={(value) => setBook(value)} value={book}>
             <SelectTrigger>
               <SelectValue placeholder="Welches Buch?" />
@@ -233,7 +273,6 @@ export default function BookRentalClient() {
               ))}
             </SelectContent>
           </Select>
-
           <div className="flex flex-row gap-2 justify-center items-center">
             <Button variant={"outline"} className="w-1/2" onClick={handleReservation}>
               Reservieren
@@ -242,10 +281,8 @@ export default function BookRentalClient() {
               Ausleihen
             </Button>
           </div>
-
           {message && <p className="text-sm text-orange-400 mt-2">{message}</p>}
         </form>
-
         {/* Übersicht Ausgeliehene */}
         <div className="flex flex-col gap-4 ">
           <h2 className="text-xl font-semibold leading-tight text-center bg-white p-4 rounded">Ausgeliehene Bücher</h2>

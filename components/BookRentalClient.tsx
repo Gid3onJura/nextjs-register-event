@@ -16,15 +16,19 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import DashboardPageHeader from "./DashboardPageHeader"
 import { IconWithTooltip } from "./IconWithTooltip"
 import { User } from "@/util/interfaces"
+import { calcDuration } from "@/lib/utils"
 
 interface BookRental {
   id: number
   bookname: string
   bookrental: {
     id: number
-    readername: string
-    rentaldate: string
-    reservationdate: string
+    user: {
+      id: number
+      name: string
+    }
+    rentaldate: Date | null
+    reservationdate: Date | null
   } | null
 }
 
@@ -37,6 +41,7 @@ export default function BookRentalClient() {
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingReturn, setPendingReturn] = useState<{ rentalid: number; bookid: number } | null>(null)
+  const [pendingReservation, setPendingReservation] = useState<{ rentalid: number; bookid: number } | null>(null)
 
   const [showTooltip, setShowTooltip] = useState<string | null>(null)
 
@@ -79,7 +84,10 @@ export default function BookRentalClient() {
   }, [])
 
   // ausgeliehene Bücher filtern
-  const rentaledBooks = bookRentals.filter((b) => b.bookrental !== null)
+  const rentaledBooks = bookRentals.filter((b) => b.bookrental !== null && b.bookrental?.rentaldate !== null)
+
+  // reservierte Bücher filtern
+  const reservedBooks = bookRentals.filter((b) => b.bookrental !== null && b.bookrental?.reservationdate !== null)
 
   // verfügbare Bücher filtern
   const availableBooks = bookRentals
@@ -146,7 +154,9 @@ export default function BookRentalClient() {
     e.preventDefault()
     setMessage("")
 
-    if (!name || !book) {
+    const selectedUser = userData.find((u) => u.id === selectedUserId) ?? null
+
+    if (!selectedUser || !book) {
       setMessage("Bitte Name und Buch angeben")
       return
     }
@@ -155,7 +165,7 @@ export default function BookRentalClient() {
       const res = await fetch("/api/books/reservation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ book, name }),
+        body: JSON.stringify({ book, userid: selectedUser.id }),
       })
 
       const data = await res.json()
@@ -177,7 +187,7 @@ export default function BookRentalClient() {
             break
         }
       } else {
-        setMessage(`Buch erfolgreich reserviert für ${name}`)
+        setMessage(`Buch erfolgreich reserviert für ${selectedUser.name}`)
       }
 
       setSelectedUserId(null)
@@ -199,7 +209,7 @@ export default function BookRentalClient() {
   }
 
   async function handleReturn() {
-    if (!pendingReturn) return
+    if (!pendingReturn || !pendingReservation) return
 
     const { rentalid, bookid } = pendingReturn
 
@@ -267,8 +277,13 @@ export default function BookRentalClient() {
 
             <SelectContent className="max-w-[90vw] w-full" position="popper">
               {availableBooks.map((b) => (
-                <SelectItem key={b.id} value={String(b.id)} disabled={b.bookrental !== null}>
-                  {b.bookname} {b.bookrental ? "(ausgeliehen)" : ""}
+                <SelectItem
+                  key={b.id}
+                  value={String(b.id)}
+                  disabled={b.bookrental && b.bookrental?.reservationdate !== null ? true : false}
+                >
+                  {b.bookname}{" "}
+                  {b.bookrental?.reservationdate ? "(reserviert)" : b.bookrental?.rentaldate ? "(ausgeliehen)" : ""}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -283,140 +298,220 @@ export default function BookRentalClient() {
           </div>
           {message && <p className="text-sm text-orange-400 mt-2">{message}</p>}
         </form>
-        {/* Übersicht Ausgeliehene */}
-        <div className="flex flex-col gap-4 ">
-          <h2 className="text-xl font-semibold leading-tight text-center bg-white p-4 rounded">Ausgeliehene Bücher</h2>
 
-          {rentaledBooks.length === 0 && <p className="text-gray-500">Keine Bücher ausgeliehen.</p>}
+        <div className="flex flex-col sm:flex-row gap-2">
+          {/* Übersicht Reservierte Bücher */}
+          <div className="flex flex-col gap-4 sm:w-1/2 w-full">
+            <h2 className="text-xl font-semibold leading-tight text-center bg-white p-4 rounded">Reservierte Bücher</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {rentaledBooks.map((book) => {
-              const rentalDate = new Date(book.bookrental!.rentaldate)
-              const now = new Date()
+            {reservedBooks.length === 0 && (
+              <div className="text-gray-500 flex justify-center">Keine Bücher reserviert.</div>
+            )}
 
-              const diffTime = now.getTime() - rentalDate.getTime()
-              const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+            <div className="flex flex-col gap-4">
+              {reservedBooks.map((book) => {
+                if (book.bookrental === null) return null
 
-              // Ganze Wochen + Resttage
-              const weeks = Math.floor(diffDays / 7)
-              const days = diffDays % 7
+                const reservedDate = new Date(book.bookrental.reservationdate)
 
-              let durationDisplay = ""
+                const durationDisplay = calcDuration(reservedDate)
 
-              if (weeks > 0) {
-                durationDisplay = `${weeks} Woche${weeks > 1 ? "n" : ""}`
-                if (days > 0) {
-                  durationDisplay += ` ${days} Tag${days > 1 ? "e" : ""}`
-                }
-              } else if (days > 0) {
-                durationDisplay = `${days} Tag${days > 1 ? "e" : ""}`
-              }
+                return (
+                  <div key={book.id} className="bg-white p-4 rounded-lg shadow flex flex-col gap-2 relative">
+                    <div className="absolute top-2 right-2 text-sm text-white">
+                      <div className="flex flex-row justify-center items-center gap-2 item">
+                        {/* Reservierung aufheben */}
+                        {book.bookrental?.reservationdate && !book.bookrental?.rentaldate && (
+                          <button
+                            onContextMenu={(e) => {
+                              e.preventDefault()
+                              setShowTooltip(`${book.id}-reserved`)
+                              setTimeout(() => setShowTooltip(null), 1500)
+                            }}
+                            onClick={() => {
+                              setPendingReservation({ rentalid: book.bookrental!.id, bookid: book.id })
+                              setConfirmOpen(true)
+                            }}
+                            className=""
+                          >
+                            <IconWithTooltip tooltip="Reservierung aufheben">
+                              <BookMarked color="#1F9136" size={25} />
+                            </IconWithTooltip>
+                            {showTooltip === `${book.id}-reserved` && (
+                              <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                                Reservierung aufheben
+                              </div>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-              return (
-                <div key={book.id} className="bg-white p-4 rounded-lg shadow flex flex-col gap-2 relative">
-                  <div className="absolute top-2 right-2 text-sm text-white">
-                    <div className="flex flex-row justify-center items-center gap-2 item">
-                      {/* Reservierung aufheben */}
-                      {book.bookrental?.reservationdate && !book.bookrental?.rentaldate && (
-                        <button
-                          onContextMenu={(e) => {
-                            e.preventDefault()
-                            setShowTooltip(`${book.id}-reserved`)
-                            setTimeout(() => setShowTooltip(null), 1500)
-                          }}
-                          onClick={() => {
-                            setPendingReturn({ rentalid: book.bookrental!.id, bookid: book.id })
-                            setConfirmOpen(true)
-                            // handleReturn(book.bookrental!.id, book.id)
-                          }}
-                          className=""
-                        >
-                          <IconWithTooltip tooltip="Reservierung aufheben">
-                            <BookMarked color="#1F9136" size={25} />
-                          </IconWithTooltip>
-                          {showTooltip === `${book.id}-reserved` && (
-                            <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
-                              Reservierung aufheben
-                            </div>
+                    <p className="pr-11">
+                      <span className="font-semibold">Das Buch:</span> {book.bookname}
+                    </p>
+
+                    <p>
+                      <span className="font-semibold">reserviert für:</span> {book.bookrental!.user.name}
+                    </p>
+
+                    <p>
+                      <span className="font-semibold">am:</span> {reservedDate.toLocaleDateString()}
+                    </p>
+
+                    {durationDisplay && (
+                      <p>
+                        <span className="font-semibold">Reserviert seit:</span> {durationDisplay}
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Übersicht Ausgeliehene Bücher */}
+          <div className="flex flex-col gap-4 sm:w-1/2 w-full">
+            <h2 className="text-xl font-semibold leading-tight text-center bg-white p-4 rounded">
+              Ausgeliehene Bücher
+            </h2>
+
+            {rentaledBooks.length === 0 && (
+              <p className="text-gray-500 flex justify-center">Keine Bücher ausgeliehen.</p>
+            )}
+
+            <div className="flex flex-col gap-4">
+              {rentaledBooks.length > 0 &&
+                rentaledBooks.map((book) => {
+                  if (book.bookrental === null) return null
+
+                  const rentalDate = new Date(book.bookrental.rentaldate)
+
+                  const durationDisplay = calcDuration(rentalDate)
+
+                  return (
+                    <div key={book.id} className="bg-white p-4 rounded-lg shadow flex flex-col gap-2 relative">
+                      <div className="absolute top-2 right-2 text-sm text-white">
+                        <div className="flex flex-row justify-center items-center gap-2 item">
+                          {/* Buch zurück geben */}
+                          {book.bookrental?.rentaldate && (
+                            <button
+                              onContextMenu={(e) => {
+                                e.preventDefault()
+                                setShowTooltip(`${book.id}-return`)
+                                setTimeout(() => setShowTooltip(null), 1500)
+                              }}
+                              onClick={() => {
+                                setPendingReturn({ rentalid: book.bookrental!.id, bookid: book.id })
+                                setConfirmOpen(true)
+                                // handleReturn(book.bookrental!.id, book.id)
+                              }}
+                              className=""
+                            >
+                              <IconWithTooltip tooltip="Buch zurückgeben">
+                                <BookmarkX color="#db3b0a" size={25} />
+                              </IconWithTooltip>
+                              {showTooltip === `${book.id}-return` && (
+                                <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                                  Buch zurückgeben
+                                </div>
+                              )}
+                            </button>
                           )}
-                        </button>
-                      )}
+                        </div>
+                      </div>
 
-                      {/* Buch zurück geben */}
-                      {book.bookrental?.rentaldate && (
-                        <button
-                          onContextMenu={(e) => {
-                            e.preventDefault()
-                            setShowTooltip(`${book.id}-return`)
-                            setTimeout(() => setShowTooltip(null), 1500)
-                          }}
-                          onClick={() => {
-                            setPendingReturn({ rentalid: book.bookrental!.id, bookid: book.id })
-                            setConfirmOpen(true)
-                            // handleReturn(book.bookrental!.id, book.id)
-                          }}
-                          className=""
-                        >
-                          <IconWithTooltip tooltip="Buch zurückgeben">
-                            <BookmarkX color="#db3b0a" size={25} />
-                          </IconWithTooltip>
-                          {showTooltip === `${book.id}-return` && (
-                            <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
-                              Buch zurückgeben
-                            </div>
-                          )}
-                        </button>
+                      <p className="pr-11">
+                        <span className="font-semibold">Das Buch:</span> {book.bookname}
+                      </p>
+
+                      <p>
+                        <span className="font-semibold">ausgeliehen an:</span> {book.bookrental!.user.name}
+                      </p>
+
+                      <p>
+                        <span className="font-semibold">am:</span> {rentalDate.toLocaleDateString()}
+                      </p>
+
+                      {durationDisplay && (
+                        <p>
+                          <span className="font-semibold">Ausgeliehen seit:</span> {durationDisplay}
+                        </p>
                       )}
                     </div>
-                  </div>
-
-                  <p className="pr-11">
-                    <span className="font-semibold">Das Buch:</span> {book.bookname}
-                  </p>
-
-                  <p>
-                    <span className="font-semibold">ausgeliehen an:</span> {book.bookrental!.readername}
-                  </p>
-
-                  <p>
-                    <span className="font-semibold">am:</span> {rentalDate.toLocaleDateString()}
-                  </p>
-
-                  {durationDisplay && (
-                    <p>
-                      <span className="font-semibold">Ausgeliehen seit:</span> {durationDisplay}
-                    </p>
-                  )}
-                </div>
-              )
-            })}
+                  )
+                })}
+            </div>
           </div>
         </div>
       </div>
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Buch zurückgeben?</DialogTitle>
-            <DialogDescription>Bist du sicher, dass dieses Buch zurückgeben wurde?</DialogDescription>
-          </DialogHeader>
+      {pendingReservation && (
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reservierung aufheben?</DialogTitle>
+              <DialogDescription>Bist du sicher, dass die Reservierung aufgehoben werden soll?</DialogDescription>
+            </DialogHeader>
 
-          <DialogFooter className="flex justify-end gap-2 mt-4">
-            <Button variant="secondary" onClick={() => setConfirmOpen(false)}>
-              Abbrechen
-            </Button>
+            <DialogFooter className="flex justify-end gap-2 mt-4">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setConfirmOpen(false)
+                  setPendingReservation(null)
+                }}
+              >
+                Abbrechen
+              </Button>
 
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setConfirmOpen(false)
-                handleReturn()
-              }}
-            >
-              Ja
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setConfirmOpen(false)
+                  setPendingReservation(null)
+                  handleReturn()
+                }}
+              >
+                Ja
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {pendingReturn && (
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Buch zurückgeben?</DialogTitle>
+              <DialogDescription>Bist du sicher, dass dieses Buch zurückgeben wurde?</DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter className="flex justify-end gap-2 mt-4">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setConfirmOpen(false)
+                  setPendingReturn(null)
+                }}
+              >
+                Abbrechen
+              </Button>
+
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setConfirmOpen(false)
+                  setPendingReturn(null)
+                  handleReturn()
+                }}
+              >
+                Ja
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   )
 }

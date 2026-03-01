@@ -150,24 +150,28 @@ export const isRateLimited = (ip: string): boolean => {
 export const createEmailTemplate = (
   firstname: string,
   lastname: string,
-  event: string,
-  note: string,
+  eventName: string,
+  eventStart: string,
+  eventEnd: string,
+  note: string | undefined,
   dojo: string,
   comments: string | undefined,
   optionMailText: string,
-  logoUrl: string
+  logoUrl: string,
 ) => {
   const htmlMail = `
   <div style="font-family: Arial, sans-serif; background-color: #f5f7fa; padding: 20px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
       <div style="background-color: #1e3a8a; padding: 20px; text-align: center;">
         <img src="cid:kamiza" alt="Kamiza Logo" style="max-height: 60px; margin-bottom: 10px;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Anmeldung zum Event: ${event}</h1>
+        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Anmeldung zum Event: ${eventName}</h1>
       </div>
       <div style="padding: 30px;">
         <h2 style="color: #1e293b;">Teilnehmerdaten</h2>
         <p style="margin: 8px 0;"><strong>Name:</strong> ${firstname} ${lastname}</p>
-        <p style="margin: 8px 0;"><strong>Event:</strong> ${event}</p>
+        <p style="margin: 8px 0;"><strong>Event:</strong> ${eventName}</p>
+        <p style="margin: 8px 0;"><strong>Start:</strong> ${eventStart}</p>
+        <p style="margin: 8px 0;"><strong>Ende:</strong> ${eventEnd}</p>
         ${note ? `<p style="margin: 8px 0; color: red;"><strong>Hinweis:</strong> ${note}</p>` : ""}
         <p style="margin: 8px 0;"><strong>Dojo:</strong> ${dojo}</p>
         ${optionMailText ? `<p style="margin: 8px 0;"><strong>Optionen:</strong><br>${optionMailText}</p>` : ""}
@@ -218,7 +222,7 @@ export const createICalEvent = async (event: Event, emailOganizer: string) => {
   return Buffer.from(cal.toString())
 }
 
-export function formatDeadline(dateString: string): string {
+export function formatDateDE(dateString: string): string {
   const date = new Date(dateString)
   return (
     date.toLocaleString("de-DE", {

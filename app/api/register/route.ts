@@ -1,20 +1,27 @@
 import { sendEmail } from "@/util/email"
 import { Event } from "@/util/interfaces"
 import { formSchema } from "@/util/types"
-import { createEmailTemplate, createICalEvent, isRateLimited } from "@/util/util"
+import { createEmailTemplate, createICalEvent, formatDateDE, isRateLimited } from "@/util/util"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
+  let optionMailText = ""
+  let icsFile = null
+  let eventHinweis = ""
+  let eventStartConverted: string = ""
+  let eventEndConverted: string = ""
+
   // rate limiting
   const ip = request.headers.get("x-forwarded-for") || request.headers.get("remote-addr") || "unknown"
 
   if (isRateLimited(ip)) {
     return NextResponse.json(
       { error: "Maximale Anzahl an Anmeldungen erreicht! Versuche es später nochmal." },
-      { status: 429 }
+      { status: 429 },
     )
   }
 
+  //#region fetch events
   const url = new URL("/api/events", request.url)
   const response = await fetch(url, {
     method: "GET",
@@ -32,7 +39,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 404 })
   }
 
-  // validate body
+  //#region validate body
   const result = formSchema.safeParse(body)
   let zodErrors = {}
   if (!result.success) {
@@ -59,78 +66,76 @@ export async function POST(request: Request) {
   // const logoUrl = `data:image/png;base64,${kamizaBase64}`
   const logoUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/kamiza.png`
 
-  let optionMailText = ""
-  let icsFile = null
-  let eventHinweis = ""
-
-  // find event
+  //#region find event
   const eventObj = allEvents.find((e: Event) => `${e.description} ${e.eventyear}` === eventName)
 
   if (!eventObj) {
     return NextResponse.json(
       { error: "Event existiert scheinbar nicht! Melde dich gerne für ein anderes Event an." },
-      { status: 404 }
+      { status: 404 },
     )
   }
 
-  if (eventObj) {
-    const eventOptions = eventObj.options || []
-    eventHinweis = eventObj.note || ""
+  const eventOptions = eventObj.options || []
+  eventHinweis = eventObj.note || ""
+  eventStartConverted = formatDateDE(eventObj.eventdatetimefrom)
+  eventEndConverted = formatDateDE(eventObj.eventdatetimeto)
 
-    if (eventOptions.length > 0) {
-      const selectedOptionDescriptions: string[] = []
-      const personOptions: { description: string; value: number }[] = []
+  //#region event options
+  if (eventOptions.length > 0) {
+    const selectedOptionDescriptions: string[] = []
+    const personOptions: { description: string; value: number }[] = []
 
-      Object.entries(selectedOptions).forEach(([id, value]) => {
-        const opt = eventOptions.find((o: any) => o.id === Number(id))
-        if (!opt) return
+    Object.entries(selectedOptions).forEach(([id, value]) => {
+      const opt = eventOptions.find((o: any) => o.id === Number(id))
+      if (!opt) return
 
-        const slug = opt.slug || ""
-        const type = opt.type || typeof value
+      const slug = opt.slug || ""
+      const type = opt.type || typeof value
 
-        // 🔹 Sonderfall: Personen zählen
-        if (slug.includes("count_persons")) {
-          const numericValue = typeof value === "number" ? value : parseInt(value as any, 10)
-          if (!isNaN(numericValue) && numericValue > 0) {
-            personOptions.push({ description: opt.description, value: numericValue })
-          }
-          return // Skip reguläre Ausgabe unten
+      // 🔹 Sonderfall: Personen zählen
+      if (slug.includes("count_persons")) {
+        const numericValue = typeof value === "number" ? value : parseInt(value as any, 10)
+        if (!isNaN(numericValue) && numericValue > 0) {
+          personOptions.push({ description: opt.description, value: numericValue })
         }
+        return // Skip reguläre Ausgabe unten
+      }
 
-        // 🔹 Normale Optionen
-        switch (type) {
-          case "boolean":
-            if (value) selectedOptionDescriptions.push(`${opt.description}`)
-            break
-          case "number":
-            if (value != 0 && value != null && value !== "")
-              selectedOptionDescriptions.push(`${opt.description}: ${value}`)
-            break
-          case "string":
-            if (value) selectedOptionDescriptions.push(`${opt.description}: ${value}`)
-            break
-          default:
-            if (value) selectedOptionDescriptions.push(`${opt.description}: ${value}`)
-            break
-        }
-      })
+      // 🔹 Normale Optionen
+      switch (type) {
+        case "boolean":
+          if (value) selectedOptionDescriptions.push(`${opt.description}`)
+          break
+        case "number":
+          if (value != 0 && value != null && value !== "")
+            selectedOptionDescriptions.push(`${opt.description}: ${value}`)
+          break
+        case "string":
+          if (value) selectedOptionDescriptions.push(`${opt.description}: ${value}`)
+          break
+        default:
+          if (value) selectedOptionDescriptions.push(`${opt.description}: ${value}`)
+          break
+      }
+    })
 
-      // 🔹 Personenabschnitt bauen (falls vorhanden)
-      let personsSection = ""
-      if (personOptions.length > 0) {
-        const total = personOptions.reduce((sum, p) => sum + p.value, 0)
-        personsSection = `
+    //#region Personenabschnitt bauen
+    let personsSection = ""
+    if (personOptions.length > 0) {
+      const total = personOptions.reduce((sum, p) => sum + p.value, 0)
+      personsSection = `
         <p><strong>Teilnehmende Personen:</strong></p>
         <ul>
           ${personOptions.map((p) => `<li>${p.description}: ${p.value}</li>`).join("")}
         </ul>
         <p><strong>Personen insgesamt:</strong> ${total}</p>
       `
-      }
+    }
 
-      // 🔹 Zusammenbauen des Mailtexts
-      if (selectedOptionDescriptions.length > 0 || personsSection) {
-        optionMailText = `
+    //#region Zusammenbauen Mailtexts
+    if (selectedOptionDescriptions.length > 0 || personsSection) {
+      optionMailText = `
         ${
           selectedOptionDescriptions.length > 0
             ? `<ul>${selectedOptionDescriptions.map((desc) => `<li>${desc}</li>`).join("")}</ul>`
@@ -138,15 +143,14 @@ export async function POST(request: Request) {
         }
         ${personsSection}
       `
-      } else {
-        optionMailText = "<p>Keine Option gewählt.</p>"
-      }
     } else {
-      optionMailText = ""
+      optionMailText = "<p>Keine Option gewählt.</p>"
     }
+  } else {
+    optionMailText = ""
   }
 
-  // create ical
+  //#region ical
   const icsFileBuffer: Buffer | null = await createICalEvent(eventObj, emailTo)
 
   icsFile = icsFileBuffer
@@ -157,30 +161,57 @@ export async function POST(request: Request) {
       }
     : null
 
-  const htmlMail = createEmailTemplate(
+  //#region create mail content
+  const htmlMailTrainer = createEmailTemplate(
     firstname,
     lastname,
     eventName,
+    eventStartConverted,
+    eventEndConverted,
+    undefined,
+    dojo,
+    comments,
+    optionMailText,
+    logoUrl,
+  )
+
+  const htmlMailParticipant = createEmailTemplate(
+    firstname,
+    lastname,
+    eventName,
+    eventStartConverted,
+    eventEndConverted,
     eventHinweis,
     dojo,
     comments,
     optionMailText,
-    logoUrl
+    logoUrl,
   )
+
   const plainMail = `Name: ${firstname} ${lastname}
                     Event: ${eventName}
+                    Start: ${eventStartConverted}
+                    Ende: ${eventEndConverted}
+                    Hinweis: ${eventHinweis}
                     Dojo: ${dojo}
                     Kommentare: ${comments}
                     ${optionMailText}`
 
-  // send email
+  //#region send email
   try {
     // email for trainer
-    await sendEmail(emailTo, "", `Anmeldung ${eventName}: ${firstname} ${lastname}`, plainMail, htmlMail)
+    await sendEmail(emailTo, "", `Anmeldung ${eventName}: ${firstname} ${lastname}`, plainMail, htmlMailTrainer)
 
-    // email for user
+    // email for participant
     if (email) {
-      await sendEmail(email, "", `Anmeldung ${eventName}: ${firstname} ${lastname}`, plainMail, htmlMail, icsFile)
+      await sendEmail(
+        email,
+        "",
+        `Anmeldung ${eventName}: ${firstname} ${lastname}`,
+        plainMail,
+        htmlMailParticipant,
+        icsFile,
+      )
     }
 
     return NextResponse.json({ message: "Anmeldung gesendet" }, { status: 200 })

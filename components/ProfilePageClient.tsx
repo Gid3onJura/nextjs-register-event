@@ -8,19 +8,19 @@ import { Label } from "./ui/label"
 import { User } from "@/util/interfaces"
 import Belt from "./Belt"
 
-export default function ProfilePageClient({ userid }: { userid: number }) {
-  const emptyUser: User = {
-    id: 0,
-    nickname: "",
-    name: "",
-    email: "",
-    dojo: 0,
-    activated: false,
-    birth: "",
-    roles: [],
-    exams: [],
-  }
+const emptyUser: User = {
+  id: 0,
+  nickname: "",
+  name: "",
+  email: "",
+  dojo: 0,
+  activated: false,
+  birth: "",
+  roles: [],
+  exams: [],
+}
 
+export default function ProfilePageClient({ userid }: { userid: number }) {
   const [message, setMessage] = useState("")
   const [userData, setUserData] = useState<User>(emptyUser)
   const [formData, setFormData] = useState({

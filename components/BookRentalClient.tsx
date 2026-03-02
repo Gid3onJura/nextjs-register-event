@@ -16,7 +16,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import DashboardPageHeader from "./DashboardPageHeader"
 import { IconWithTooltip } from "./IconWithTooltip"
 import { User } from "@/util/interfaces"
-import { calcDuration } from "@/lib/utils"
+import { calcDuration, colorDanger } from "@/util/util"
 
 interface BookRental {
   id: number
@@ -27,8 +27,8 @@ interface BookRental {
       id: number
       name: string
     }
-    rentaldate: Date | null
-    reservationdate: Date | null
+    rentaldate: Date
+    reservationdate: Date
   } | null
 }
 
@@ -87,19 +87,30 @@ export default function BookRentalClient() {
   const rentaledBooks = bookRentals.filter((b) => b.bookrental !== null && b.bookrental?.rentaldate !== null)
 
   // reservierte Bücher filtern
-  const reservedBooks = bookRentals.filter((b) => b.bookrental !== null && b.bookrental?.reservationdate !== null)
+  const reservedBooks = bookRentals.filter(
+    (b) => b.bookrental !== null && b.bookrental?.reservationdate !== null && b.bookrental?.rentaldate === null,
+  )
 
   // verfügbare Bücher filtern
   const availableBooks = bookRentals
 
+  //#region handle rental
   async function handleRental(e: React.FormEvent) {
     e.preventDefault()
     setMessage("")
 
     const selectedUser = userData.find((u) => u.id === selectedUserId) ?? null
 
+    const existingRental = bookRentals.find((b) => b.id === Number(book))
+
     if (!selectedUser || !book) {
       setMessage("Bitte Name und Buch angeben")
+      return
+    }
+
+    if (selectedUser.id !== existingRental?.bookrental?.user.id && existingRental?.bookrental?.reservationdate) {
+      setMessage("Das Buch ist bereits für jemand anderen reserviert")
+      alert("Das Buch ist bereits für jemand anderen reserviert")
       return
     }
 
@@ -150,6 +161,7 @@ export default function BookRentalClient() {
     }
   }
 
+  //#region handle reservation
   async function handleReservation(e: React.FormEvent) {
     e.preventDefault()
     setMessage("")
@@ -209,9 +221,9 @@ export default function BookRentalClient() {
   }
 
   async function handleReturn() {
-    if (!pendingReturn || !pendingReservation) return
+    if (!pendingReturn && !pendingReservation) return
 
-    const { rentalid, bookid } = pendingReturn
+    const { rentalid, bookid } = pendingReturn ? pendingReturn : pendingReservation!
 
     try {
       const res = await fetch("/api/books/rental", {
@@ -276,16 +288,23 @@ export default function BookRentalClient() {
             </SelectTrigger>
 
             <SelectContent className="max-w-[90vw] w-full" position="popper">
-              {availableBooks.map((b) => (
-                <SelectItem
-                  key={b.id}
-                  value={String(b.id)}
-                  disabled={b.bookrental && b.bookrental?.reservationdate !== null ? true : false}
-                >
-                  {b.bookname}{" "}
-                  {b.bookrental?.reservationdate ? "(reserviert)" : b.bookrental?.rentaldate ? "(ausgeliehen)" : ""}
-                </SelectItem>
-              ))}
+              {availableBooks.map((b) => {
+                const rentalLabel = b.bookrental?.rentaldate
+                  ? "(ausgeliehen)"
+                  : b.bookrental?.reservationdate
+                    ? "(reserviert)"
+                    : ""
+
+                return (
+                  <SelectItem
+                    key={b.id}
+                    value={String(b.id)}
+                    disabled={b.bookrental && b.bookrental?.rentaldate !== null ? true : false}
+                  >
+                    {b.bookname} {rentalLabel}
+                  </SelectItem>
+                )
+              })}
             </SelectContent>
           </Select>
           <div className="flex flex-row gap-2 justify-center items-center">
@@ -335,7 +354,7 @@ export default function BookRentalClient() {
                             className=""
                           >
                             <IconWithTooltip tooltip="Reservierung aufheben">
-                              <BookMarked color="#1F9136" size={25} />
+                              <BookMarked color={colorDanger} size={25} />
                             </IconWithTooltip>
                             {showTooltip === `${book.id}-reserved` && (
                               <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
@@ -356,7 +375,8 @@ export default function BookRentalClient() {
                     </p>
 
                     <p>
-                      <span className="font-semibold">am:</span> {reservedDate.toLocaleDateString()}
+                      <span className="font-semibold">am:</span>{" "}
+                      {reservedDate.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })}
                     </p>
 
                     {durationDisplay && (
@@ -409,7 +429,7 @@ export default function BookRentalClient() {
                               className=""
                             >
                               <IconWithTooltip tooltip="Buch zurückgeben">
-                                <BookmarkX color="#db3b0a" size={25} />
+                                <BookmarkX color={colorDanger} size={25} />
                               </IconWithTooltip>
                               {showTooltip === `${book.id}-return` && (
                                 <div className="absolute bottom-8 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
@@ -430,7 +450,8 @@ export default function BookRentalClient() {
                       </p>
 
                       <p>
-                        <span className="font-semibold">am:</span> {rentalDate.toLocaleDateString()}
+                        <span className="font-semibold">am:</span>{" "}
+                        {rentalDate.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })}
                       </p>
 
                       {durationDisplay && (

@@ -105,7 +105,7 @@ export default function ProfilePageClient({ userid }: { userid: number }) {
             Daten werden geladen...
           </div>
         ) : (
-          <div className="flex flex-col gap-4 p-6 bg-gray-800 text-white rounded shadow-md w-full">
+          <div className="flex flex-col gap-4 p-6 bg-gray-500 text-white rounded shadow-md w-full">
             <h2 className="text-xl font-semibold">Dein Profil</h2>
 
             <div className="grid grid-cols-1 gap-4">

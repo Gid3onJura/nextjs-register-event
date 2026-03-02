@@ -8,10 +8,6 @@ export async function getAuthToken() {
 export async function loadUserProfile() {
   const token = await getAuthToken()
 
-  console.log("====================================")
-  console.log("token", token)
-  console.log("====================================")
-
   const response = await fetch("https://deine-api/user", {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",

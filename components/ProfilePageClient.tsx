@@ -125,10 +125,6 @@ export default function ProfilePageClient({ userid }: { userid: number }) {
                 <strong>Geburtsdatum:</strong>
                 <p>{userBirth}</p>
               </div>
-              <div className="flex flex-row gap-2">
-                <strong>Rollen:</strong>
-                <p>{userData.roles.join(", ")}</p>
-              </div>
               <div className="flex flex-row gap-2 items-center">
                 <strong>Aktueller Rang:</strong> {lastRank && <Belt rank={lastRank} />}
               </div>

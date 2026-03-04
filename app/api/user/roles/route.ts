@@ -31,7 +31,7 @@ export async function GET() {
     const data = await response.json()
 
     return NextResponse.json({
-      roles: data.user?.roles || [],
+      roles: data.user?.roles ? JSON.parse(data.user.roles) : [],
     })
   } catch (error) {
     console.error("Error fetching user roles:", error)

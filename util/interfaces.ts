@@ -51,6 +51,6 @@ export interface User {
   dojo: number
   activated: boolean
   birth: string
-  roles: string[]
+  roles: []
   exams: Exam[]
 }

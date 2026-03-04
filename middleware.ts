@@ -43,7 +43,7 @@ export async function middleware(req: NextRequest) {
       const response = await responseValidation.json()
 
       const isValid = response.valid
-      const userRoles = response.user.roles
+      const userRoles = JSON.parse(response.user.roles)
 
       if (!isValid) {
         return NextResponse.redirect(new URL("/login", req.url))

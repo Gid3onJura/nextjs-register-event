@@ -41,12 +41,7 @@ export async function GET(request: Request) {
 
     const data = await response.json()
 
-    return NextResponse.json({
-      ...data,
-      roles: data.user?.roles ? JSON.parse(data.user.roles) : [],
-    })
-
-    // return Response.json(data, { status: 200 })
+    return Response.json(data, { status: 200 })
   } catch (error) {
     return Response.json({ error: JSON.stringify(error), message: "[GET user]: Something went wrong" }, { status: 500 })
   }

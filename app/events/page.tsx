@@ -61,6 +61,8 @@ export default function Event() {
   const placeholderEvent = "Wähle ein Event"
   const placeholderDojo = "Zu welchem Dojo gehörst du?"
 
+  const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""
+
   // get events from api
   useEffect(() => {
     setIsLoading(true)
@@ -366,7 +368,7 @@ export default function Event() {
                                                 "text-muted-foreground text-right ml-2",
                                                 deadlinePassed && "text-red-300",
                                                 tooEarlyToRegister && "text-red-800",
-                                                isSelectable && "text-green-500"
+                                                isSelectable && "text-green-500",
                                               )}
                                             >
                                               {statusText}
@@ -538,7 +540,7 @@ export default function Event() {
                                 <FormControl>
                                   <ReCAPTCHA
                                     size="normal"
-                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                                    sitekey={RECAPTCHA_SITE_KEY}
                                     ref={recaptchaRef}
                                     onChange={(token) => {
                                       handleChange(token)

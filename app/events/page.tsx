@@ -34,6 +34,8 @@ const dojos = [
   },
 ]
 
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""
+
 export default function Event() {
   const [events, setEvents] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -60,8 +62,6 @@ export default function Event() {
   // placeholder text
   const placeholderEvent = "Wähle ein Event"
   const placeholderDojo = "Zu welchem Dojo gehörst du?"
-
-  const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""
 
   // get events from api
   useEffect(() => {

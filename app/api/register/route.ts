@@ -14,8 +14,6 @@ export async function POST(request: Request) {
 
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
 
-  const apiKey = request.headers.get("api-key")
-
   // rate limiting
   const ip = request.headers.get("x-forwarded-for") || request.headers.get("remote-addr") || "unknown"
 
@@ -41,10 +39,6 @@ export async function POST(request: Request) {
   }
 
   const body: unknown = await request.json()
-
-  if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 404 })
-  }
 
   //#region validate body
   const result = formSchema.safeParse(body)

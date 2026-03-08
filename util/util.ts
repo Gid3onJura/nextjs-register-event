@@ -48,12 +48,6 @@ export const setOrder = async (values: TFormSchemaOrders) => {
 }
 
 export const setRegister = async (values: TFormSchema) => {
-  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
-
-  if (!API_KEY) {
-    return new Response(JSON.stringify({ error: "Prüfe deine Konfiguration" }), { status: 500 })
-  }
-
   const response = await fetch("/api/register", {
     method: "POST",
     body: JSON.stringify({
@@ -66,7 +60,7 @@ export const setRegister = async (values: TFormSchema) => {
       captchatoken: values.captchatoken,
       options: values.options,
     }),
-    headers: { "Content-Type": "application/json", "api-key": API_KEY },
+    headers: { "Content-Type": "application/json" },
   })
 
   return response

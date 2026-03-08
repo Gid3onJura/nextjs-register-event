@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     allEvents = await response.json()
   } catch (error) {
-    return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
+    return NextResponse.json({ error: "Fehler beim Abrufen der Events " + JSON.stringify(error) }, { status: 500 })
   }
 
   const body: unknown = await request.json()

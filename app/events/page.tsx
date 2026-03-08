@@ -138,6 +138,7 @@ export default function Event() {
         notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
       }
     } else {
+      console.log(response)
       console.log("Received non-JSON response")
       notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }

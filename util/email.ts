@@ -3,7 +3,7 @@ import nodemailer from "nodemailer"
 const transporter = nodemailer.createTransport({
   host: process.env.NEXT_PUBLIC_SMTP_HOST,
   port: 465, // or 587 or your SMTP server's port
-  secure: true,
+  secure: true, // true for port 465, false for 587
   auth: {
     user: process.env.NEXT_PUBLIC_SMTP_USER,
     pass: process.env.NEXT_PUBLIC_SMTP_PW,
@@ -16,7 +16,7 @@ export const sendEmail = async (
   subject: string,
   text: string,
   html: string,
-  iscfile?: any | null
+  iscfile?: any | null,
 ) => {
   const attachments = [
     {

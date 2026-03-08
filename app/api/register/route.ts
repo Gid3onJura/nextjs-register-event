@@ -10,6 +10,11 @@ export async function POST(request: Request) {
   let eventHinweis = ""
   let eventStartConverted: string = ""
   let eventEndConverted: string = ""
+  let allEvents = null
+
+  const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
+
+  const apiKey = request.headers.get("api-key")
 
   // rate limiting
   const ip = request.headers.get("x-forwarded-for") || request.headers.get("remote-addr") || "unknown"
@@ -23,17 +28,19 @@ export async function POST(request: Request) {
 
   //#region fetch events
   const url = new URL("/api/events", request.url)
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  })
 
-  const allEvents = await response.json()
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+
+    allEvents = await response.json()
+  } catch (error) {
+    return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
+  }
 
   const body: unknown = await request.json()
-  const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
-
-  const apiKey = request.headers.get("api-key")
 
   if (!apiKey || apiKey !== process.env.NEXT_PUBLIC_API_KEY) {
     return NextResponse.json({ error: "Forbidden" }, { status: 404 })

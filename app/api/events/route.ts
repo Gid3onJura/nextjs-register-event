@@ -2,6 +2,10 @@ export async function GET(request: Request) {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
 
+  if (!API_BASE_URL || !API_KEY) {
+    return Response.json({ error: "Prüfe deine Konfiguration" }, { status: 500 })
+  }
+
   // if (!accessToken) {
   //   return Response.json({ error: "No access token" }, { status: 500 })
   // }
@@ -27,7 +31,7 @@ export async function GET(request: Request) {
   } catch (error) {
     return Response.json(
       { error: JSON.stringify(error), message: "[GET all events]: Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

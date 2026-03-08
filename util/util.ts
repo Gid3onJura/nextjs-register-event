@@ -221,7 +221,8 @@ export const createICalEvent = async (event: Event, emailOganizer: string) => {
   return Buffer.from(cal.toString())
 }
 
-export function formatDateDE(dateString: string): string {
+export function formatDateDE(dateString: string | undefined | null): string {
+  if (!dateString) return ""
   const date = new Date(dateString)
   return (
     date.toLocaleString("de-DE", {

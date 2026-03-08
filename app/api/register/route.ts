@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   let eventHinweis = ""
   let eventStartConverted: string = ""
   let eventEndConverted: string = ""
-  let allEvents = null
+  let allEvents: Event[] = []
 
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
 

@@ -27,6 +27,10 @@ export async function POST(request: Request) {
   //#region fetch events
   const url = new URL("/api/events", request.url)
 
+  console.log("====================================")
+  console.log(url)
+  console.log("====================================")
+
   try {
     const response = await fetch(url, {
       method: "GET",

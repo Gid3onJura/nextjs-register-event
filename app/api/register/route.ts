@@ -25,9 +25,10 @@ export async function POST(request: Request) {
   }
 
   //#region fetch events
+  const url = new URL("/api/events", request.url)
 
   try {
-    const response = await fetch("/api/events", {
+    const response = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })

@@ -11,6 +11,7 @@ export interface Event {
   eventdate: string
   eventdatetimefrom: string
   eventdatetimeto: string
+  eventtype: string
   deadline: string
   options: EventOption[]
   note: string

@@ -24,26 +24,8 @@ export async function POST(request: Request) {
     )
   }
 
-  //#region fetch events
-  const url = new URL("/api/events", request.url)
-
-  return NextResponse.json({ url: url }, { status: 500 })
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-
-    allEvents = await response.json()
-  } catch (error) {
-    console.log(error)
-    return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
-  }
-
-  const body: unknown = await request.json()
-
   //#region validate body
+  const body: unknown = await request.json()
   const result = formSchema.safeParse(body)
   let zodErrors = {}
   if (!result.success) {
@@ -62,6 +44,27 @@ export async function POST(request: Request) {
 
   if (!emailTo) {
     return NextResponse.json({ error: "Empfänger-Mail fehlt" })
+  }
+
+  //#region fetch events
+  const url = new URL("/api/events", request.url)
+
+  console.log("====================================")
+  console.log(url)
+  console.log("====================================")
+
+  return NextResponse.json({ url: url }, { status: 200 })
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+
+    allEvents = await response.json()
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
   }
 
   // payload is valid

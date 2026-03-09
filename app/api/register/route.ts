@@ -27,9 +27,7 @@ export async function POST(request: Request) {
   //#region fetch events
   const url = new URL("/api/events", request.url)
 
-  console.log("====================================")
-  console.log(url)
-  console.log("====================================")
+  return NextResponse.json({ url: url }, { status: 500 })
 
   try {
     const response = await fetch(url, {

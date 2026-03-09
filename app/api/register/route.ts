@@ -53,8 +53,6 @@ export async function POST(request: Request) {
   console.log(url)
   console.log("====================================")
 
-  return NextResponse.json({ url: url }, { status: 200 })
-
   try {
     const response = await fetch(url, {
       method: "GET",

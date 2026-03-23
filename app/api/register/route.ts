@@ -49,17 +49,21 @@ export async function POST(request: Request) {
   //#region fetch events
   const url = new URL("/api/events", request.url)
 
-  try {
-    const response = await fetch(url.href, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
+  console.log("====================================")
+  console.log(url)
+  console.log("====================================")
 
-    allEvents = await response.json()
-  } catch (error) {
-    console.log(error)
-    return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
-  }
+  // try {
+  //   const response = await fetch(url.href, {
+  //     method: "GET",
+  //     headers: { "Content-Type": "application/json" },
+  //   })
+
+  //   allEvents = await response.json()
+  // } catch (error) {
+  //   console.log(error)
+  //   return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
+  // }
 
   // payload is valid
   const { firstname, lastname, event: eventName, email, dojo, comments, options: selectedOptions } = result.data

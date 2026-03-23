@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   let eventHinweis = ""
   let eventStartConverted: string = ""
   let eventEndConverted: string = ""
-  const allEvents: Event[] = []
+  let allEvents: Event[] = []
 
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
 
@@ -49,21 +49,25 @@ export async function POST(request: Request) {
   //#region fetch events
   const url = new URL("/api/events", request.url)
 
+  if (url) {
+    return NextResponse.json({ url: url.href })
+  }
+
   console.log("====================================")
   console.log(url)
   console.log("====================================")
 
-  // try {
-  //   const response = await fetch(url.href, {
-  //     method: "GET",
-  //     headers: { "Content-Type": "application/json" },
-  //   })
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
 
-  //   allEvents = await response.json()
-  // } catch (error) {
-  //   console.log(error)
-  //   return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
-  // }
+    allEvents = await response.json()
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
+  }
 
   // payload is valid
   const { firstname, lastname, event: eventName, email, dojo, comments, options: selectedOptions } = result.data

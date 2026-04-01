@@ -13,6 +13,8 @@ export async function POST(request: Request) {
   let allEvents: Event[] = []
 
   const emailTo = process.env.NEXT_PUBLIC_REGISTER_EMAIL_TO ?? ""
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
 
   // rate limiting
   const ip = request.headers.get("x-forwarded-for") || request.headers.get("remote-addr") || "unknown"
@@ -47,25 +49,26 @@ export async function POST(request: Request) {
   }
 
   //#region fetch events
-  const url = new URL("/api/events", request.url)
+  const url = "event/reduced"
 
-  if (url) {
-    return NextResponse.json({ url: url.href })
+  const headers = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    "api-key": API_KEY,
   }
 
-  console.log("====================================")
-  console.log(url)
-  console.log("====================================")
-
   try {
-    const response = await fetch(url, {
+    const response = await fetch(API_BASE_URL + "/" + url, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
     })
 
     allEvents = await response.json()
+
+    if (!allEvents) {
+      throw new Error("Keine Events gefunden")
+    }
   } catch (error) {
-    console.log(error)
     return NextResponse.json({ error: "Fehler beim Abrufen der Events" }, { status: 500 })
   }
 

@@ -131,6 +131,16 @@ export default function Event() {
 
       if (responseData.message) {
         notify(responseData.message, "success")
+
+        form.reset({
+          firstname: "",
+          lastname: "",
+          event: "",
+          email: "",
+          dojo: "",
+          comments: "",
+          options: {},
+        })
       }
 
       if (responseData.error) {
@@ -141,16 +151,6 @@ export default function Event() {
       console.log("Received non-JSON response")
       notify("Anmeldung fehlgeschlagen! Bitte versuche es erneut.", "error")
     }
-
-    // form.reset({
-    //   firstname: "",
-    //   lastname: "",
-    //   event: "",
-    //   email: "",
-    //   dojo: "",
-    //   comments: "",
-    //   options: {},
-    // })
 
     recaptchaRef.current?.reset()
     setIsVerified(false)

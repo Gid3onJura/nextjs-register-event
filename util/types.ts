@@ -10,7 +10,7 @@ export const formSchema = zod.object({
       }
       return true
     },
-    { message: "Bitte wähle ein Event aus" }
+    { message: "Bitte wähle ein Event aus" },
   ),
   email: zod.string().email({ message: "Bitte gib eine gültige E-Mail Adresse ein" }).optional().or(zod.literal("")),
   dojo: zod.string().refine(
@@ -20,7 +20,7 @@ export const formSchema = zod.object({
       }
       return true
     },
-    { message: "Bitte wähle ein Dojo aus" }
+    { message: "Bitte wähle ein Dojo aus" },
   ),
   comments: zod.string().optional(),
   options: zod.record(zod.union([zod.number(), zod.boolean(), zod.string(), zod.null()])).default({}),
@@ -43,7 +43,7 @@ export const formSchemaOrders = zod.object({
         .min(0)
         .or(zod.nan()) // Optional, falls NaN-Werte behandelt werden sollen
         .optional(), // Dies erlaubt, dass das Feld leer sein kann
-    })
+    }),
   ),
   email: zod.string().email({ message: "Bitte gib eine gültige E-Mail Adresse ein" }).optional().or(zod.literal("")),
   comments: zod.string().optional(),
@@ -51,3 +51,26 @@ export const formSchemaOrders = zod.object({
 })
 
 export type TFormSchemaOrders = zod.infer<typeof formSchemaOrders>
+
+export const eventCreateSchema = zod.object({
+  description: zod.string().min(1, { message: "Bitte gib eine Event-Beschreibung ein" }),
+  eventyear: zod.string().min(1, { message: "Bitte gib das Event-Jahr ein" }),
+  eventtype: zod.string().min(1, { message: "Bitte wähle einen Event-Typ aus" }),
+  eventdate: zod.string().optional(),
+  eventdatetimefrom: zod.string().min(1, { message: "Bitte gib eine Startzeit ein" }),
+  eventdatetimeto: zod.string().min(1, { message: "Bitte gib eine Endzeit ein" }),
+  deadline: zod.string().optional(),
+  location: zod.string().optional(),
+  note: zod.string().optional(),
+  options: zod
+    .array(
+      zod.object({
+        label: zod.string().min(1, { message: "Bitte gib eine Bezeichnung ein" }),
+        slug: zod.string().min(1, { message: "Bitte gib einen Slug ein" }),
+        type: zod.enum(["boolean", "number", "string"], { message: "Bitte wähle einen Typ aus" }),
+      }),
+    )
+    .optional(),
+})
+
+export type TEventCreateSchema = zod.infer<typeof eventCreateSchema>

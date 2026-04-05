@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { BookOpen, Settings, User } from "lucide-react"
+import { BookOpen, ClipboardList, Settings, User } from "lucide-react"
 import { useEffect, useState } from "react"
 import { DashboardCard } from "@/util/interfaces"
 
@@ -40,7 +40,7 @@ export default function DashboardOverview() {
       description: "Bearbeite dein Profil und deine Daten",
       icon: <User />,
       href: "/dashboard/profile",
-      allowedRoles: ["user", "admin", "staff"],
+      allowedRoles: ["user", "admin"],
     },
     {
       title: "Einstellungen",
@@ -48,6 +48,13 @@ export default function DashboardOverview() {
       icon: <Settings />,
       href: "/dashboard/settings",
       allowedRoles: ["admin"],
+    },
+    {
+      title: "Events",
+      description: "Erstelle Events",
+      icon: <ClipboardList />,
+      href: "/dashboard/events",
+      allowedRoles: ["admin", "sensei"],
     },
   ]
 

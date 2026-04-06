@@ -53,6 +53,7 @@ export default function EventsPageClient() {
   const [options, setOptions] = useState<Array<{ label: string; type: "boolean" | "number" | "string" }>>([])
   const [events, setEvents] = useState<Event[]>([])
   const [isLoadingEvents, setIsLoadingEvents] = useState(true)
+  const [descriptionMessage, setDescriptionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   const form = useForm<TEventCreateSchema>({
     resolver: zodResolver(eventCreateSchema),
@@ -157,6 +158,7 @@ export default function EventsPageClient() {
           location: "",
           note: "",
         })
+        setDescriptionMessage(null)
         setOptions([])
         await loadEvents()
       }
@@ -171,6 +173,27 @@ export default function EventsPageClient() {
   useEffect(() => {
     void loadEvents()
   }, [])
+
+  const checkDescriptionDuplicate = (description: string) => {
+    if (!description.trim()) {
+      setDescriptionMessage(null)
+      return
+    }
+
+    const isDuplicate = events.some((event) => event.description.toLowerCase() === description.toLowerCase())
+
+    if (isDuplicate) {
+      setDescriptionMessage({
+        type: "error",
+        text: "⚠️ Ein Event mit diesem Namen existiert bereits.",
+      })
+    } else {
+      setDescriptionMessage({
+        type: "success",
+        text: "✓ Der Event-Name ist verfügbar.",
+      })
+    }
+  }
 
   const currentYear = new Date().getFullYear()
   const previousYear = currentYear - 1
@@ -214,8 +237,21 @@ export default function EventsPageClient() {
                           placeholder="Beispiel: Kyu-Prüfung Merseburg"
                           className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            checkDescriptionDuplicate(e.target.value)
+                          }}
                         />
                       </FormControl>
+                      {descriptionMessage && (
+                        <p
+                          className={`text-sm mt-1 ${
+                            descriptionMessage.type === "error" ? "text-red-600" : "text-green-600"
+                          }`}
+                        >
+                          {descriptionMessage.text}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

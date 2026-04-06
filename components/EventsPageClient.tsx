@@ -44,7 +44,6 @@ export default function EventsPageClient() {
     resolver: zodResolver(eventCreateSchema),
     defaultValues: {
       description: "",
-      eventyear: "",
       eventtype: "",
       eventdatetimefrom: "",
       eventdatetimeto: "",
@@ -58,8 +57,9 @@ export default function EventsPageClient() {
   const handleSubmit = async (values: TEventCreateSchema) => {
     setIsSubmitting(true)
 
-    // Extrahiere eventdate aus eventdatetimefrom
+    // Extrahiere eventdate und eventyear aus eventdatetimefrom
     const eventdate = values.eventdatetimefrom.split("T")[0]
+    const eventyear = eventdate.split("-")[0]
 
     // Generiere slugs für options
     const optionsWithSlug = options.map((opt) => ({
@@ -73,7 +73,7 @@ export default function EventsPageClient() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...values, eventdate, options: optionsWithSlug }),
+        body: JSON.stringify({ ...values, eventdate, eventyear, options: optionsWithSlug }),
       })
 
       const responseData = await response.json()
@@ -93,7 +93,6 @@ export default function EventsPageClient() {
         notify("Event erfolgreich erstellt.", "success")
         form.reset({
           description: "",
-          eventyear: "",
           eventtype: "",
           eventdatetimefrom: "",
           eventdatetimeto: "",
@@ -142,25 +141,6 @@ export default function EventsPageClient() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="eventyear"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Event-Jahr *</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="2026"
-                            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="eventtype"
                     render={({ field }) => (
                       <FormItem>
@@ -191,8 +171,6 @@ export default function EventsPageClient() {
                       </FormItem>
                     )}
                   />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="deadline"

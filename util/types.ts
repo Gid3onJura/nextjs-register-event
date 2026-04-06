@@ -54,7 +54,6 @@ export type TFormSchemaOrders = zod.infer<typeof formSchemaOrders>
 
 export const eventCreateSchema = zod.object({
   description: zod.string().min(1, { message: "Bitte gib eine Event-Beschreibung ein" }),
-  eventyear: zod.string().min(1, { message: "Bitte gib das Event-Jahr ein" }),
   eventtype: zod.string().min(1, { message: "Bitte wähle einen Event-Typ aus" }),
   eventdate: zod.string().optional(),
   eventdatetimefrom: zod.string().min(1, { message: "Bitte gib eine Startzeit ein" }),

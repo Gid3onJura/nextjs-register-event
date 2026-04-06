@@ -16,7 +16,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import DashboardPageHeader from "./DashboardPageHeader"
 import { IconWithTooltip } from "./IconWithTooltip"
 import { User } from "@/util/interfaces"
-import { calcDuration, colorDanger } from "@/util/util"
+import { calcDuration, colorDanger, formatDateDE } from "@/util/util"
 
 interface BookRental {
   id: number
@@ -375,8 +375,7 @@ export default function BookRentalClient() {
                     </p>
 
                     <p>
-                      <span className="font-semibold">am:</span>{" "}
-                      {reservedDate.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })}
+                      <span className="font-semibold">am:</span> {formatDateDE(reservedDate, "date")}
                     </p>
 
                     {durationDisplay && (
@@ -450,8 +449,7 @@ export default function BookRentalClient() {
                       </p>
 
                       <p>
-                        <span className="font-semibold">am:</span>{" "}
-                        {rentalDate.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })}
+                        <span className="font-semibold">am:</span> {formatDateDE(rentalDate, "date")}
                       </p>
 
                       {durationDisplay && (

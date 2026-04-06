@@ -221,11 +221,20 @@ export const createICalEvent = async (event: Event, emailOganizer: string) => {
   return Buffer.from(cal.toString())
 }
 
-export function formatDateDE(dateString: string | undefined | null): string {
-  if (!dateString) return ""
-  const date = new Date(dateString)
+export function formatDateDE(date: string | undefined | null | Date, format?: string): string {
+  if (!date) return "undefined"
+  const dateObj = new Date(date)
+
+  if (format === "date") {
+    return dateObj.toLocaleString("de-DE", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+  }
+
   return (
-    date.toLocaleString("de-DE", {
+    dateObj.toLocaleString("de-DE", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { eventCreateSchema, TEventCreateSchema } from "@/util/types"
 import { Event } from "@/util/interfaces"
-import { notify } from "@/util/util"
+import { formatDateDE, notify } from "@/util/util"
 import { Plus, Trash2 } from "lucide-react"
 
 function generateSlug(label: string, type: string): string {
@@ -29,18 +29,6 @@ function generateSlug(label: string, type: string): string {
     .replace(/_+/g, "_")
     .replace(/^_|_$/g, "")
   return prefix + slugified
-}
-
-function formatDateTime(dateString?: string) {
-  if (!dateString) return "Unbekannt"
-  const date = new Date(dateString)
-  return date.toLocaleString("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
 }
 
 function getEventTypeLabel(typeValue?: string) {
@@ -455,7 +443,7 @@ export default function EventsPageClient() {
                             </span>
                           </div>
                           <p className="text-sm text-slate-500">
-                            {formatDateTime(event.eventdatetimefrom)} – {formatDateTime(event.eventdatetimeto)}
+                            {formatDateDE(event.eventdatetimefrom)} – {formatDateDE(event.eventdatetimeto)}
                           </p>
                           {event.note ? <p className="text-sm text-slate-500">Hinweis: {event.note}</p> : null}
                           {event.options?.length ? (

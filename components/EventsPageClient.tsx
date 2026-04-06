@@ -43,6 +43,11 @@ const eventTypes = [
   { label: "Sonstiges", value: "sonstiges" },
 ]
 
+function getCurrentYearStart() {
+  const currentYear = new Date().getFullYear()
+  return `${currentYear}-01-01T00:00`
+}
+
 export default function EventsPageClient() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [options, setOptions] = useState<Array<{ label: string; type: "boolean" | "number" | "string" }>>([])
@@ -54,9 +59,9 @@ export default function EventsPageClient() {
     defaultValues: {
       description: "",
       eventtype: "",
-      eventdatetimefrom: "",
-      eventdatetimeto: "",
-      deadline: "",
+      eventdatetimefrom: getCurrentYearStart(),
+      eventdatetimeto: getCurrentYearStart(),
+      deadline: getCurrentYearStart(),
       location: "",
       note: "",
       options: [],

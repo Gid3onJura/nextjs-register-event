@@ -85,3 +85,43 @@ export async function POST(request: Request) {
     return Response.json({ error: "Event konnte nicht erstellt werden", details: String(error) }, { status: 500 })
   }
 }
+
+export async function DELETE(request: Request) {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
+  const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
+
+  const authToken = (await cookies()).get("auth_token")?.value
+
+  if (!API_BASE_URL || !API_KEY) {
+    return Response.json({ error: "Prüfe deine Konfiguration" }, { status: 500 })
+  }
+
+  const url = new URL(request.url)
+  const eventId = url.searchParams.get("id")
+
+  if (!eventId) {
+    return Response.json({ error: "Event-ID fehlt" }, { status: 400 })
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/event/${eventId}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": API_KEY,
+        Authorization: "Bearer " + authToken,
+      },
+    })
+
+    const data = await response.text()
+
+    if (!response.ok) {
+      return Response.json({ error: data || "Event konnte nicht gelöscht werden" }, { status: response.status })
+    }
+
+    return Response.json({ success: true }, { status: 200 })
+  } catch (error) {
+    return Response.json({ error: "Event konnte nicht gelöscht werden", details: String(error) }, { status: 500 })
+  }
+}

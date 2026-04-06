@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { eventCreateSchema, TEventCreateSchema } from "@/util/types"
+import { Event } from "@/util/interfaces"
 import { notify } from "@/util/util"
 import { Plus, Trash2 } from "lucide-react"
 
@@ -30,16 +31,36 @@ function generateSlug(label: string, type: string): string {
   return prefix + slugified
 }
 
+function formatDateTime(dateString?: string) {
+  if (!dateString) return "Unbekannt"
+  const date = new Date(dateString)
+  return date.toLocaleString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
+function getEventTypeLabel(typeValue?: string) {
+  return eventTypes.find((type) => type.value === typeValue)?.label || typeValue || "Unbekannt"
+}
+
 const eventTypes = [
   { label: "Lehrgang", value: "lehrgang" },
   { label: "Training", value: "training" },
   { label: "Seminar", value: "seminar" },
+  { label: "Wettstreit", value: "wettstreit" },
   { label: "Sonstiges", value: "sonstiges" },
 ]
 
 export default function EventsPageClient() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [options, setOptions] = useState<Array<{ label: string; type: "boolean" | "number" | "string" }>>([])
+  const [events, setEvents] = useState<Event[]>([])
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true)
+
   const form = useForm<TEventCreateSchema>({
     resolver: zodResolver(eventCreateSchema),
     defaultValues: {
@@ -53,6 +74,49 @@ export default function EventsPageClient() {
       options: [],
     },
   })
+
+  const loadEvents = async () => {
+    setIsLoadingEvents(true)
+
+    try {
+      const response = await fetch("/api/events")
+      if (!response.ok) {
+        throw new Error("Events konnten nicht geladen werden")
+      }
+      const data = await response.json()
+      setEvents(Array.isArray(data) ? data : [])
+    } catch (error) {
+      console.error(error)
+      notify("Events konnten nicht geladen werden.", "error")
+      setEvents([])
+    } finally {
+      setIsLoadingEvents(false)
+    }
+  }
+
+  const handleDeleteEvent = async (eventId: number) => {
+    if (!confirm("Event wirklich löschen?")) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/events?id=${eventId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        const responseData = await response.json()
+        notify(responseData.error ?? "Löschen fehlgeschlagen.", "error")
+        return
+      }
+
+      setEvents((current) => current.filter((event) => event.id !== eventId))
+      notify("Event gelöscht.", "success")
+    } catch (error) {
+      console.error(error)
+      notify("Löschen fehlgeschlagen.", "error")
+    }
+  }
 
   const handleSubmit = async (values: TEventCreateSchema) => {
     setIsSubmitting(true)
@@ -101,6 +165,7 @@ export default function EventsPageClient() {
           note: "",
         })
         setOptions([])
+        await loadEvents()
       }
     } catch (error) {
       console.error(error)
@@ -109,6 +174,30 @@ export default function EventsPageClient() {
       setIsSubmitting(false)
     }
   }
+
+  useEffect(() => {
+    void loadEvents()
+  }, [])
+
+  const currentYear = new Date().getFullYear()
+  const previousYear = currentYear - 1
+
+  const filteredEvents = events.filter((event) => {
+    const year = event.eventyear || event.eventdate?.split("T")[0]?.split("-")[0] || "0"
+    return year === String(currentYear) || year === String(previousYear)
+  })
+
+  const groupedEvents = filteredEvents.reduce<Record<string, Event[]>>((acc, event) => {
+    const year = event.eventyear || event.eventdate?.split("T")[0]?.split("-")[0] || "Unbekannt"
+    const normalizedYear = String(year)
+    if (!acc[normalizedYear]) {
+      acc[normalizedYear] = []
+    }
+    acc[normalizedYear].push(event)
+    return acc
+  }, {})
+
+  const years = Object.keys(groupedEvents).sort((a, b) => Number(b) - Number(a))
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
@@ -335,6 +424,74 @@ export default function EventsPageClient() {
             </Form>
           </CardContent>
         </Card>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Erstellte Events</h2>
+          {isLoadingEvents ? (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-700">
+              Lade vorhandene Events...
+            </div>
+          ) : years.length === 0 ? (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-700">
+              Keine Events gefunden.
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {years.map((year) => (
+                <div key={year} className="rounded-xl border border-gray-200 bg-white shadow-sm">
+                  <div className="border-b border-gray-200 px-5 py-4 bg-gray-50">
+                    <h3 className="text-lg font-semibold">{year}</h3>
+                  </div>
+                  <div className="space-y-3 px-5 py-4">
+                    {groupedEvents[year].map((event) => (
+                      <div
+                        key={event.id}
+                        className="rounded-xl border border-gray-100 bg-gray-50 p-4 sm:flex sm:items-center sm:justify-between"
+                      >
+                        <div className="space-y-2 sm:flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+                            <p className="font-semibold text-base">{event.description}</p>
+                            <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                              {getEventTypeLabel(event.eventtype)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-500">
+                            {formatDateTime(event.eventdatetimefrom)} – {formatDateTime(event.eventdatetimeto)}
+                          </p>
+                          {event.note ? <p className="text-sm text-slate-500">Hinweis: {event.note}</p> : null}
+                          {event.options?.length ? (
+                            <div className="space-y-2 pt-2">
+                              <p className="text-sm font-medium text-slate-700">Optionen:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {event.options.map((option) => (
+                                  <span
+                                    key={option.id}
+                                    className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+                                  >
+                                    {option.description}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+                        <div className="mt-4 flex items-center gap-3 sm:mt-0">
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => void handleDeleteEvent(event.id)}
+                          >
+                            Löschen
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

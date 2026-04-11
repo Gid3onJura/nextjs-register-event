@@ -196,11 +196,10 @@ export default function EventsPageClient() {
   }
 
   const currentYear = new Date().getFullYear()
-  const previousYear = currentYear - 1
 
   const filteredEvents = events.filter((event) => {
     const year = event.eventyear || event.eventdate?.split("T")[0]?.split("-")[0] || "0"
-    return year === String(currentYear) || year === String(previousYear)
+    return year >= String(currentYear)
   })
 
   const groupedEvents = filteredEvents.reduce<Record<string, Event[]>>((acc, event) => {

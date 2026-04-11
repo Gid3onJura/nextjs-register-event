@@ -49,8 +49,6 @@ export async function POST(request: Request) {
 
   const result = eventCreateSchema.safeParse(body)
 
-  console.log(result)
-
   if (!result.success) {
     const errors: Record<string, string> = {}
     result.error.issues.forEach((issue) => {

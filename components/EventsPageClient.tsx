@@ -152,9 +152,9 @@ export default function EventsPageClient() {
         form.reset({
           description: "",
           eventtype: "",
-          eventdatetimefrom: "",
-          eventdatetimeto: "",
-          deadline: "",
+          eventdatetimefrom: getCurrentYearStart(),
+          eventdatetimeto: getCurrentYearStart(),
+          deadline: getCurrentYearStart(),
           location: "",
           note: "",
         })

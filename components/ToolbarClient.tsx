@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X, Home, LogIn, LogOut, LayoutDashboard, Tickets, TreePine } from "lucide-react"
+import { Menu, X, Home, LogIn, LogOut, LayoutDashboard, Tickets, TreePine, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
@@ -16,18 +16,38 @@ export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
       text-white shadow-sm
     "
     >
-      <div className="max-w-5xl mx-auto flex justify-between items-center p-4">
+      <div className="max-w-5xl mx-auto flex flex-wrap justify-between items-center p-4 gap-2 md:gap-0">
         {/* Left: Logo / Home */}
-        <Link href="/" className="flex items-center gap-1 hover:text-gray-500">
-          <Home size={20} /> Startseite
+        <Link
+          href="/"
+          className="flex-1 sm:flex-none flex items-center gap-1 hover:text-gray-500 whitespace-nowrap justify-center sm:justify-start"
+        >
+          <Home size={20} />
+          <span className="hidden sm:inline">Startseite</span>
         </Link>
 
-        <Link href="/events" className="flex items-center gap-1 hover:text-gray-500">
-          <Tickets size={20} /> Anmeldung
+        <Link
+          href="/events"
+          className="flex-1 sm:flex-none flex items-center gap-1 hover:text-gray-500 whitespace-nowrap justify-center sm:justify-start"
+        >
+          <Tickets size={20} />
+          <span className="hidden sm:inline">Anmeldung</span>
         </Link>
 
-        {/* <Link href="/adventcalendar" className="flex items-center gap-1 hover:text-gray-500">
-          <TreePine size={20} /> Adventskalender
+        <Link
+          href="/survey"
+          className="flex-1 sm:flex-none flex items-center gap-1 hover:text-gray-500 whitespace-nowrap justify-center sm:justify-start"
+        >
+          <BarChart3 size={20} />
+          <span className="hidden sm:inline">Umfrage</span>
+        </Link>
+
+        {/* <Link
+          href="/adventcalendar"
+          className="flex-1 sm:flex-none flex items-center gap-1 hover:text-gray-500 whitespace-nowrap justify-center sm:justify-start"
+        >
+          <TreePine size={20} />
+          <span className="hidden sm:inline">Adventskalender</span>
         </Link> */}
 
         {/* Mobile Button */}

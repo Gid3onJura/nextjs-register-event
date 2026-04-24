@@ -13,6 +13,7 @@ import { eventCreateSchema, TEventCreateSchema } from "@/util/types"
 import { Event } from "@/util/interfaces"
 import { formatDateDE, notify } from "@/util/util"
 import { Plus, Trash2 } from "lucide-react"
+import DashboardPageHeader from "./DashboardPageHeader"
 
 function generateSlug(label: string, type: string): string {
   let prefix
@@ -216,6 +217,7 @@ export default function EventsPageClient() {
 
   return (
     <div className="min-h-screen bg-white p-4 md:p-8">
+      <DashboardPageHeader />
       <div className="mx-auto max-w-4xl">
         <Card className="shadow-xl">
           <CardHeader>

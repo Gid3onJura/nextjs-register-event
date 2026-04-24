@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { BookOpen, ClipboardList, Settings, User } from "lucide-react"
+import { BookOpen, ClipboardList, Settings, User, BarChart3 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { DashboardCard } from "@/util/interfaces"
 
@@ -54,6 +54,13 @@ export default function DashboardOverview() {
       description: "Erstelle Events",
       icon: <ClipboardList />,
       href: "/dashboard/events",
+      allowedRoles: ["admin", "sensei"],
+    },
+    {
+      title: "Umfragen",
+      description: "Zeige Umfrage-Auswertungen",
+      icon: <BarChart3 />,
+      href: "/dashboard/survey",
       allowedRoles: ["admin", "sensei"],
     },
   ]

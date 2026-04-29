@@ -8,6 +8,7 @@ import { Download } from "lucide-react"
 import { notify } from "@/util/util"
 import jsPDF from "jspdf"
 import DashboardPageHeader from "./DashboardPageHeader"
+import { User } from "@/util/interfaces"
 
 interface SurveyQuestion {
   id: string
@@ -33,6 +34,7 @@ interface SurveyItem {
 
 interface SurveyStats {
   totalResponses: number
+  participationAverageUser: number
   questionStats: {
     [questionId: string]: {
       question: string
@@ -53,7 +55,8 @@ function normalizeSurveyStats(data: any, survey: SurveyContent): SurveyStats {
       return candidate
     })()
 
-  const totalResponses = typeof data?.totalResponses === "number" ? data.totalResponses : 0
+  const totalResponses = data?.totalResponses ?? 0
+  const participationAverageUser = data?.participationAverageUser ?? 0
   const questionById = survey.questions.reduce<Record<string, SurveyQuestion>>((acc, question) => {
     acc[question.id] = question
     return acc
@@ -88,11 +91,13 @@ function normalizeSurveyStats(data: any, survey: SurveyContent): SurveyStats {
   return {
     totalResponses,
     questionStats,
+    participationAverageUser,
   }
 }
 
 export default function SurveyPageClient() {
   const [surveys, setSurveys] = useState<SurveyItem[]>([])
+  const [user, setUser] = useState<User[]>([])
   const [selectedSurvey, setSelectedSurvey] = useState<SurveyItem | null>(null)
   const [stats, setStats] = useState<SurveyStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -102,23 +107,40 @@ export default function SurveyPageClient() {
 
   useEffect(() => {
     loadSurveys()
+    loadAllUser()
+    setIsLoading(false)
   }, [])
 
   useEffect(() => {
-    if (selectedSurvey) {
-      loadData()
+    const fetchData = async () => {
+      if (selectedSurvey) {
+        await loadData()
+      }
     }
-  }, [selectedSurvey])
+
+    fetchData()
+  }, [selectedSurvey, user])
 
   const loadSurveys = async () => {
     try {
       const response = await fetch("/api/survey/all")
       const data = await response.json()
       setSurveys(data)
-      setIsLoading(false)
     } catch (error) {
       console.error("Fehler beim Laden der Umfragen:", error)
       notify("Fehler beim Laden der Umfragen", "error")
+      setIsLoading(false)
+    }
+  }
+
+  const loadAllUser = async () => {
+    try {
+      const response = await fetch("/api/user")
+      const data = await response.json()
+      setUser(data)
+    } catch (error) {
+      console.error("Fehler beim Laden der User:", error)
+      notify("Fehler beim Laden der User", "error")
       setIsLoading(false)
     }
   }
@@ -410,7 +432,10 @@ export default function SurveyPageClient() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-lg font-semibold">Teilnehmer insgesamt: {stats.totalResponses}</p>
+              <p className="text-lg font-semibold">
+                Teilnehmer insgesamt: {stats.totalResponses} von {user.length} (
+                {stats.participationAverageUser.toFixed(2)}%)
+              </p>
             </CardContent>
           </Card>
           <div className="space-y-6">

@@ -17,7 +17,7 @@ export default function Home() {
           className="shadow-md hover:shadow-lg w-full rounded-lg sm:rounded-2xl p-4 text-lg sm:text-base"
           variant={"interaction"}
         >
-          <Link href="/events">Anmeldung zum Event</Link>
+          <Link href="/events">Anmelden an einem Event</Link>
         </Button>
         {/* <Button asChild className="shadow-md hover:shadow-lg w-full rounded-lg sm:rounded-2xl p-4 text-lg sm:text-base">
           <Link href="/order">Bestellung aufgeben</Link>

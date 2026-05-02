@@ -176,7 +176,7 @@ export default function Survey() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Fehler</CardTitle>
+            <CardTitle>Ups...</CardTitle>
             <CardDescription>Keine Umfragen verfügbar.</CardDescription>
           </CardHeader>
           {/* <CardFooter>
@@ -238,7 +238,7 @@ export default function Survey() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Fehler</CardTitle>
+            <CardTitle>Ups...</CardTitle>
             <CardDescription>Keine Umfrage ausgewählt.</CardDescription>
           </CardHeader>
           <CardFooter>

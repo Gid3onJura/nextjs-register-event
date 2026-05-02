@@ -34,13 +34,13 @@ export default function ToolbarClient({ isLoggedIn }: { isLoggedIn: boolean }) {
           <span className="hidden sm:inline">Anmeldung</span>
         </Link>
 
-        <Link
+        {/* <Link
           href="/survey"
           className="flex-1 sm:flex-none flex items-center gap-1 hover:text-gray-500 whitespace-nowrap justify-center sm:justify-start"
         >
           <BarChart3 size={20} />
           <span className="hidden sm:inline">Umfrage</span>
-        </Link>
+        </Link> */}
 
         {/* <Link
           href="/adventcalendar"

@@ -182,7 +182,11 @@ export default function SurveyPageClient() {
   }, [selectedSurvey, API_BASE_URL, API_KEY])
 
   useEffect(() => {
-    loadData()
+    const fetchData = async () => {
+      await loadData()
+    }
+
+    fetchData()
   }, [loadData])
 
   const exportToPDF = () => {

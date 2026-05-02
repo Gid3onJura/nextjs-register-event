@@ -65,10 +65,6 @@ export async function POST(request: Request) {
     const body: unknown = await request.json()
     const { surveyId, ...responses } = body as any
 
-    console.log("====================================")
-    console.log(responses)
-    console.log("====================================")
-
     // Lade Survey-Konfiguration basierend auf surveyId
     const surveyResponse = await fetch(`${API_BASE_URL}/survey/${surveyId}`, {
       method: "GET",

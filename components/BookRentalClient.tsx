@@ -56,7 +56,6 @@ export default function BookRentalClient() {
 
       setBookRentals(bookRentalData)
     } catch (error) {
-      console.log(error)
       setBookRentals([])
     }
   }
@@ -72,7 +71,6 @@ export default function BookRentalClient() {
 
       setUserData(userDataFromApi)
     } catch (error) {
-      console.log(error)
       setUserData([])
     }
   }
@@ -156,7 +154,6 @@ export default function BookRentalClient() {
 
       setBookRentals(bookRentalData)
     } catch (error) {
-      console.log(error)
       setMessage("Fehler beim Ausleihen")
     }
   }
@@ -215,7 +212,6 @@ export default function BookRentalClient() {
 
       setBookRentals(bookRentalData)
     } catch (error) {
-      console.log(error)
       setMessage("Fehler beim Ausleihen")
     }
   }

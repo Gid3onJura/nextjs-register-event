@@ -96,20 +96,32 @@ export default function Survey() {
   const recaptchaRef = useRef<ReCAPTCHA>(null)
 
   useEffect(() => {
-    fetch("/api/survey")
-      .then((res) => res.json())
-      .then((data: SurveyItem[]) => {
-        // Filter abgelaufene Umfragen
+    const loadSurveys = async () => {
+      try {
+        setIsLoading(true)
+
+        const response = await fetch("/api/survey")
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`)
+        }
+
+        const data: SurveyItem[] = await response.json()
+
+        // Abgelaufene Umfragen herausfiltern
         const now = new Date()
         const activeSurveys = data.filter((item) => new Date(item.deadline) > now)
+
         setSurveys(activeSurveys)
-        setIsLoading(false)
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Fehler beim Laden der Umfragen:", err)
         notify("Fehler beim Laden der Umfragen", "error")
+      } finally {
         setIsLoading(false)
-      })
+      }
+    }
+
+    void loadSurveys()
   }, [])
 
   const form = useForm({

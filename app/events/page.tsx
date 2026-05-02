@@ -78,7 +78,6 @@ export default function Event() {
         setEvents(eventsData)
         setIsLoading(false)
       } catch (error) {
-        console.log(error)
         setIsLoading(false)
         setEvents([])
       }
@@ -180,7 +179,6 @@ export default function Event() {
         setIsVerified(false)
       }
     } catch (error) {
-      console.log(error)
       setIsVerified(false)
     }
   }

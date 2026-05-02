@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -111,16 +111,6 @@ export default function SurveyPageClient() {
     setIsLoading(false)
   }, [])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (selectedSurvey) {
-        await loadData()
-      }
-    }
-
-    fetchData()
-  }, [selectedSurvey, user])
-
   const loadSurveys = async () => {
     try {
       const response = await fetch("/api/survey/all")
@@ -145,10 +135,11 @@ export default function SurveyPageClient() {
     }
   }
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!selectedSurvey) return
 
     setIsLoading(true)
+
     try {
       // Lade Survey-Konfiguration
       const surveyResponse = await fetch(`${API_BASE_URL}/survey/${selectedSurvey.id}`, {
@@ -159,6 +150,7 @@ export default function SurveyPageClient() {
           "api-key": API_KEY,
         },
       })
+
       const surveyResult = await surveyResponse.json()
       const survey = surveyResult?.survey ?? surveyResult
 
@@ -173,6 +165,7 @@ export default function SurveyPageClient() {
           "api-key": API_KEY,
         },
       })
+
       if (statsResponse.ok) {
         const statsData = await statsResponse.json()
         setStats(normalizeSurveyStats(statsData, survey))
@@ -186,7 +179,11 @@ export default function SurveyPageClient() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [selectedSurvey, API_BASE_URL, API_KEY])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   const exportToPDF = () => {
     if (!stats || !surveyData) return

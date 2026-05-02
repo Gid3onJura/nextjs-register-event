@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""
 
+  const { id } = await params
+
   try {
-    const response = await fetch(`${API_BASE_URL}/survey/${params.id}/stats`, {
+    const response = await fetch(`${API_BASE_URL}/survey/${id}/stats`, {
       method: "GET",
       headers: {
         Accept: "application/json",

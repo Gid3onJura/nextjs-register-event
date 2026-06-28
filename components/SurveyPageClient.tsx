@@ -63,7 +63,35 @@ function normalizeSurveyStats(data: any, survey: SurveyContent): SurveyStats {
   }, {})
 
   const questionStats: Record<string, any> = {}
+  survey.questions.forEach((question) => {
+    const statsValue = rawStats?.[question.id]
+    if (statsValue === undefined) return
+
+    const responses =
+      totalResponses > 0
+        ? totalResponses
+        : typeof statsValue === "object" && !Array.isArray(statsValue)
+          ? Object.values(statsValue as Record<string, any>).reduce(
+              (sum: number, value: any) => sum + Number(value || 0),
+              0,
+            )
+          : Array.isArray(statsValue)
+            ? statsValue.length
+            : 0
+
+    questionStats[question.id] = {
+      question: question.question,
+      type: question.type,
+      responses,
+      stats:
+        question.type === "textarea" && typeof statsValue === "object" && !Array.isArray(statsValue)
+          ? Object.keys(statsValue as Record<string, any>)
+          : statsValue,
+    }
+  })
+
   Object.entries(rawStats || {}).forEach(([questionId, statsValue]) => {
+    if (questionStats[questionId]) return
     const question = questionById[questionId]
     const responses =
       totalResponses > 0
@@ -440,11 +468,11 @@ export default function SurveyPageClient() {
             </CardContent>
           </Card>
           <div className="space-y-6">
-            {Object.entries(stats.questionStats).map(([questionId, questionStats]) => {
-              const question = surveyData.questions.find((q: SurveyQuestion) => q.id === questionId)
-              if (!question) return null
+            {surveyData.questions.map((question: SurveyQuestion) => {
+              const questionStats = stats.questionStats[question.id]
+              if (!questionStats) return null
               return (
-                <Card key={questionId}>
+                <Card key={question.id}>
                   <CardHeader>
                     <CardTitle>{question.question}</CardTitle>
                   </CardHeader>

@@ -144,8 +144,6 @@ export default function Survey() {
     setIsSubmitting(true)
     try {
       const { captchatoken, ...filteredData } = data
-      console.log("Formulardaten:", filteredData)
-      console.log("umfrage:", selectedSurvey?.id)
       const response = await fetch("/api/survey", {
         method: "POST",
         headers: {

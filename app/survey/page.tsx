@@ -15,6 +15,7 @@ import Link from "next/link"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft } from "lucide-react"
 import { z } from "zod"
+import { dateLocales, dateOptions } from "@/util/const"
 
 interface SurveyQuestion {
   id: string
@@ -125,6 +126,8 @@ export default function Survey() {
   }, [])
 
   const form = useForm({
+    mode: "onChange",
+    reValidateMode: "onChange",
     resolver: selectedSurvey ? zodResolver(createSurveySchema(selectedSurvey.survey.questions)) : undefined,
     defaultValues: selectedSurvey
       ? selectedSurvey.survey.questions.reduce(
@@ -223,7 +226,7 @@ export default function Survey() {
                 </CardHeader>
                 <CardFooter className="flex flex-col items-start mt-auto">
                   <p className="text-sm text-gray-500 mb-2">
-                    Deadline: {new Date(item.deadline).toLocaleDateString("de-DE")}
+                    Deadline: {new Date(item.deadline).toLocaleDateString(dateLocales, dateOptions)}
                   </p>
                   <Button className="w-full">Diese Umfrage ausfüllen</Button>
                 </CardFooter>

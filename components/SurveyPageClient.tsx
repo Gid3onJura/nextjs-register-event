@@ -9,6 +9,7 @@ import { notify } from "@/util/util"
 import jsPDF from "jspdf"
 import DashboardPageHeader from "./DashboardPageHeader"
 import { User } from "@/util/interfaces"
+import { dateLocales, dateOptions } from "@/util/const"
 
 interface SurveyQuestion {
   id: string
@@ -417,7 +418,8 @@ export default function SurveyPageClient() {
             <SelectContent>
               {surveys.map((survey) => (
                 <SelectItem key={survey.id} value={survey.id.toString()}>
-                  {survey.survey.title} (Deadline: {new Date(survey.deadline).toLocaleDateString("de-DE")})
+                  {survey.survey.title} (Deadline:{" "}
+                  {new Date(survey.deadline).toLocaleDateString(dateLocales, dateOptions)})
                 </SelectItem>
               ))}
             </SelectContent>
@@ -457,7 +459,7 @@ export default function SurveyPageClient() {
             <CardHeader>
               <CardTitle>{surveyData.title} - Auswertung</CardTitle>
               <CardDescription>
-                Deadline: {new Date(selectedSurvey.deadline).toLocaleDateString("de-DE")}
+                Deadline: {new Date(selectedSurvey.deadline).toLocaleDateString(dateLocales, dateOptions)}
               </CardDescription>
             </CardHeader>
             <CardContent>

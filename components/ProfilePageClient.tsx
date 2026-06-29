@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { Label } from "./ui/label"
 import { User } from "@/util/interfaces"
 import Belt from "./Belt"
+import { dateLocales, dateOptions } from "@/util/const"
 
 const emptyUser: User = {
   id: 0,
@@ -42,13 +43,7 @@ export default function ProfilePageClient({ userid }: { userid: number }) {
 
         setUserData(userData)
         setFormData({ email: userData.email ?? "" })
-        setUserBirth(
-          new Date(userData.birth).toLocaleDateString("de-DE", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }),
-        )
+        setUserBirth(new Date(userData.birth).toLocaleDateString(dateLocales, dateOptions))
       } catch (error) {
         console.log(error)
         setUserData(emptyUser)

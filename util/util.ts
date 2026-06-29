@@ -4,6 +4,7 @@ import { TFormSchema, TFormSchemaOrders } from "./types"
 import ical from "ical-generator"
 import { fromZonedTime, toZonedTime } from "date-fns-tz"
 import { Event } from "./interfaces"
+import { dateLocales, dateOptions, dateTimeOptions } from "./const"
 
 export const isTimestampExpired = (timestamp: number) => {
   const now = Date.now() / 1000
@@ -226,22 +227,10 @@ export function formatDateDE(date: string | undefined | null | Date, format?: st
   const dateObj = new Date(date)
 
   if (format === "date") {
-    return dateObj.toLocaleString("de-DE", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    })
+    return dateObj.toLocaleString(dateLocales, dateOptions)
   }
 
-  return (
-    dateObj.toLocaleString("de-DE", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }) + " Uhr"
-  )
+  return dateObj.toLocaleString(dateLocales, dateTimeOptions) + " Uhr"
 }
 
 export function formatRelativeDeadline(dateString: string): string {

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { ProtectedRoute } from "./util/interfaces"
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token = req.cookies.get("auth_token")?.value
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY ?? ""

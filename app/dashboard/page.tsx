@@ -1,4 +1,4 @@
-import DashboardOverview from "@/components/DashboardOverview"
+import DashboardClient from "../../components/DashboardClient"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
@@ -10,5 +10,5 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
-  return <DashboardOverview />
+  return <DashboardClient />
 }

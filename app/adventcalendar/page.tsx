@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
+import adventCalendar from "../../adventcalendar.json"
 // import Lottie from "lottie-react"
 // import snowAnimation from "../../public/snow.json"
 import SnowCanvas from "@/components/SnowCanvas"
@@ -11,7 +12,7 @@ import { Great_Vibes } from "next/font/google"
 
 function getModeByTime(date = new Date()): "day" | "night" {
   const hour = date.getHours()
-  return hour >= 7 && hour < 18 ? "day" : "night"
+  return hour >= 7 && hour < 16 ? "day" : "night"
 }
 
 function getTodayAdventDay() {
@@ -20,7 +21,7 @@ function getTodayAdventDay() {
   const day = now.getDate()
 
   // Nur im Dezember
-  if (month !== 0) return 0
+  //if (month !== 0) return 0
 
   return Math.min(day, 24)
 }
@@ -36,7 +37,10 @@ export default function Home() {
   const [mode, setMode] = useState<"day" | "night">("night")
   const [today, setToday] = useState<number>(0)
   const [openedDays, setOpenedDays] = useState<number[]>([])
+  const [completedDays, setCompletedDays] = useState<number[]>([])
   const [blowing, setBlowing] = useState(false)
+  const selectedDay = adventCalendar.find((item) => item.day === openDay)
+  const isExerciseCompleted = openDay !== null && completedDays.includes(openDay)
 
   useEffect(() => {
     setMode(getModeByTime())
@@ -45,11 +49,16 @@ export default function Home() {
     // open days
     const stored = localStorage.getItem("opened-days")
     if (stored) setOpenedDays(JSON.parse(stored))
+    const completed = localStorage.getItem("completed-days")
+    if (completed) setCompletedDays(JSON.parse(completed))
 
     // Optional: alle 5 Minuten neu prüfen
-    const interval = setInterval(() => {
-      setMode(getModeByTime())
-    }, 1 * 60 * 1000)
+    const interval = setInterval(
+      () => {
+        setMode(getModeByTime())
+      },
+      1 * 60 * 1000,
+    )
 
     return () => clearInterval(interval)
   }, [])
@@ -65,13 +74,24 @@ export default function Home() {
     })
   }
 
+  function completeExercise(day: number) {
+    setCompletedDays((prev) => {
+      if (prev.includes(day)) return prev
+      const next = [...prev, day]
+      localStorage.setItem("completed-days", JSON.stringify(next))
+      return next
+    })
+  }
+
   function blowOutCandles() {
     setBlowing(true)
 
     setTimeout(() => {
       setOpenDay(null)
       setOpenedDays([])
+      setCompletedDays([])
       localStorage.removeItem("opened-days")
+      localStorage.removeItem("completed-days")
       setBlowing(false)
     }, 400)
   }
@@ -131,7 +151,7 @@ export default function Home() {
       {/* 🎄 Inhalt */}
       <section className="relative z-10 max-w-5xl mx-auto px-4 py-16 mb-20">
         <div className="flex flex-row text-center text-5xl sm:text-6xl md:text-7xl mb-12 justify-between items-center gap-1">
-          <p>🎄</p>
+          <p>{mode === "day" ? "🌲" : "🎄"}</p>
           <motion.h1
             className={`
             ${greatVibes.className}
@@ -156,7 +176,7 @@ export default function Home() {
           >
             SDKM - Adventskalender
           </motion.h1>
-          <p>🎄</p>
+          <p>{mode === "day" ? "🌲" : "🎄"}</p>
         </div>
 
         {/* 📱 Responsives Grid */}
@@ -228,7 +248,23 @@ export default function Home() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-4xl mb-4">Türchen {openDay}</h2>
-            <p className="text-lg">✨ Frohe Weihnachten! ✨</p>
+            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-red-700">Deine Übung</p>
+            <p className="text-lg">{selectedDay?.exercise ?? "Für dieses Türchen wurde keine Übung gefunden."}</p>
+            {isExerciseCompleted ? (
+              <div className="mt-6 rounded-xl bg-amber-100 p-4">
+                <p className="text-sm font-semibold">Dein Lösungsbuchstabe</p>
+                <p className="my-1 text-4xl font-bold">{selectedDay?.letter}</p>
+                <p className="text-sm">Position im Lösungssatz: {selectedDay?.position}</p>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => completeExercise(openDay)}
+                className="mt-6 rounded-lg bg-red-800 px-5 py-3 font-semibold text-white transition-colors hover:bg-red-900"
+              >
+                Übung abgeschlossen
+              </button>
+            )}
           </motion.div>
         </motion.div>
       )}

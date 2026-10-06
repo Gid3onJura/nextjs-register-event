@@ -20,7 +20,7 @@ import { dateLocales, dateOptions } from "@/util/const"
 interface SurveyQuestion {
   id: string
   question: string
-  type: "number" | "select" | "multiselect" | "textarea" | "boolean"
+  type: "number" | "select" | "multiselect" | "textarea" | "string" | "boolean"
   required: boolean
   options?: string[]
   min?: number
@@ -68,6 +68,11 @@ function createSurveySchema(questions: SurveyQuestion[]) {
         break
       case "textarea":
         fieldSchema = z.string().optional()
+        break
+      case "string":
+        fieldSchema = z.string({
+          required_error: q.required ? "Dieses Feld ist erforderlich" : undefined,
+        })
         break
       case "boolean":
         fieldSchema = z.boolean().optional()
@@ -147,12 +152,20 @@ export default function Survey() {
     setIsSubmitting(true)
     try {
       const { captchatoken, ...filteredData } = data
+      const submissionData = { ...filteredData }
+      selectedSurvey?.survey.questions.forEach((question) => {
+        const value = submissionData[question.id]
+        if ((question.type === "textarea" || question.type === "string") && typeof value === "string") {
+          submissionData[question.id] = value.trim()
+        }
+      })
+
       const response = await fetch("/api/survey", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...filteredData, surveyId: selectedSurvey?.id }),
+        body: JSON.stringify({ ...submissionData, surveyId: selectedSurvey?.id }),
       })
 
       if (response.ok) {
@@ -354,7 +367,9 @@ export default function Survey() {
                                   </div>
                                 )
                               case "textarea":
-                                return <Textarea {...field} />
+                                return <Textarea {...field} value={field.value ?? ""} />
+                              case "string":
+                                return <Input type="text" {...field} value={field.value ?? ""} />
                               case "boolean":
                                 return (
                                   <div className="flex items-center space-x-2">

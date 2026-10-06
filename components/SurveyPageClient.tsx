@@ -14,7 +14,7 @@ import { dateLocales, dateOptions } from "@/util/const"
 interface SurveyQuestion {
   id: string
   question: string
-  type: "number" | "select" | "multiselect" | "textarea" | "boolean"
+  type: "number" | "select" | "multiselect" | "textarea" | "string" | "boolean"
   required: boolean
   options?: string[]
   min?: number

@@ -27,8 +27,13 @@ function createSurveyResponseSchema(questions: any[]) {
       case "multiselect":
         fieldSchema = z.array(z.string()).optional()
         break
+      case "string":
+        fieldSchema = z.string({
+          required_error: q.required ? "Dieses Feld ist erforderlich" : undefined,
+        }).trim()
+        break
       case "textarea":
-        fieldSchema = z.string().optional()
+        fieldSchema = z.string().trim().optional()
         break
       case "boolean":
         fieldSchema = z.boolean().optional()

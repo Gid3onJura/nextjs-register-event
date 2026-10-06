@@ -7,7 +7,7 @@ import adventCalendar from "../../adventcalendar.json"
 // import snowAnimation from "../../public/snow.json"
 import SnowCanvas from "@/components/SnowCanvas"
 import Candle from "@/components/Candle"
-import { Wind, Sun, Moon, DoorClosed } from "lucide-react"
+import { Wind, Sun, Moon, DoorClosed, Snowflake } from "lucide-react"
 import { Great_Vibes } from "next/font/google"
 
 function getModeByTime(date = new Date()): "day" | "night" {
@@ -51,16 +51,6 @@ export default function Home() {
     if (stored) setOpenedDays(JSON.parse(stored))
     const completed = localStorage.getItem("completed-days")
     if (completed) setCompletedDays(JSON.parse(completed))
-
-    // Optional: alle 5 Minuten neu prüfen
-    const interval = setInterval(
-      () => {
-        setMode(getModeByTime())
-      },
-      1 * 60 * 1000,
-    )
-
-    return () => clearInterval(interval)
   }, [])
 
   function openDoor(day: number) {
@@ -196,9 +186,15 @@ export default function Home() {
                 h-20
                 w-20
                 rounded-2xl
-                bg-white/10
+                border
+                border-emerald-100/35
+                bg-gradient-to-br
+                from-emerald-950/55
+                via-emerald-900/30
+                to-red-950/30
                 backdrop-blur
                 shadow-lg
+                transition-colors
                 flex
                 items-center
                 justify-center
@@ -206,7 +202,7 @@ export default function Home() {
                 sm:text-4xl
                 cursor-pointer
 
-                ${isLocked ? "bg-white/5 text-white/40 cursor-not-allowed" : "bg-white/15 text-white shadow-lg"}
+                ${isLocked ? "border-white/10 bg-white/5 text-white/40 cursor-not-allowed" : "text-white hover:border-amber-200/70 hover:shadow-amber-200/15"}
               `}
               >
                 {isOpened ? <Candle day={day} /> : isLocked ? <DoorClosed size={34} /> : day}
@@ -238,31 +234,47 @@ export default function Home() {
             initial={{ scale: 0.8, rotate: -5 }}
             animate={{ scale: 1, rotate: 0 }}
             className="
-              bg-white
-              text-red-900
-              rounded-3xl
-              p-10
+              relative
+              overflow-hidden
+              rounded-2xl
+              border
+              border-amber-200/80
+              bg-gradient-to-b
+              from-amber-50
+              to-white
+              p-8
+              text-emerald-950
               max-w-md
               text-center
+              shadow-2xl
             "
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-4xl mb-4">Türchen {openDay}</h2>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-red-700">Deine Übung</p>
-            <p className="text-lg">{selectedDay?.exercise ?? "Für dieses Türchen wurde keine Übung gefunden."}</p>
+            <div
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-700 via-amber-400 to-red-700"
+            />
+            <Snowflake aria-hidden="true" className="mx-auto mb-2 h-6 w-6 text-emerald-700" />
+            {/* <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-red-800">Adventskalender</p> */}
+            <h2 className="mb-4 text-3xl">Türchen {openDay}</h2>
+            <p className="mb-2 text-sm font-semibold text-emerald-800">Deine Übung</p>
+            <p className="text-base leading-relaxed text-slate-700">
+              {selectedDay?.exercise ?? "Für dieses Türchen wurde keine Übung gefunden."}
+            </p>
             {isExerciseCompleted ? (
-              <div className="mt-6 rounded-xl bg-amber-100 p-4">
-                <p className="text-sm font-semibold">Dein Lösungsbuchstabe</p>
-                <p className="my-1 text-4xl font-bold">{selectedDay?.letter}</p>
-                <p className="text-sm">Position im Lösungssatz: {selectedDay?.position}</p>
+              <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-semibold text-emerald-900">Dein Lösungsbuchstabe</p>
+                <p className="my-1 text-4xl font-bold">
+                  {selectedDay?.letter} {selectedDay?.position}
+                </p>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => completeExercise(openDay)}
-                className="mt-6 rounded-lg bg-red-800 px-5 py-3 font-semibold text-white transition-colors hover:bg-red-900"
+                className="mt-6 rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white transition-colors hover:bg-emerald-900"
               >
-                Übung abgeschlossen
+                Übung abgeschlossen?
               </button>
             )}
           </motion.div>

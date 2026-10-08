@@ -21,7 +21,7 @@ function getTodayAdventDay() {
   const day = now.getDate()
 
   // Nur im Dezember
-  //if (month !== 0) return 0
+  if (month !== 0) return 0
 
   return Math.min(day, 24)
 }
